@@ -53,10 +53,8 @@ class DashboardProvider extends ChangeNotifier {
     } catch (e) {
       if (e is ApiAuthException) {
         _errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
-        // Tự động logout khi token hết hạn
-        Supabase.instance.client.auth.signOut();
       } else {
-        _errorMessage = 'Rất tiếc! Không thể tải dữ liệu. Vui lòng thử lại.';
+        _errorMessage = 'Không thể tải dữ liệu. Vui lòng thử lại sau.';
       }
       debugPrint('DashboardProvider error: $e');
     } finally {

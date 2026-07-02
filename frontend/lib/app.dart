@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'providers/auth_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -237,6 +238,8 @@ class _VocabAppState extends State<VocabApp> {
       redirect: (context, state) {
         final authProv = context.read<AuthProvider>();
         final isLoggedIn = authProv.isAuthenticated;
+        final session = Supabase.instance.client.auth.currentSession;
+        final hasValidSession = isLoggedIn && session != null;
         final location = state.matchedLocation;
 
         // Always allow splash and onboarding without auth
@@ -244,8 +247,8 @@ class _VocabAppState extends State<VocabApp> {
 
         // Auth routes
         final isAuthRoute = location == '/login' || location == '/register';
-        if (!isLoggedIn && !isAuthRoute) return '/login';
-        if (isLoggedIn && isAuthRoute) return '/';
+        if (!hasValidSession && !isAuthRoute) return '/login';
+        if (hasValidSession && isAuthRoute) return '/';
 
         return null;
       },

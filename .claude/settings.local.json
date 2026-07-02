@@ -37,7 +37,9 @@
       "Bash(git remote *)",
       "Bash(git push *)",
       "Bash(git add *)",
-      "Bash(git commit -m 'Fix: Add pronunciation field, SSL connect args, skip init_db on Supabase *)"
+      "Bash(git commit -m 'Fix: Add pronunciation field, SSL connect args, skip init_db on Supabase *)",
+      "Bash(flutter build *)",
+      "Bash(npx vercel *)"
     ]
   }
 }
