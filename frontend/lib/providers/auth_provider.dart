@@ -35,6 +35,8 @@ class AuthProvider extends ChangeNotifier {
       );
       if (response.user == null) {
         _errorMessage = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+      } else {
+        _user = response.user; // Set ngay, không chờ listener
       }
     } on AuthException catch (e) {
       _errorMessage = _mapAuthError(e.message);
@@ -60,10 +62,7 @@ class AuthProvider extends ChangeNotifier {
       if (response.user == null) {
         _errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
       } else {
-        // Optionally sync user to backend
-        try {
-          // Backend will handle user sync on first request
-        } catch (_) {}
+        _user = response.user; // Set ngay sau khi đăng ký
       }
     } on AuthException catch (e) {
       _errorMessage = _mapAuthError(e.message);
@@ -78,6 +77,12 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await Supabase.instance.client.auth.signOut();
     _user = null;
+    notifyListeners();
+  }
+
+  /// Set user từ bên ngoài (dùng cho sync)
+  void setUser(User? user) {
+    _user = user;
     notifyListeners();
   }
 
