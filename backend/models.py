@@ -45,7 +45,9 @@ class Vocabulary(Base):
     word = Column(String(100), nullable=False)
     meaning = Column(String(200), nullable=False)
     example = Column(Text, nullable=True)
+    pronunciation = Column(String(100), nullable=True)              # Phiên âm IPA
     topic = Column(String(50), default="general")
+    lesson_id = Column(Integer, nullable=True)                      # 1-15: bài từ vựng
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

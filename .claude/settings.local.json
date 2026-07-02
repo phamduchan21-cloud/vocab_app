@@ -33,7 +33,11 @@
       "PowerShell(Get-Process *)",
       "Bash(awk '{print $NF}')",
       "Bash(xargs -I{} curl -s http://localhost:8000/api/dashboard -H \"Authorization: Bearer {}\")",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Fix: Add pronunciation field, SSL connect args, skip init_db on Supabase *)"
     ]
   }
 }

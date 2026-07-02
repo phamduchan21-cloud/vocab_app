@@ -80,11 +80,11 @@ class VocabularyService:
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
-    async def create(self, user_id: str, word: str, meaning: str, example: Optional[str] = None, topic: str = "general", lesson_id: Optional[int] = None) -> Vocabulary:
+    async def create(self, user_id: str, word: str, meaning: str, example: Optional[str] = None, topic: str = "general", lesson_id: Optional[int] = None, pronunciation: Optional[str] = None) -> Vocabulary:
         from datetime import date, timedelta
         vocab = Vocabulary(
             id=str(uuid.uuid4()), user_id=user_id, word=word, meaning=meaning,
-            example=example, topic=topic, lesson_id=lesson_id,
+            example=example, pronunciation=pronunciation, topic=topic, lesson_id=lesson_id,
             next_review_date=date.today() + timedelta(days=1),
             ease_factor=2.5, review_count=0, times_correct=0, times_wrong=0,
         )
@@ -93,7 +93,7 @@ class VocabularyService:
         await self.db.refresh(vocab)
         return vocab
 
-    async def update(self, id: str, user_id: str, word: Optional[str] = None, meaning: Optional[str] = None, example: Optional[str] = None, topic: Optional[str] = None) -> Optional[Vocabulary]:
+    async def update(self, id: str, user_id: str, word: Optional[str] = None, meaning: Optional[str] = None, example: Optional[str] = None, pronunciation: Optional[str] = None, topic: Optional[str] = None) -> Optional[Vocabulary]:
         vocab = await self.get_by_id(id, user_id)
         if not vocab:
             return None
@@ -103,6 +103,8 @@ class VocabularyService:
             vocab.meaning = meaning
         if example is not None:
             vocab.example = example
+        if pronunciation is not None:
+            vocab.pronunciation = pronunciation
         if topic is not None:
             vocab.topic = topic
         await self.db.commit()
