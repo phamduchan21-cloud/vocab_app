@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter --version)",
+      "PowerShell(flutter *)",
+      "PowerShell(dart *)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(flutter pub *)",
+      "PowerShell(pip install *)",
+      "Bash(pip install *)",
+      "Bash(python -c \"import sys; sys.path.insert\\(0, '.'\\); from core.config import settings; print\\('config OK'\\); from database import Base; print\\('database OK'\\); from models import User, Vocabulary, QuizResult, QuizCategory; print\\('models OK'\\); from schemas import UserCreate, UserLogin, UserResponse, VocabularyCreate, VocabularyUpdate, VocabularyResponse, QuizCategoryResponse, QuizGenerateRequest, QuizQuestion, QuizAnswer, QuizSubmit, QuizResultResponse, DashboardResponse, PaginatedResponse; print\\('schemas OK'\\); from services.auth_service import AuthService; print\\('auth_service OK'\\); from services.vocabulary_service import VocabularyService; print\\('vocab_service OK'\\); from services.quiz_service import QuizService; print\\('quiz_service OK'\\); from services.dashboard_service import DashboardService; print\\('dashboard_service OK'\\)\")",
+      "Bash(python -c \"import sys; sys.path.insert\\(0, '.'\\); from routers.auth import router as auth_router; print\\('auth router OK'\\); from routers.vocabulary import router as vocab_router; print\\('vocab router OK'\\); from routers.quiz import router as quiz_router; print\\('quiz router OK'\\); from routers.dashboard import router as dash_router; print\\('dashboard router OK'\\)\")",
+      "Bash(timeout 8 python -c \"import sys; sys.path.insert\\(0, '.'\\); from main import app; print\\('App created successfully'\\); print\\('Routes:'\\); [print\\(f'  {r.methods} {r.path}'\\) for r in app.routes if hasattr\\(r, 'methods'\\)]\")",
+      "Bash(python -c ' *)",
+      "Bash(timeout 5 uvicorn main:app --host 0.0.0.0 --port 8000)",
+      "PowerShell(Write-Output \"=== Frontend File Structure ===\"; Get-ChildItem D:\\\\AppHocTuVung\\\\frontend\\\\lib -Recurse -File | ForEach-Object { Write-Output $_.FullName.Replace\\('D:\\\\AppHocTuVung\\\\frontend\\\\lib\\\\', 'lib/'\\) })",
+      "Bash(curl *)",
+      "PowerShell(flutter run *)",
+      "Bash(flutter analyze *)",
+      "PowerShell(flutter analyze *)",
+      "Bash(python *)",
+      "WebSearch",
+      "Bash(timeout 3)",
+      "PowerShell(TaskStop b8y31d109 *)",
+      "Bash(fuser -k 8000/tcp)",
+      "Bash(awk '{print $1}')",
+      "Bash(xargs kill -9)",
+      "WebFetch(domain:migii.vn)",
+      "WebFetch(domain:play.google.com)",
+      "WebFetch(domain:apps.apple.com)",
+      "Read(//workspace/AppHocTuVung/**)",
+      "Read(//proc/**)",
+      "PowerShell(Get-Process *)",
+      "Bash(awk '{print $NF}')",
+      "Bash(xargs -I{} curl -s http://localhost:8000/api/dashboard -H \"Authorization: Bearer {}\")",
+      "Read(//tmp/**)"
+    ]
+  }
+}
