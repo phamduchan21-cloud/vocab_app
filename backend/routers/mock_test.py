@@ -71,6 +71,16 @@ async def submit_mock_test(
     return result
 
 
+@router.get("/available-topics")
+async def get_available_topics(
+    service: MockTestService = Depends(get_mock_test_service),
+    current_user: User = Depends(get_current_user),
+):
+    """Lấy danh sách chủ đề có thể kiểm tra (từ user vocab + seed data)."""
+    topics = await service.get_available_topics(user_id=current_user.id)
+    return {"topics": topics}
+
+
 @router.get("/history", response_model=PaginatedResponse)
 async def get_mock_test_history(
     page: int = Query(default=1, ge=1),

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: vocab-api
+    name: backend
     runtime: python
     region: singapore
     plan: free

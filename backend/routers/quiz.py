@@ -53,6 +53,7 @@ async def generate_quiz(
             user_id=current_user.id,
             count=data.count,
             skill_type=data.skill_type,
+            topic=data.topic,
         )
     except ValueError as e:
         raise HTTPException(
@@ -83,6 +84,7 @@ async def submit_quiz(
         user_id=current_user.id,
         quiz_type=data.quiz_type,
         skill_type=data.skill_type,
+        topic=data.topic,
         answers=data.answers,
     )
     return result
@@ -111,6 +113,7 @@ async def get_quiz_history(
             id=str(q.id),
             quiz_type=q.quiz_type,
             skill_type=q.skill_type,
+            topic=q.topic,
             total_questions=q.total_questions,
             correct_answers=q.correct_answers,
             score_percent=float(q.score_percent),

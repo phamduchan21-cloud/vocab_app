@@ -26,6 +26,9 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False)
     username = Column(String(50), nullable=True)
     is_premium = Column(Boolean, default=False)
+    english_level = Column(String(20), nullable=True, default=None)
+    learning_goals = Column(JSON, nullable=True, default=None)
+    daily_word_goal = Column(Integer, default=10)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     vocabularies = relationship("Vocabulary", back_populates="user", lazy="select")
@@ -71,6 +74,7 @@ class QuizResult(Base):
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     quiz_type = Column(String(50), nullable=False)
     skill_type = Column(String(20), nullable=True, default=None)  # listening | reading | vocabulary | grammar
+    topic = Column(String(50), nullable=True, default=None)
     total_questions = Column(Integer, nullable=False)
     correct_answers = Column(Integer, nullable=False)
     score_percent = Column(DECIMAL(5, 2), nullable=False)

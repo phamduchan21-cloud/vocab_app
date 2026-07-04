@@ -12,6 +12,8 @@ from schemas import (
     VocabularyResponse,
     ReviewRequest,
     PaginatedResponse,
+    SeedTopicItem,
+    SeedVocabItem,
 )
 from services.vocabulary_service import VocabularyService
 from core.security import get_current_user
@@ -223,4 +225,39 @@ async def review_vocabulary(
         topic=vocab.topic,
         created_at=vocab.created_at,
         updated_at=vocab.updated_at,
+    )
+
+
+# ─── Seed Data Endpoints ─────────────────────────────────────────────
+
+
+@router.get("/seed-topics")
+async def get_seed_topics(
+    service: VocabularyService = Depends(get_vocab_service),
+):
+    """Lấy danh sách 15 chủ đề từ vựng có sẵn (seed data)."""
+    return {"topics": await service.get_seed_topics()}
+
+
+@router.get("/seed-vocab")
+async def get_seed_vocab(
+    topic: Optional[str] = Query(default=None),
+    lesson_id: Optional[int] = Query(default=None),
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=50),
+    search: Optional[str] = Query(default=None),
+    service: VocabularyService = Depends(get_vocab_service),
+):
+    """Lấy từ vựng mẫu (seed data) theo chủ đề / bài học."""
+    items, total = await service.get_seed_vocab(
+        topic=topic, lesson_id=lesson_id, page=page, limit=limit, search=search,
+    )
+    pages = math.ceil(total / limit) if total > 0 else 0
+
+    return PaginatedResponse(
+        items=items,
+        total=total,
+        page=page,
+        pages=pages,
+        limit=limit,
     )

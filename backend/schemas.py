@@ -1,7 +1,29 @@
+from enum import Enum
 from pydantic import BaseModel, Field
 from typing import Optional, List, Any
 from datetime import datetime, date
 from decimal import Decimal
+
+
+# ─── English Level ───────────────────────────────────────────────────
+
+class EnglishLevel(str, Enum):
+    beginner = "beginner"
+    elementary = "elementary"
+    intermediate = "intermediate"
+    upper_intermediate = "upper_intermediate"
+    advanced = "advanced"
+    proficient = "proficient"
+
+
+ENGLISH_LEVEL_LABELS = {
+    "beginner": "Sơ cấp",
+    "elementary": "Tiểu học",
+    "intermediate": "Trung cấp",
+    "upper_intermediate": "Trung cao cấp",
+    "advanced": "Cao cấp",
+    "proficient": "Thành thạo",
+}
 
 
 # ─── Auth Schemas ────────────────────────────────────────────────────
@@ -22,7 +44,37 @@ class UserResponse(BaseModel):
     email: str
     username: Optional[str] = None
     is_premium: bool = False
+    english_level: Optional[str] = None
+    daily_word_goal: int = 10
+    learning_goals: Optional[dict] = None
     created_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
+class UserProfileUpdate(BaseModel):
+    username: Optional[str] = Field(None, max_length=50)
+    english_level: Optional[str] = Field(None, pattern="^(beginner|elementary|intermediate|upper_intermediate|advanced|proficient)?$")
+    daily_word_goal: Optional[int] = Field(None, ge=5, le=100)
+    learning_goals: Optional[dict] = None
+
+
+class UserProfileResponse(BaseModel):
+    """User profile kết hợp với dashboard stats."""
+    id: str
+    email: str
+    username: Optional[str] = None
+    is_premium: bool = False
+    english_level: Optional[str] = None
+    daily_word_goal: int = 10
+    learning_goals: Optional[dict] = None
+    created_at: Optional[datetime] = None
+    # Dashboard stats
+    streak: int = 0
+    xp: int = 0
+    gems: int = 0
+    level: int = 0
+    level_title: str = "Mầm non"
 
     model_config = {"from_attributes": True}
 
@@ -77,6 +129,7 @@ class QuizCategoryResponse(BaseModel):
 class QuizGenerateRequest(BaseModel):
     count: int = Field(default=5, ge=1, le=50)
     skill_type: Optional[str] = Field(default=None, pattern="^(listening|reading|vocabulary|grammar)?$")
+    topic: Optional[str] = Field(default=None, max_length=50)
 
 
 class QuizQuestion(BaseModel):
@@ -103,6 +156,7 @@ class QuizAnswer(BaseModel):
 class QuizSubmit(BaseModel):
     quiz_type: str = Field(default="default", max_length=50)
     skill_type: Optional[str] = Field(default=None, pattern="^(listening|reading|vocabulary|grammar)?$")
+    topic: Optional[str] = Field(default=None, max_length=50)
     answers: List[QuizAnswer]
 
 
@@ -110,6 +164,7 @@ class QuizResultResponse(BaseModel):
     id: str
     quiz_type: str
     skill_type: Optional[str] = None
+    topic: Optional[str] = None
     total_questions: int
     correct_answers: int
     score_percent: float
@@ -254,6 +309,8 @@ class MockTestQuestion(BaseModel):
     question: str
     options: List[str]
     correctAnswer: str
+    difficulty: Optional[str] = None        # easy | medium | hard
+    question_type: Optional[str] = None     # meaning_match | fill_blank | definition_match
 
 
 class MockTestGenerateResponse(BaseModel):
@@ -361,3 +418,22 @@ class PaginatedResponse(BaseModel):
     page: int
     pages: int
     limit: int
+
+
+# ─── Seed Vocabulary Schemas ─────────────────────────────────────────
+
+class SeedTopicItem(BaseModel):
+    lesson_id: int
+    title: str
+    icon: str
+    description: str
+    count: int
+
+
+class SeedVocabItem(BaseModel):
+    word: str
+    meaning: str
+    example: Optional[str] = None
+    pronunciation: Optional[str] = None
+    topic: str
+    lesson_id: int

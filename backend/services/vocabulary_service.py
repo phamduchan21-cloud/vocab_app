@@ -170,3 +170,62 @@ class VocabularyService:
 
     async def get_advanced_textbooks(self) -> list:
         return ADVANCED_TEXTBOOKS
+
+    # ─── Seed data methods ────────────────────────────────────
+
+    async def get_seed_topics(self) -> list:
+        """Trả về danh sách chủ đề từ seed data."""
+        from schemas import SeedTopicItem
+        return [
+            SeedTopicItem(
+                lesson_id=lesson["id"],
+                title=lesson["title"],
+                icon=lesson["icon"],
+                description=lesson.get("description", ""),
+                count=lesson["count"],
+            )
+            for lesson in VOCAB_LESSONS
+        ]
+
+    async def get_seed_vocab(
+        self,
+        topic: Optional[str] = None,
+        lesson_id: Optional[int] = None,
+        page: int = 1,
+        limit: int = 20,
+        search: Optional[str] = None,
+    ) -> tuple:
+        """Lấy từ vựng mẫu (seed data) với phân trang và lọc."""
+        from seed_data import SEED_VOCABULARIES
+        from schemas import SeedVocabItem
+
+        filtered = SEED_VOCABULARIES
+        if topic:
+            filtered = [v for v in filtered if v.get("topic") == topic]
+        if lesson_id is not None:
+            filtered = [v for v in filtered if v.get("lesson_id") == lesson_id]
+        if search:
+            q = search.lower()
+            filtered = [
+                v for v in filtered
+                if q in v["word"].lower() or q in v["meaning"].lower()
+            ]
+
+        total = len(filtered)
+        start = (page - 1) * limit
+        end = start + limit
+        page_items = filtered[start:end]
+
+        items = [
+            SeedVocabItem(
+                word=v["word"],
+                meaning=v["meaning"],
+                example=v.get("example"),
+                pronunciation=v.get("pronunciation"),
+                topic=v.get("topic", "general"),
+                lesson_id=v.get("lesson_id"),
+            )
+            for v in page_items
+        ]
+
+        return items, total

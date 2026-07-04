@@ -12,6 +12,7 @@ from schemas import (
     QuizResultResponse,
     QuizQuestion,
 )
+from seed_data import SEED_VOCABULARIES
 
 
 class QuizService:
@@ -23,10 +24,51 @@ class QuizService:
         result = await self.db.execute(query)
         return list(result.scalars().all())
 
+    async def _build_questions_from_vocab_list(
+        self, vocabs: list, count: int
+    ) -> Tuple[List[QuizQuestion], List]:
+        """Xây dựng câu hỏi quiz từ danh sách từ vựng (model objects hoặc dicts)."""
+        selected = random.sample(vocabs, min(count, len(vocabs)))
+        questions: List[QuizQuestion] = []
+
+        for i, vocab in enumerate(selected):
+            # Hỗ trợ cả model object và dict (seed data)
+            if isinstance(vocab, dict):
+                word = vocab["word"]
+                meaning = vocab["meaning"]
+                vid = f"seed_{i}"
+                all_meanings = [v["meaning"] for v in vocabs if v["word"] != word]
+            else:
+                word = vocab.word
+                meaning = vocab.meaning
+                vid = str(vocab.id)
+                all_meanings = [v.meaning for v in vocabs if v.id != vocab.id]
+
+            random.shuffle(all_meanings)
+            wrong_answers = all_meanings[:3]
+            options = [meaning] + wrong_answers
+            random.shuffle(options)
+
+            questions.append(QuizQuestion(
+                question=f"Nghĩa của từ '{word}' là gì?",
+                options=options,
+                correctAnswer=meaning,
+                vocabId=vid,
+            ))
+
+        return questions, len(questions)
+
     async def generate_quiz(
-        self, user_id: str, count: int = 5, skill_type: Optional[str] = None
+        self,
+        user_id: str,
+        count: int = 5,
+        skill_type: Optional[str] = None,
+        topic: Optional[str] = None,
     ) -> Tuple[List[QuizQuestion], int]:
         query = select(Vocabulary).where(Vocabulary.user_id == user_id)
+
+        if topic and topic != "all":
+            query = query.where(Vocabulary.topic == topic)
 
         # Nếu là kỹ năng từ vựng, ưu tiên lấy từ cần ôn tập
         if skill_type == "vocabulary":
@@ -41,30 +83,23 @@ class QuizService:
         result = await self.db.execute(query)
         all_vocabs = list(result.scalars().all())
 
+        # Nếu không đủ từ → bổ sung từ seed data
         if len(all_vocabs) < count:
+            seed_vocabs = SEED_VOCABULARIES
+            if topic and topic != "all":
+                seed_vocabs = [v for v in seed_vocabs if v.get("topic") == topic]
+
+            if seed_vocabs:
+                # Trộn user vocab + seed vocab
+                combined = list(all_vocabs) + seed_vocabs
+                return await self._build_questions_from_vocab_list(combined, count)
+
             raise ValueError(
                 f"Bạn cần ít nhất {count} từ vựng để tạo quiz. "
                 f"Hiện có: {len(all_vocabs)} từ."
             )
 
-        selected = random.sample(all_vocabs, min(count, len(all_vocabs)))
-        questions: List[QuizQuestion] = []
-
-        for vocab in selected:
-            distractors = [v for v in all_vocabs if v.id != vocab.id]
-            random.shuffle(distractors)
-            wrong_answers = [d.meaning for d in distractors[:3]]
-            options = [vocab.meaning] + wrong_answers
-            random.shuffle(options)
-
-            questions.append(QuizQuestion(
-                question=f"Nghĩa của từ '{vocab.word}' là gì?",
-                options=options,
-                correctAnswer=vocab.meaning,
-                vocabId=str(vocab.id),
-            ))
-
-        return questions, len(questions)
+        return await self._build_questions_from_vocab_list(all_vocabs, count)
 
     async def submit_quiz(
         self,
@@ -72,6 +107,7 @@ class QuizService:
         quiz_type: str,
         answers: List[QuizAnswer],
         skill_type: Optional[str] = None,
+        topic: Optional[str] = None,
     ) -> QuizResultResponse:
         correct = 0
         total = len(answers)
@@ -97,6 +133,7 @@ class QuizService:
             user_id=user_id,
             quiz_type=quiz_type,
             skill_type=skill_type,
+            topic=topic,
             total_questions=total,
             correct_answers=correct,
             score_percent=score_percent,
@@ -116,7 +153,12 @@ class QuizService:
                 request=RecordActivityRequest(
                     activity_type="quiz",
                     xp_earned=correct * 10,
-                    metadata={"skill_type": skill_type, "correct": correct, "total": total},
+                    metadata={
+                        "skill_type": skill_type,
+                        "topic": topic,
+                        "correct": correct,
+                        "total": total,
+                    },
                 ),
             )
         except Exception:
@@ -126,6 +168,7 @@ class QuizService:
             id=str(result.id),
             quiz_type=result.quiz_type,
             skill_type=result.skill_type,
+            topic=result.topic,
             total_questions=result.total_questions,
             correct_answers=result.correct_answers,
             score_percent=float(result.score_percent),

@@ -12,6 +12,7 @@ from schemas import (
     MockTestResultResponse,
     MockTestHistoryItem,
 )
+from seed_data import SEED_VOCABULARIES
 
 # Cấu hình theo level
 LEVEL_CONFIG = {
@@ -33,6 +34,71 @@ class MockTestService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def _build_questions(
+        self, vocabs: list, count: int, level: str
+    ) -> List[MockTestQuestion]:
+        """Xây dựng câu hỏi phù hợp với cấp độ."""
+        selected = random.sample(vocabs, min(count, len(vocabs)))
+        questions: List[MockTestQuestion] = []
+
+        for i, vocab in enumerate(selected):
+            if isinstance(vocab, dict):
+                word = vocab["word"]
+                meaning = vocab["meaning"]
+                example = vocab.get("example", "")
+                all_meanings = [v["meaning"] for v in vocabs if v["word"] != word]
+                all_words = [v["word"] for v in vocabs if v["word"] != word]
+            else:
+                word = vocab.word
+                meaning = vocab.meaning
+                example = vocab.example or ""
+                all_meanings = [v.meaning for v in vocabs if v.id != vocab.id]
+                all_words = [v.word for v in vocabs if v.id != vocab.id]
+
+            random.shuffle(all_meanings)
+            random.shuffle(all_words)
+
+            # Level-based question types
+            if level == "beginner":
+                questions.append(MockTestQuestion(
+                    question=f"Nghĩa của từ '{word}' là gì?",
+                    options=[meaning] + all_meanings[:3],
+                    correctAnswer=meaning,
+                    difficulty="easy",
+                    question_type="meaning_match",
+                ))
+            elif level == "intermediate" and example and len(example) > 5:
+                # Fill-in-blank: thay word bằng ____
+                blank_q = example.replace(word, "______", 1).replace(word.capitalize(), "______", 1)
+                questions.append(MockTestQuestion(
+                    question=f"Điền từ thích hợp: '{blank_q}'",
+                    options=[word] + all_words[:3],
+                    correctAnswer=word,
+                    difficulty="medium",
+                    question_type="fill_blank",
+                ))
+            else:
+                # Fallback: definition-to-word
+                questions.append(MockTestQuestion(
+                    question=f"Từ nào có nghĩa là '{meaning}'?",
+                    options=[word] + all_words[:3],
+                    correctAnswer=word,
+                    difficulty="medium",
+                    question_type="definition_match",
+                ))
+
+            # Shuffle options for last question
+            if level == "beginner":
+                opts = questions[-1].options[:]
+                random.shuffle(opts)
+                questions[-1].options = opts
+            else:
+                opts = questions[-1].options[:]
+                random.shuffle(opts)
+                questions[-1].options = opts
+
+        return questions
+
     async def generate(
         self, user_id: str, level: str, topic: Optional[str] = None
     ) -> Tuple[str, List[MockTestQuestion], int, int]:
@@ -52,28 +118,22 @@ class MockTestService:
         result = await self.db.execute(query)
         all_vocabs = list(result.scalars().all())
 
+        # Fallback to seed data if not enough vocab
         if len(all_vocabs) < count:
-            raise ValueError(
-                f"Bạn cần ít nhất {count} từ vựng để tạo đề thi. "
-                f"Hiện có: {len(all_vocabs)} từ."
-            )
+            seed_vocabs = SEED_VOCABULARIES
+            if topic:
+                seed_vocabs = [v for v in seed_vocabs if v.get("topic") == topic]
+            combined = list(all_vocabs) + seed_vocabs
+            if len(combined) < count:
+                raise ValueError(
+                    f"Bạn cần ít nhất {count} từ vựng để tạo đề thi. "
+                    f"Hiện có: {len(combined)} từ."
+                )
+            questions = await self._build_questions(combined, count, level)
+            test_id = str(uuid.uuid4())
+            return test_id, questions, count, duration
 
-        selected = random.sample(all_vocabs, count)
-        questions: List[MockTestQuestion] = []
-
-        for vocab in selected:
-            distractors = [v for v in all_vocabs if v.id != vocab.id]
-            random.shuffle(distractors)
-            wrong_answers = [d.meaning for d in distractors[:3]]
-            options = [vocab.meaning] + wrong_answers
-            random.shuffle(options)
-
-            questions.append(MockTestQuestion(
-                question=f"Nghĩa của từ '{vocab.word}' là gì?",
-                options=options,
-                correctAnswer=vocab.meaning,
-            ))
-
+        questions = await self._build_questions(all_vocabs, count, level)
         test_id = str(uuid.uuid4())
         return test_id, questions, count, duration
 
@@ -166,3 +226,24 @@ class MockTestService:
         ]
 
         return history, total
+
+    async def get_available_topics(self, user_id: str) -> list:
+        """Lấy danh sách chủ đề có thể kiểm tra."""
+        # Topics from user's vocabulary
+        query = select(Vocabulary.topic).where(
+            Vocabulary.user_id == user_id,
+            Vocabulary.topic.isnot(None),
+            Vocabulary.topic != "",
+        ).distinct()
+        result = await self.db.execute(query)
+        user_topics = [row[0] for row in result.fetchall()]
+
+        # Topics from seed data
+        seed_topics = list(set(
+            v.get("topic", "general") for v in SEED_VOCABULARIES
+            if v.get("topic")
+        ))
+
+        union = list(set(user_topics + seed_topics))
+        union.sort()
+        return union
