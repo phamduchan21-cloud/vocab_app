@@ -1,6 +1,7 @@
 {
-  "buildCommand": "flutter build web --release",
   "outputDirectory": "build/web",
+  "buildCommand": null,
   "devCommand": "flutter run -d chrome --web-port 3000",
-  "installCommand": "flutter pub get"
+  "installCommand": null,
+  "cleanUrls": true
 }

@@ -22,20 +22,28 @@ class TopicGrid extends StatelessWidget {
 
   static const _topicEmojis = {
     'general': '📚',
-    'du lịch': '🌍',
-    'công việc': '💼',
-    'ẩm thực': '🍜',
-    'y tế': '🏥',
-    'học tập': '🎓',
-    'gia đình': '🏠',
-    'giải trí': '🎬',
-    'sức khỏe': '💪',
+    'greetings': '👋',
+    'family': '👨‍👩‍👧‍👦',
+    'numbers': '🔢',
+    'daily': '🌅',
+    'food': '🍜',
+    'travel': '✈️',
+    'shopping': '🛒',
+    'weather': '⛅',
+    'health': '💪',
+    'work': '💼',
+    'education': '🎓',
+    'entertainment': '🎮',
+    'technology': '💻',
+    'emotions': '😊',
+    'society': '🌍',
   };
 
   String _emojiFor(String topic) {
+    final key = topic.toLowerCase().trim();
     return _topicEmojis.entries
         .firstWhere(
-          (e) => topic.toLowerCase().contains(e.key),
+          (e) => key.contains(e.key),
           orElse: () => MapEntry(topic, '📚'),
         )
         .value;
@@ -52,26 +60,18 @@ class TopicGrid extends StatelessWidget {
 
   Widget _buildSkeleton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey[200]!,
-        highlightColor: Colors.grey[100]!,
-        child: GridView.count(
-          crossAxisCount: 4,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 0.9,
-          children: List.generate(
-            4,
-            (_) => Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
+        baseColor: AppColors.surfaceSubtle,
+        highlightColor: AppColors.surface,
+        child: Row(
+          children: List.generate(4, (_) => Expanded(
+            child: Container(
+              height: 72,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
             ),
-          ),
+          )),
         ),
       ),
     );
@@ -80,119 +80,96 @@ class TopicGrid extends StatelessWidget {
   Widget _buildContent() {
     final displayTopics = topics!.take(8).toList();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('📂', style: TextStyle(fontSize: 18)),
-              const SizedBox(width: 8),
-              Text(
-                'Danh mục chủ đề',
-                style: GoogleFonts.nunito(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              '📂  Danh mục chủ đề',
+              style: GoogleFonts.workSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
+            ),
+            if (onSeeAll != null)
+              GestureDetector(
+                onTap: onSeeAll,
+                child: Text(
+                  'Xem tất cả →',
+                  style: GoogleFonts.workSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.blue,
+                  ),
                 ),
               ),
-              const Spacer(),
-              TextButton(
-                onPressed: onSeeAll,
-                child: const Text('Xem tất cả →'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 0.85,
-            ),
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: displayTopics.length,
-            itemBuilder: (context, index) {
-              final topic = displayTopics[index];
-              return _TopicCell(
-                emoji: _emojiFor(topic.topic),
-                topic: topic,
-                onTap: () => onTopicTap?.call(topic.topic),
-              );
-            },
-          ),
-        ],
-      ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: displayTopics.map((topic) => _TopicChip(
+            emoji: _emojiFor(topic.topic),
+            topic: topic,
+            onTap: () => onTopicTap?.call(topic.topic),
+          )).toList(),
+        ),
+      ],
     );
   }
 }
 
-class _TopicCell extends StatelessWidget {
+class _TopicChip extends StatelessWidget {
   final String emoji;
   final TopicProgressItem topic;
   final VoidCallback? onTap;
 
-  const _TopicCell({
-    required this.emoji,
-    required this.topic,
-    this.onTap,
-  });
+  const _TopicChip({required this.emoji, required this.topic, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.ink.withValues(alpha: 0.10)),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(height: 4),
-            Text(
-              topic.topic.length > 5
-                  ? '${topic.topic.substring(0, 5)}..'
-                  : topic.topic,
-              style: GoogleFonts.nunito(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              '${topic.total} từ',
-              style: GoogleFonts.nunito(
-                fontSize: 10,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${topic.masteryPercent.toStringAsFixed(0)}%',
-              style: GoogleFonts.nunito(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: topic.masteryPercent >= 70
-                    ? AppColors.accent3
-                    : AppColors.primary,
-              ),
+            Text(emoji, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 6),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  topic.topic.length > 10
+                      ? '${topic.topic.substring(0, 10)}..'
+                      : topic.topic,
+                  style: GoogleFonts.workSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                  ),
+                ),
+                Text(
+                  '${topic.total} từ · ${topic.masteryPercent.round()}%',
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 10,
+                    color: AppColors.inkSoft,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

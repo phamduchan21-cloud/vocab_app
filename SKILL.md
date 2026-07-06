@@ -300,3 +300,4 @@ Test frontend: flutter run -d chrome
 ---
 
 > **Lưu ý cuối:** Mọi thay đổi phải được kiểm tra bằng `flutter analyze` (0 lỗi) và Swagger docs hoạt động trước khi commit.
+> **Quy Ä‘á»‹nh encoding:** Táº¥t cáº£ file text, code vÃ  Markdown pháº£i lÆ°u báº±ng `UTF-8` Ä‘á»ƒ trÃ¡nh lá»—i font chá»¯ vÃ  vá»¡ tiáº¿ng Viá»‡t.

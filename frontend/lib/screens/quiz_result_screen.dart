@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:math' as math;
 import '../app.dart';
 import '../providers/quiz_provider.dart';
-import '../widgets/loading_widget.dart';
-import '../widgets/cat_widget.dart';
+import '../widgets/app_bottom_nav.dart';
 
 class QuizResultScreen extends StatelessWidget {
   final String id;
@@ -19,8 +19,48 @@ class QuizResultScreen extends StatelessWidget {
 
     if (result == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Kết quả')),
-        body: const LoadingWidget(),
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          title: Text(
+            'Kết quả',
+            style: GoogleFonts.workSans(
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              color: AppColors.ink,
+            ),
+          ),
+          backgroundColor: AppColors.surface,
+          foregroundColor: AppColors.ink,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.ink),
+            onPressed: () => context.go('/quiz'),
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('\u{1F4ED}', style: TextStyle(fontSize: 56)),
+              const SizedBox(height: 16),
+              Text(
+                'Không có kết quả cho bài quiz này',
+                style: GoogleFonts.workSans(fontSize: 16, color: AppColors.inkSoft),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => context.go('/quiz'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  elevation: 0,
+                ),
+                child: Text('Quay lại', style: GoogleFonts.workSans(fontWeight: FontWeight.w600)),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: const AppBottomNav(selectedIndex: 1),
       );
     }
 
@@ -28,229 +68,238 @@ class QuizResultScreen extends StatelessWidget {
     final isGood = scorePercent >= 80;
     final isMedium = scorePercent >= 50;
     final color = isGood
-        ? AppColors.primary
+        ? AppColors.success
         : isMedium
-            ? AppColors.accent1
-            : AppColors.accent2;
-    final message = isGood
-        ? 'Xuất sắc!'
-        : isMedium
-            ? 'Cố gắng hơn nhé!'
-            : 'Cần ôn tập thêm!';
+            ? AppColors.warning
+            : AppColors.danger;
 
     return Scaffold(
+      backgroundColor: AppColors.background,
+      bottomNavigationBar: const AppBottomNav(selectedIndex: 1),
       appBar: AppBar(
-        title: const Text('Kết quả'),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
+        title: Text(
+          'Kết quả',
+          style: GoogleFonts.workSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            color: AppColors.ink,
+          ),
+        ),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.ink,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.ink),
+          onPressed: () => context.go('/quiz'),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(32, 32, 32, 60),
         child: Column(
           children: [
-            const SizedBox(height: 8),
-            // Mèo celebration
-            if (isGood)
-              const CatWidget(size: 100, expression: CatExpression.love)
-            else
-              const CatWidget(size: 100, expression: CatExpression.normal),
-            const SizedBox(height: 16),
+            // Postmark score circle
+            _PostmarkScore(
+              score: result.correctAnswers,
+              total: result.totalQuestions,
+              color: color,
+            ),
+            const SizedBox(height: 20),
+
             // Message
             Text(
-              message,
-              style: GoogleFonts.nunito(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+              isGood
+                  ? 'Xuất sắc!'
+                  : isMedium
+                      ? 'Cố gắng hơn nhé!'
+                      : 'Cần ôn tập thêm!',
+              style: GoogleFonts.workSans(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
                 color: color,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               result.quizType,
-              style: GoogleFonts.nunito(fontSize: 16, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 24),
-            // Score ring
-            SizedBox(
-              width: 140,
-              height: 140,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 140,
-                    height: 140,
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0, end: scorePercent / 100),
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, _) {
-                        return CircularProgressIndicator(
-                          value: value,
-                          strokeWidth: 10,
-                          backgroundColor: const Color(0xFFF3F4F6),
-                          valueColor: AlwaysStoppedAnimation<Color>(color),
-                          strokeCap: StrokeCap.round,
-                        );
-                      },
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${scorePercent.toStringAsFixed(0)}%',
-                        style: GoogleFonts.nunito(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: color,
-                        ),
-                      ),
-                      Text(
-                        '${result.correctAnswers}/${result.totalQuestions}',
-                        style: GoogleFonts.nunito(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              style: GoogleFonts.workSans(
+                fontSize: 15,
+                color: AppColors.inkSoft,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
+
             // Stats row
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildStatItem('Đúng', '${result.correctAnswers}', AppColors.primary),
-                _buildStatItem('Sai', '${result.totalQuestions - result.correctAnswers}', AppColors.accent2),
-                _buildStatItem('Tổng', '${result.totalQuestions}', AppColors.textSecondary),
+                _ResultStat(
+                  value: '${result.correctAnswers}',
+                  label: 'Đúng',
+                  color: AppColors.success,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  width: 1,
+                  height: 40,
+                  color: AppColors.ink.withValues(alpha: 0.10),
+                ),
+                _ResultStat(
+                  value: '${result.totalQuestions - result.correctAnswers}',
+                  label: 'Sai',
+                  color: AppColors.danger,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  width: 1,
+                  height: 40,
+                  color: AppColors.ink.withValues(alpha: 0.10),
+                ),
+                _ResultStat(
+                  value: '${result.scorePercent.round()}%',
+                  label: 'Điểm',
+                  color: AppColors.warning,
+                ),
               ],
             ),
-            const SizedBox(height: 24),
-            // Details
+            const SizedBox(height: 28),
+
+            // Details section
             if (result.details != null && result.details!.isNotEmpty)
               Container(
-                margin: const EdgeInsets.only(bottom: 24),
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.ink.withValues(alpha: 0.14),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Chi tiết đáp án',
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: AppColors.ink,
+                      ),
                     ),
+                    const SizedBox(height: 16),
+                    ...result.details!.asMap().entries.map((entry) {
+                      final detail = entry.value as Map<String, dynamic>;
+                      final isCorrect =
+                          detail['selected'] == detail['correctAnswer'];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isCorrect
+                              ? AppColors.success.withValues(alpha: 0.06)
+                              : AppColors.danger.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              isCorrect
+                                  ? Icons.check_circle_rounded
+                                  : Icons.cancel_rounded,
+                              color: isCorrect
+                                  ? AppColors.success
+                                  : AppColors.danger,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Câu ${entry.key + 1}',
+                                    style: GoogleFonts.workSans(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: AppColors.ink,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Bạn chọn: ${detail['selected'] ?? 'Chưa chọn'}',
+                                    style: GoogleFonts.workSans(
+                                      fontSize: 13,
+                                      color: AppColors.inkSoft,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Đáp án: ${detail['correctAnswer']}',
+                                    style: GoogleFonts.workSans(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: isCorrect
+                                          ? AppColors.success
+                                          : AppColors.danger,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
                 ),
-                child: ExpansionTile(
-                  title: Text(
-                    'Chi tiết câu hỏi',
-                    style: GoogleFonts.nunito(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  initiallyExpanded: false,
-                  shape: const Border(),
-                  collapsedShape: const Border(),
-                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  children: result.details!.asMap().entries.map((entry) {
-                    final detail = entry.value as Map<String, dynamic>;
-                    final isCorrect = detail['selected'] == detail['correctAnswer'];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: isCorrect
-                            ? AppColors.primary.withValues(alpha: 0.05)
-                            : AppColors.accent2.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                            color: isCorrect ? AppColors.primary : AppColors.accent2,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Câu ${entry.key + 1}: ${detail['question']}',
-                                  style: GoogleFonts.nunito(
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textPrimary,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Bạn chọn: ${detail['selected'] ?? 'Chưa chọn'}',
-                                  style: GoogleFonts.nunito(color: AppColors.textSecondary, fontSize: 13),
-                                ),
-                                Text(
-                                  'Đáp án: ${detail['correctAnswer']}',
-                                  style: GoogleFonts.nunito(
-                                    color: isCorrect ? AppColors.primary : AppColors.accent2,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
               ),
-            // Action buttons
+
+            const SizedBox(height: 28),
+
+            // Actions
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => context.go('/quiz'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary),
-                      minimumSize: const Size(double.infinity, 54),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      foregroundColor: AppColors.inkSoft,
+                      side: BorderSide(
+                        color: AppColors.ink.withValues(alpha: 0.14),
+                      ),
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    child: Text('Làm lại', style: GoogleFonts.nunito(fontWeight: FontWeight.bold)),
+                    child: Text(
+                      'Làm lại',
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: SizedBox(
-                    height: 54,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: AppTheme.primaryButtonGradient,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                  child: ElevatedButton(
+                    onPressed: () => context.go('/'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.blue,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: ElevatedButton(
-                        onPressed: () => context.go('/'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                        ),
-                        child: Text('Về trang chủ', style: GoogleFonts.nunito(fontWeight: FontWeight.bold)),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Về trang chủ',
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
                       ),
                     ),
                   ),
@@ -262,29 +311,161 @@ class QuizResultScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildStatItem(String label, String value, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Text(
-            value,
-            style: GoogleFonts.nunito(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+// ═══════════════════════════════════════════════════════════════════════════════
+// POSTMARK SCORE CIRCLE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+class _PostmarkScore extends StatelessWidget {
+  final int score;
+  final int total;
+  final Color color;
+
+  const _PostmarkScore({
+    required this.score,
+    required this.total,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 130,
+      height: 130,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 2.5),
+        color: AppColors.surface,
+      ),
+      child: CustomPaint(
+        painter: _PostmarkDashPainter(color: color),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$score',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                  height: 1.0,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '/ $total đúng',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                  color: color,
+                  height: 1.0,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 6),
+      ),
+    );
+  }
+}
+
+class _PostmarkDashPainter extends CustomPainter {
+  final Color color;
+
+  _PostmarkDashPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 10;
+
+    // Dashed inner circle
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    const dashWidth = 4.0;
+    const dashSpace = 4.0;
+    final totalDashLen = dashWidth + dashSpace;
+    final circumference = 2 * math.pi * radius;
+    final dashCount = (circumference / totalDashLen).floor();
+
+    canvas.save();
+    for (int i = 0; i < dashCount; i++) {
+      final startAngle = (2 * math.pi / dashCount) * i;
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        (2 * math.pi / dashCount) * (dashWidth / totalDashLen),
+        false,
+        paint,
+      );
+    }
+    canvas.restore();
+
+    // Striped background pattern
+    final stripePaint = Paint()
+      ..color = color.withValues(alpha: 0.08)
+      ..strokeWidth = 1;
+    const stripeGap = 4.0;
+    final rect = Rect.fromCircle(center: center, radius: radius - 2);
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
+    for (double y = rect.top; y < rect.bottom; y += stripeGap * 2) {
+      canvas.drawLine(
+        Offset(rect.left, y + stripeGap),
+        Offset(rect.right, y + stripeGap),
+        stripePaint,
+      );
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESULT STAT WIDGET
+// ═══════════════════════════════════════════════════════════════════════════════
+
+class _ResultStat extends StatelessWidget {
+  final String value;
+  final String label;
+  final Color color;
+
+  const _ResultStat({
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.ibmPlexMono(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            color: color,
+            height: 1.1,
+          ),
+        ),
+        const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.nunito(fontSize: 13, color: AppColors.textSecondary),
+          style: GoogleFonts.workSans(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: AppColors.inkSoft,
+          ),
         ),
       ],
     );

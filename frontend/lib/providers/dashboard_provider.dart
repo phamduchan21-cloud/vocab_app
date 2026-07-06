@@ -1,7 +1,6 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/dashboard_service.dart';
-import '../services/api_service.dart';
 import '../models/dashboard_data.dart';
 
 class DashboardProvider extends ChangeNotifier {
@@ -21,6 +20,17 @@ class DashboardProvider extends ChangeNotifier {
     // Auth state changed, no special handling needed
   }
 
+  /// Safely execute an API call with timeout.
+  /// Returns null on failure so one failing call doesn't crash the whole batch.
+  Future<T?> _safeGet<T>(Future<T> Function() fn, {Duration timeout = const Duration(seconds: 10)}) async {
+    try {
+      return await fn().timeout(timeout);
+    } catch (e) {
+      debugPrint('DashboardProvider._safeGet error: $e');
+      return null;
+    }
+  }
+
   Future<void> loadDashboard() async {
     if (_isLoading) return;
 
@@ -29,32 +39,26 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Run each request independently with individual timeout
+      // so one slow/failed endpoint doesn't freeze the entire dashboard
       final results = await Future.wait([
-        _service.getStats(),
-        _service.getTodayReview(),
-        _service.getTopicProgress(),
-        _service.getLeaderboard(),
-        _service.getSkills(),
-        _service.getMockTestStats(),
+        _safeGet(() => _service.getStats()),
+        _safeGet(() => _service.getTodayReview()),
+        _safeGet(() => _service.getTopicProgress()),
+        _safeGet(() => _service.getLeaderboard()),
+        _safeGet(() => _service.getSkills()),
       ]);
 
-      final mockStats = results[5] as Map<String, int>;
       _data = DashboardData(
-        stats: results[0] as DashboardStats,
-        review: results[1] as TodayReviewData,
-        topics: results[2] as List<TopicProgressItem>,
-        leaderboard: results[3] as List<LeaderboardEntry>,
-        skills: results[4] as List<SkillItem>,
-        topik1Completed: mockStats['topik1Completed'] ?? 0,
-        topik1Total: mockStats['topik1Total'] ?? 0,
-        topik2Completed: mockStats['topik2Completed'] ?? 0,
-        topik2Total: mockStats['topik2Total'] ?? 0,
+        stats: (results[0] as DashboardStats?) ?? DashboardStats(),
+        review: (results[1] as TodayReviewData?) ?? TodayReviewData(),
+        topics: (results[2] as List<TopicProgressItem>?) ?? [],
+        leaderboard: (results[3] as List<LeaderboardEntry>?) ?? [],
+        skills: (results[4] as List<SkillItem>?) ?? [],
       );
     } catch (e) {
-      if (e is ApiAuthException) {
-        _errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
-      } else {
-        _errorMessage = 'Không thể tải dữ liệu. Vui lòng thử lại sau.';
+      if (_data == null) {
+        _errorMessage = 'Không thể tải dữ liệu. Vui lòng thử lại.';
       }
       debugPrint('DashboardProvider error: $e');
     } finally {
@@ -64,6 +68,8 @@ class DashboardProvider extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
+    // Reset state trước khi load lại
+    _data = null;
     await loadDashboard();
   }
 }

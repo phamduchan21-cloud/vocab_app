@@ -51,4 +51,8 @@ class VocabularyService {
   Future<void> delete(String id) async {
     await _api.delete('/api/vocabularies/$id');
   }
+
+  Future<void> reviewWord(String id, int quality) async {
+    await _api.put('/api/vocabularies/$id/review', body: {'quality': quality});
+  }
 }

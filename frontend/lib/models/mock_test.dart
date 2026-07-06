@@ -61,8 +61,38 @@ class MockTestResult {
         totalQuestions: json['total_questions'] ?? 0,
         correctAnswers: json['correct_answers'] ?? 0,
         scorePercent: (json['score_percent'] ?? 0.0).toDouble(),
-        predictedLevel: json['predicted_level'] ?? '1급',
+        predictedLevel: json['grade'] ?? json['predicted_level'] ?? 'C',
         details: json['details'],
+        completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at']) : null,
+      );
+}
+
+class MockTestHistoryItem {
+  final String id;
+  final String testLevel;
+  final int totalQuestions;
+  final int correctAnswers;
+  final double scorePercent;
+  final String grade;
+  final DateTime? completedAt;
+
+  MockTestHistoryItem({
+    required this.id,
+    required this.testLevel,
+    required this.totalQuestions,
+    required this.correctAnswers,
+    required this.scorePercent,
+    required this.grade,
+    this.completedAt,
+  });
+
+  factory MockTestHistoryItem.fromJson(Map<String, dynamic> json) => MockTestHistoryItem(
+        id: json['id'] ?? '',
+        testLevel: json['test_level'] ?? '',
+        totalQuestions: json['total_questions'] ?? 0,
+        correctAnswers: json['correct_answers'] ?? 0,
+        scorePercent: (json['score_percent'] ?? 0.0).toDouble(),
+        grade: json['grade'] ?? 'C',
         completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at']) : null,
       );
 }

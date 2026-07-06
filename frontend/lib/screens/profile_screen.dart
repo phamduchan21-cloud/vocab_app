@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:provider/provider.dart';
+
 import '../app.dart';
-import '../config/api_config.dart';
+import '../models/dashboard_data.dart';
+import '../models/profile_data.dart';
+import '../models/quiz_result.dart';
 import '../providers/auth_provider.dart';
+import '../providers/dashboard_provider.dart';
+import '../providers/profile_provider.dart';
+import '../widgets/app_bottom_nav.dart';
+import '../widgets/empty_state_widget.dart';
+import '../widgets/error_state_widget.dart';
+import '../widgets/loading_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,218 +22,795 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  Map<String, dynamic>? _stats;
-  List<Map<String, dynamic>> _achievements = [];
-  Map<String, dynamic>? _assessment;
-  bool _isLoading = true;
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _loadProfile();
-  }
-
-  Future<void> _loadProfile() async {
-    setState(() => _isLoading = true);
-    try {
-      final results = await Future.wait([
-        http.get(Uri.parse('${ApiConfig.baseUrl}/api/dashboard')),
-        http.get(Uri.parse('${ApiConfig.baseUrl}/api/gamification/achievements')),
-      ]);
-      if (results.every((r) => r.statusCode == 200)) {
-        setState(() {
-          _stats = json.decode(results[0].body);
-          final achList = json.decode(results[1].body);
-          _achievements = List<Map<String, dynamic>>.from(achList is List ? achList : []);
-          _assessment = {
-            'listening': 80, 'reading': 65, 'writing': 55, 'speaking': 40,
-          };
-          _isLoading = false;
-        });
-      } else { _mockData(); }
-    } catch (_) { _mockData(); }
-  }
-
-  void _mockData() {
-    setState(() {
-      _isLoading = false;
-      _stats = {'streak': 12, 'xp': 12450, 'gems': 2300, 'level': 15, 'level_title': '🌳 Cây lớn', 'vocab_count': 230, 'quiz_count': 45, 'correct_answers': 850, 'accuracy_rate': 70.8};
-      _achievements = [
-        {'achievement_key': 'streak_7', 'title': '🔥 7 Days Strong', 'icon': 'fire', 'unlocked_at': '2026-06-25'},
-        {'achievement_key': 'word_50', 'title': '📚 50 Words', 'icon': 'books', 'unlocked_at': '2026-06-20'},
-        {'achievement_key': 'first_quiz', 'title': '🎯 First Quiz', 'icon': 'star', 'unlocked_at': '2026-06-15'},
-        {'achievement_key': 'perfect_week', 'title': '💪 Perfect Week', 'icon': 'fire'},
-      ];
-      _assessment = {'listening': 80, 'reading': 65, 'writing': 55, 'speaking': 40};
+    _tabController = TabController(length: 4, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dashboard = context.read<DashboardProvider>();
+      final profile = context.read<ProfileProvider>();
+      if (dashboard.data == null && !dashboard.isLoading) {
+        dashboard.loadDashboard();
+      }
+      profile.loadProfile();
     });
   }
 
-  Color _scoreColor(double score) {
-    if (score >= 80) return AppColors.accent3;
-    if (score >= 60) return AppColors.primary;
-    if (score >= 40) return AppColors.accent1;
-    return AppColors.accent2;
-  }
-
-  String _levelFromScore(double score) {
-    if (score >= 80) return 'B2';
-    if (score >= 65) return 'B1';
-    if (score >= 50) return 'A2';
-    return 'A1';
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final email = auth.user?.email ?? 'Người dùng';
-    final username = (auth.user?.userMetadata?['username'] as String?) ?? email.split('@').first;
+    final dashboard = context.watch<DashboardProvider>();
+    final profile = context.watch<ProfileProvider>();
+
+    final user = auth.user;
+    final email = user?.email ?? '---';
+    final metadata = user?.userMetadata;
+    final displayName = (metadata?['username'] as String?)?.trim();
+    final fallbackName = email.contains('@') ? email.split('@').first : 'Học viên';
+    final username = displayName?.isNotEmpty == true ? displayName! : fallbackName;
+    final avatarText = username.isNotEmpty ? username[0].toUpperCase() : '?';
+
+    final stats = dashboard.data?.stats ?? DashboardStats();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('👤 Hồ sơ', style: GoogleFonts.nunito(fontWeight: FontWeight.bold, fontSize: 20)),
-        backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.05),
-        foregroundColor: const Color(0xFF8B5CF6),
+        title: Text(
+          'Hồ sơ học tập',
+          style: GoogleFonts.workSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: AppColors.ink,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => _showEditProfileSheet(username),
+          ),
+        ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      bottomNavigationBar: const AppBottomNav(selectedIndex: 4),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await dashboard.loadDashboard();
+          await profile.loadProfile();
+        },
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          children: [
+            _ProfileHero(
+              avatarText: avatarText,
+              username: username,
+              email: email,
+              englishLevel: profile.userProfile?.englishLevel,
+              stats: stats,
+              onClaimReward: profile.isClaimingReward
+                    ? null
+                    : () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        final message = await profile.claimStreakReward();
+                        if (!mounted || message == null) return;
+                        messenger.showSnackBar(
+                          SnackBar(content: Text(message)),
+                        );
+                        await dashboard.loadDashboard();
+                    },
+            ),
+            const SizedBox(height: 20),
+            TabBar(
+              controller: _tabController,
+              labelColor: AppColors.blue,
+              unselectedLabelColor: AppColors.inkSoft,
+              indicatorColor: AppColors.blue,
+              tabs: const [
+                Tab(text: 'Tổng quan'),
+                Tab(text: 'Tiến độ'),
+                Tab(text: 'Huy hiệu'),
+                Tab(text: 'Tài khoản'),
+              ],
+            ),
+            SizedBox(
+              height: 680,
+              child: TabBarView(
+                controller: _tabController,
                 children: [
-                  _buildHeader(username, email),
-                  const SizedBox(height: 20),
-                  _buildAssessment(),
-                  const SizedBox(height: 20),
-                  _buildAchievements(),
-                  const SizedBox(height: 20),
-                  _buildStats(),
-                  const SizedBox(height: 20),
-                  _buildLogout(context),
+                  _OverviewTab(stats: stats, recentQuizzes: profile.recentQuizzes),
+                  _ProgressTab(
+                    isLoading: profile.isLoading,
+                    errorMessage: profile.errorMessage,
+                    weeklyActivity: profile.data,
+                    topics: dashboard.data?.topics ?? const [],
+                  ),
+                  _BadgeTab(
+                    isLoading: profile.isLoading,
+                    errorMessage: profile.errorMessage,
+                    achievements: profile.achievements,
+                  ),
+                  _AccountTab(
+                    email: email,
+                    username: username,
+                    englishLevel: profile.userProfile?.englishLevel,
+                    onEdit: () => _showEditProfileSheet(username),
+                  ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildHeader(String username, String email) {
-    final s = _stats;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+  Future<void> _showEditProfileSheet(String currentName) async {
+    final controller = TextEditingController(text: currentName);
+    final profile = context.read<ProfileProvider>();
+    final auth = context.read<AuthProvider>();
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: Column(
-        children: [
-          Container(
-            width: 72, height: 72,
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
-            child: Center(child: Text(username.isNotEmpty ? username[0].toUpperCase() : '?', style: GoogleFonts.nunito(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white))),
+      builder: (sheetContext) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            20 + MediaQuery.of(sheetContext).viewInsets.bottom,
           ),
-          const SizedBox(height: 12),
-          Text(username, style: GoogleFonts.nunito(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-          Text(email, style: GoogleFonts.nunito(fontSize: 13, color: Colors.white70)),
-          const SizedBox(height: 16),
-          if (s != null) Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _headerStat('🏆', '${s['level']}', s['level_title'] ?? ''),
-              _headerStat('🔥', '${s['streak']}', 'Ngày'),
-              _headerStat('⭐', '${s['xp']}', 'XP'),
+              Text(
+                'Cập nhật tên hiển thị',
+                style: GoogleFonts.workSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.ink,
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText: 'Tên hiển thị',
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(sheetContext);
+                    final navigator = Navigator.of(sheetContext);
+                    final error = await profile.updateDisplayName(controller.text);
+                    if (!mounted) return;
+                    if (error != null) {
+                      messenger.showSnackBar(SnackBar(content: Text(error)));
+                      return;
+                    }
+                    auth.setUser(auth.user);
+                    navigator.pop();
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Đã cập nhật tên hiển thị.')),
+                    );
+                  },
+                  child: const Text('Lưu thay đổi'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ProfileHero extends StatefulWidget {
+  final String avatarText;
+  final String username;
+  final String email;
+  final String? englishLevel;
+  final DashboardStats stats;
+  final VoidCallback? onClaimReward;
+
+  const _ProfileHero({
+    required this.avatarText,
+    required this.username,
+    required this.email,
+    this.englishLevel,
+    required this.stats,
+    required this.onClaimReward,
+  });
+
+  @override
+  State<_ProfileHero> createState() => _ProfileHeroState();
+}
+
+class _ProfileHeroState extends State<_ProfileHero>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _levelUpController;
+  Animation<double>? _levelUpScale;
+
+  @override
+  void dispose() {
+    _levelUpController?.dispose();
+    super.dispose();
+  }
+
+  void _onClaimReward() {
+    // Trigger level up animation
+    _levelUpController?.dispose();
+    _levelUpController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _levelUpScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _levelUpController!, curve: Curves.elasticOut),
+    );
+    _levelUpController!.forward();
+    _levelUpController!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            _levelUpController?.reverse();
+          }
+        });
+      }
+    });
+
+    // Call original handler
+    widget.onClaimReward?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white.withValues(alpha: 0.16),
+                    child: Text(
+                      widget.avatarText,
+                      style: GoogleFonts.workSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.username,
+                          style: GoogleFonts.workSans(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.email,
+                          style: GoogleFonts.workSans(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.92),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        _EnglishLevelBadge(
+                          level: widget.englishLevel,
+                          onTap: () => _showLevelPicker(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+          Row(
+            children: [
+              _HeroMetric(label: 'Level', value: '${widget.stats.level}'),
+              _HeroMetric(label: 'XP', value: '${widget.stats.xp}'),
+              _HeroMetric(label: 'Streak', value: '${widget.stats.streak}'),
+              _HeroMetric(label: 'Gems', value: '${widget.stats.gems}'),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => context.go('/progress'),
+                  icon: const Icon(Icons.insights_outlined),
+                  label: const Text('Xem tiến độ'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _onClaimReward,
+                  icon: const Icon(Icons.local_fire_department_outlined),
+                  label: const Text('Nhận thưởng streak'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.blueDark,
+                  ),
+                ),
+              ),
             ],
           ),
         ],
       ),
+    ),
+    if (_levelUpController != null && _levelUpController!.isAnimating)
+      Positioned.fill(
+        child: IgnorePointer(
+          child: AnimatedBuilder(
+            animation: _levelUpController!,
+            builder: (context, child) => Opacity(
+              opacity: _levelUpController!.value < 0.3
+                  ? _levelUpController!.value / 0.3
+                  : (1.0 - (_levelUpController!.value - 0.3) / 0.7).clamp(0.0, 1.0),
+              child: Transform.scale(
+                scale: _levelUpScale?.value ?? 0,
+                child: child,
+              ),
+            ),
+            child: const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('🎉', style: TextStyle(fontSize: 64)),
+                  SizedBox(height: 8),
+                  Text(
+                    'Level Up!',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(blurRadius: 20, color: Colors.black38),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+  }
+}
+
+void _showLevelPicker(BuildContext context) {
+  final profile = context.read<ProfileProvider>();
+  final currentLevel = profile.userProfile?.englishLevel;
+  final messenger = ScaffoldMessenger.of(context);
+
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Chọn trình độ tiếng Anh',
+              style: GoogleFonts.workSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Trình độ này giúp chúng tôi gợi ý nội dung phù hợp với bạn.',
+              style: GoogleFonts.workSans(
+                fontSize: 13,
+                color: AppColors.inkSoft,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...englishLevels.map((level) {
+              final isSelected = level['key'] == currentLevel;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: InkWell(
+                  onTap: () async {
+                    final error =
+                        await profile.updateEnglishLevel(level['key']!);
+                    if (ctx.mounted) {
+                      Navigator.pop(ctx);
+                    }
+                    if (!context.mounted) return;
+                    if (error != null) {
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(error)),
+                      );
+                    } else {
+                      messenger.showSnackBar(
+                        SnackBar(
+                          backgroundColor: AppColors.success,
+                          content: Text(
+                              'Đã cập nhật trình độ: ${level['label']}'),
+                        ),
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.blueBg
+                          : AppColors.surface,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.blue
+                            : AppColors.ink.withValues(alpha: 0.10),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(level['emoji']!, style: const TextStyle(fontSize: 24)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            level['label']!,
+                            style: GoogleFonts.workSans(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                        ),
+                        if (isSelected)
+                          const Icon(Icons.check_circle,
+                              color: AppColors.blue),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+class _EnglishLevelBadge extends StatelessWidget {
+  final String? level;
+  final VoidCallback onTap;
+
+  const _EnglishLevelBadge({this.level, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final emoji = getEnglishLevelEmoji(level) ?? '📚';
+    final label = getEnglishLevelLabel(level);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.20),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 6),
+            Text(
+              label ?? 'Chưa xác định',
+              style: GoogleFonts.workSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.edit_outlined,
+              size: 12,
+              color: Colors.white.withValues(alpha: 0.78),
+            ),
+          ],
+        ),
+      ),
     );
   }
+}
 
-  Widget _headerStat(String emoji, String value, String label) {
-    return Column(children: [
-      Text(emoji, style: const TextStyle(fontSize: 24)),
-      Text(value, style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-      Text(label, style: GoogleFonts.nunito(fontSize: 11, color: Colors.white70)),
-    ]);
-  }
+class _HeroMetric extends StatelessWidget {
+  final String label;
+  final String value;
 
-  Widget _buildAssessment() {
-    final a = _assessment;
-    if (a == null) return const SizedBox.shrink();
-    final skills = [
-      {'key': 'listening', 'label': '🎧 Nghe', 'score': (a['listening'] ?? 0).toDouble()},
-      {'key': 'reading', 'label': '📖 Đọc', 'score': (a['reading'] ?? 0).toDouble()},
-      {'key': 'writing', 'label': '✍️ Viết', 'score': (a['writing'] ?? 0).toDouble()},
-      {'key': 'speaking', 'label': '🗣️ Nói', 'score': (a['speaking'] ?? 0).toDouble()},
-    ];
-    final total = skills.fold(0.0, (sum, s) => sum + s['score']) / skills.length;
+  const _HeroMetric({required this.label, required this.value});
 
-    return Container(
-      width: double.infinity, padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2))]),
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            const Text('📊', style: TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
-            Text('Đánh giá năng lực', style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-          ]),
-          const SizedBox(height: 12),
-          ...skills.map((s) {
-            final score = s['score'] as double;
-            final color = _scoreColor(score);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(children: [
-                SizedBox(width: 80, child: Text('${s['label']}', style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary))),
-                Expanded(child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: LinearProgressIndicator(value: score / 100, backgroundColor: AppColors.catLight, valueColor: AlwaysStoppedAnimation<Color>(color), minHeight: 8),
-                )),
-                const SizedBox(width: 8),
-                SizedBox(width: 60, child: Text('${score.toStringAsFixed(0)}% - ${_levelFromScore(score)}', style: GoogleFonts.nunito(fontSize: 12, fontWeight: FontWeight.bold, color: color))),
-              ]),
-            );
-          }),
-          const SizedBox(height: 8),
-          Center(child: Text('📈 Tổng: ${total.toStringAsFixed(0)}% — ${_levelFromScore(total)}', style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary))),
+          Text(
+            value,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.workSans(
+              fontSize: 11,
+              color: Colors.white.withValues(alpha: 0.88),
+            ),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildAchievements() {
+class _OverviewTab extends StatelessWidget {
+  final DashboardStats stats;
+  final List<QuizResult> recentQuizzes;
+
+  const _OverviewTab({
+    required this.stats,
+    required this.recentQuizzes,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(0, 18, 0, 24),
+      children: [
+        Row(
+          children: [
+            _MiniStatCard(label: 'Từ đã học', value: '${stats.vocabCount}', icon: Icons.menu_book_outlined),
+            const SizedBox(width: 10),
+            _MiniStatCard(label: 'Quiz đã làm', value: '${stats.quizCount}', icon: Icons.quiz_outlined),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _MiniStatCard(label: 'Độ chính xác', value: '${stats.accuracyRate.round()}%', icon: Icons.track_changes_outlined),
+            const SizedBox(width: 10),
+            _MiniStatCard(label: 'Tiến độ tuần', value: '${stats.weeklyProgress}%', icon: Icons.timelapse_outlined),
+          ],
+        ),
+        const SizedBox(height: 18),
+        Text(
+          'Quiz gần đây',
+          style: GoogleFonts.workSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+          ),
+        ),
+        const SizedBox(height: 10),
+        if (recentQuizzes.isEmpty)
+          const EmptyStateWidget(
+            title: 'Chưa có bài quiz nào',
+            subtitle: 'Làm một bài quiz theo chủ đề để hiển thị lịch sử tại đây.',
+            action: 'Mở quiz',
+            showCat: false,
+          )
+        else
+          ...recentQuizzes.take(4).map((item) => _QuizHistoryTile(item: item)),
+      ],
+    );
+  }
+}
+
+class _MiniStatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _MiniStatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: AppColors.blue, size: 20),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.workSans(
+                fontSize: 12,
+                color: AppColors.inkSoft,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressTab extends StatelessWidget {
+  final bool isLoading;
+  final String? errorMessage;
+  final List<WeeklyActivityDay> weeklyActivity;
+  final List<TopicProgressItem> topics;
+
+  const _ProgressTab({
+    required this.isLoading,
+    required this.errorMessage,
+    required this.weeklyActivity,
+    required this.topics,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading && weeklyActivity.isEmpty) {
+      return const SkeletonLoading(type: SkeletonType.card);
+    }
+    if (errorMessage != null && weeklyActivity.isEmpty) {
+      return ErrorStateWidget(
+        message: errorMessage!,
+        onRetry: () => context.read<ProfileProvider>().loadProfile(),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(0, 18, 0, 24),
+      children: [
+        _WeeklyActivityCard(days: weeklyActivity),
+        const SizedBox(height: 18),
+        Text(
+          'Chủ đề nổi bật',
+          style: GoogleFonts.workSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...topics.take(6).map((topic) => _TopicProgressTile(item: topic)),
+      ],
+    );
+  }
+}
+
+class _WeeklyActivityCard extends StatelessWidget {
+  final List<WeeklyActivityDay> days;
+
+  const _WeeklyActivityCard({required this.days});
+
+  @override
+  Widget build(BuildContext context) {
+    final displayDays = days.isEmpty
+        ? List.generate(
+            7,
+            (index) => WeeklyActivityDay(date: 'N/A', xp: 0, quizzes: 0, learned: 0),
+          )
+        : days;
+    final maxXp = displayDays.fold<int>(1, (max, day) => day.xp > max ? day.xp : max);
+
     return Container(
-      width: double.infinity, padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2))]),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            const Text('🏆', style: TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
-            Text('Thành tựu (${_achievements.length})', style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-          ]),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8, runSpacing: 8,
-            children: _achievements.map((a) {
-              final unlocked = a['unlocked_at'] != null;
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: unlocked ? AppColors.catLight : AppColors.catLight.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: unlocked ? Border.all(color: AppColors.primary.withValues(alpha: 0.3)) : null,
+          Text(
+            'Hoạt động 7 ngày',
+            style: GoogleFonts.workSans(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.ink,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: displayDays.map((day) {
+              final height = maxXp == 0 ? 8.0 : 14 + (day.xp / maxXp) * 72;
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    children: [
+                      Text(
+                        '${day.xp} XP',
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 10,
+                          color: AppColors.inkSoft,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: height,
+                        decoration: BoxDecoration(
+                          color: AppColors.blue,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(unlocked ? '✅' : '🔒', style: const TextStyle(fontSize: 14)),
-                  const SizedBox(width: 6),
-                  Text(a['title'] ?? '', style: GoogleFonts.nunito(fontSize: 12, fontWeight: FontWeight.w600, color: unlocked ? AppColors.textPrimary : AppColors.textHint)),
-                ]),
               );
             }).toList(),
           ),
@@ -233,57 +818,429 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+}
 
-  Widget _buildStats() {
-    final s = _stats;
-    if (s == null) return const SizedBox.shrink();
+class _TopicProgressTile extends StatelessWidget {
+  final TopicProgressItem item;
+
+  const _TopicProgressTile({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: double.infinity, padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2))]),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            const Text('📈', style: TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
-            Text('Thống kê', style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-          ]),
-          const SizedBox(height: 12),
-          _statRow('📚 Từ vựng', '${s['vocab_count']}', 'từ'),
-          _statRow('📝 Bài học', '${s['quiz_count']}', 'bài'),
-          _statRow('✅ Câu đúng', '${s['correct_answers']}', 'câu'),
-          _statRow('🔥 Streak', '${s['streak']}', 'ngày'),
-          _statRow('💎 Gems', '${s['gems']}', 'gems'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                item.topic,
+                style: GoogleFonts.workSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                ),
+              ),
+              Text(
+                '${item.masteryPercent.round()}%',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.blue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: item.masteryPercent / 100,
+              minHeight: 8,
+              backgroundColor: AppColors.surfaceSubtle,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.blue),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${item.mastered}/${item.total} từ đã nắm vững',
+            style: GoogleFonts.workSans(
+              fontSize: 12,
+              color: AppColors.inkSoft,
+            ),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _statRow(String label, String value, String unit) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(label, style: GoogleFonts.nunito(fontSize: 14, color: AppColors.textSecondary)),
-        Text('$value $unit', style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-      ]),
+class _BadgeTab extends StatelessWidget {
+  final bool isLoading;
+  final String? errorMessage;
+  final List<AchievementItem> achievements;
+
+  const _BadgeTab({
+    required this.isLoading,
+    required this.errorMessage,
+    required this.achievements,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading && achievements.isEmpty) {
+      return const SkeletonLoading(type: SkeletonType.grid);
+    }
+    if (errorMessage != null && achievements.isEmpty) {
+      return ErrorStateWidget(
+        message: errorMessage!,
+        onRetry: () => context.read<ProfileProvider>().loadProfile(),
+      );
+    }
+    if (achievements.isEmpty) {
+      return const EmptyStateWidget(
+        title: 'Chưa mở khóa huy hiệu',
+        subtitle: 'Học đều mỗi ngày để nhận huy hiệu streak và thành tích.',
+        action: 'Bắt đầu học',
+        showCat: false,
+      );
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(0, 18, 0, 24),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.05,
+      ),
+      itemCount: achievements.length,
+      itemBuilder: (context, index) {
+        final item = achievements[index];
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.blueBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  item.icon ?? '🏆',
+                  style: const TextStyle(fontSize: 22),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                item.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.workSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.ink,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                item.description ?? 'Thành tích đã mở khóa',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.workSans(
+                  fontSize: 12,
+                  color: AppColors.inkSoft,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
+}
 
-  Widget _buildLogout(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () {
-          context.read<AuthProvider>().logout();
-        },
-        icon: const Icon(Icons.logout_rounded, size: 18),
-        label: Text('Đăng xuất', style: GoogleFonts.nunito(fontSize: 15, fontWeight: FontWeight.bold)),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.accent2,
-          side: const BorderSide(color: AppColors.accent2),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+class _AccountTab extends StatelessWidget {
+  final String email;
+  final String username;
+  final String? englishLevel;
+  final VoidCallback onEdit;
+
+  const _AccountTab({
+    required this.email,
+    required this.username,
+    this.englishLevel,
+    required this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(0, 18, 0, 24),
+      children: [
+        _ActionTile(
+          icon: Icons.person_outline,
+          title: 'Tên hiển thị',
+          subtitle: username,
+          onTap: onEdit,
         ),
+        _ActionTile(
+          icon: Icons.mail_outline,
+          title: 'Email',
+          subtitle: email,
+          onTap: () {},
+        ),
+        _ActionTile(
+          icon: Icons.school_outlined,
+          title: 'Trình độ tiếng Anh',
+          subtitle: getEnglishLevelLabel(englishLevel) ?? 'Chưa chọn',
+          onTap: () => _showLevelPicker(context),
+        ),
+        _AccountDailyGoalTile(),
+        _ActionTile(
+          icon: Icons.history_outlined,
+          title: 'Lịch sử quiz',
+          subtitle: 'Xem chi tiết các bài quiz đã làm',
+          onTap: () => context.go('/quiz/history'),
+        ),
+        _ActionTile(
+          icon: Icons.bookmark_outline,
+          title: 'Từ đã lưu',
+          subtitle: 'Mở bộ sưu tập từ vựng đánh dấu',
+          onTap: () => context.go('/bookmark'),
+        ),
+        _ActionTile(
+          icon: Icons.logout_rounded,
+          title: 'Đăng xuất',
+          subtitle: 'Kết thúc phiên đăng nhập hiện tại',
+          danger: true,
+          onTap: () => context.read<AuthProvider>().logout(),
+        ),
+      ],
+    );
+  }
+}
+
+class _AccountDailyGoalTile extends StatefulWidget {
+  @override
+  State<_AccountDailyGoalTile> createState() => _AccountDailyGoalTileState();
+}
+
+class _AccountDailyGoalTileState extends State<_AccountDailyGoalTile> {
+  double _sliderValue = 10;
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = context.read<ProfileProvider>();
+    _sliderValue = (profile.userProfile?.dailyWordGoal ?? 10).toDouble();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = context.watch<ProfileProvider>();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.flag_outlined, color: AppColors.blue),
+              const SizedBox(width: 10),
+              Text(
+                'Mục tiêu từ mới mỗi ngày',
+                style: GoogleFonts.workSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text(
+                '5',
+                style: GoogleFonts.workSans(
+                  fontSize: 12,
+                  color: AppColors.inkSoft,
+                ),
+              ),
+              Expanded(
+                child: Slider(
+                  value: _sliderValue,
+                  min: 5,
+                  max: 50,
+                  divisions: 9,
+                  activeColor: AppColors.blue,
+                  inactiveColor: AppColors.surfaceSubtle,
+                  label: '${_sliderValue.round()} từ',
+                  onChanged: (v) => setState(() => _sliderValue = v),
+                  onChangeEnd: (v) {
+                    profile.updateDailyGoal(v.round());
+                  },
+                ),
+              ),
+              Text(
+                '50',
+                style: GoogleFonts.workSans(
+                  fontSize: 12,
+                  color: AppColors.inkSoft,
+                ),
+              ),
+            ],
+          ),
+          Center(
+            child: Text(
+              '${_sliderValue.round()} từ / ngày',
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.blue,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool danger;
+  final VoidCallback onTap;
+
+  const _ActionTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    this.danger = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: danger ? AppColors.danger : AppColors.blue),
+        title: Text(
+          title,
+          style: GoogleFonts.workSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: danger ? AppColors.danger : AppColors.ink,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.workSans(
+            fontSize: 12,
+            color: AppColors.inkSoft,
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _QuizHistoryTile extends StatelessWidget {
+  final QuizResult item;
+
+  const _QuizHistoryTile({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.blueBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                '${item.scorePercent.round()}%',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.blue,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.topic?.isNotEmpty == true
+                      ? 'Quiz chủ đề ${item.topic}'
+                      : item.quizType,
+                  style: GoogleFonts.workSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${item.correctAnswers}/${item.totalQuestions} câu đúng',
+                  style: GoogleFonts.workSans(
+                    fontSize: 12,
+                    color: AppColors.inkSoft,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

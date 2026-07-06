@@ -243,10 +243,6 @@ class DashboardData {
   final List<TopicProgressItem> topics;
   final List<LeaderboardEntry> leaderboard;
   final List<SkillItem> skills;
-  final int topik1Completed;
-  final int topik1Total;
-  final int topik2Completed;
-  final int topik2Total;
 
   DashboardData({
     required this.stats,
@@ -254,14 +250,10 @@ class DashboardData {
     required this.topics,
     required this.leaderboard,
     this.skills = const [],
-    this.topik1Completed = 0,
-    this.topik1Total = 0,
-    this.topik2Completed = 0,
-    this.topik2Total = 0,
   });
 }
 
-// ─── Skill (Migii TOPIK inspired) ──────────────────────────────────
+// ─── Skill ────────────────────────────────────────────────────────────
 
 class SkillItem {
   final String type;

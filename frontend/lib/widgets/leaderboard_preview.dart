@@ -29,34 +29,22 @@ class LeaderboardPreview extends StatelessWidget {
 
   Widget _buildSkeleton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey[200]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: AppColors.surfaceSubtle,
+        highlightColor: AppColors.surface,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _skeletonLine(140, 20),
+            Container(height: 20, width: 200,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
             const SizedBox(height: 12),
-            ...List.generate(
-              3,
-              (_) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _skeletonLine(double.infinity, 48),
-              ),
-            ),
+            ...List.generate(3, (_) => Container(
+              height: 48, margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+            )),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _skeletonLine(double w, double h) {
-    return Container(
-      width: w,
-      height: h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
       ),
     );
   }
@@ -64,58 +52,57 @@ class LeaderboardPreview extends StatelessWidget {
   Widget _buildContent() {
     final displayEntries = entries!.take(5).toList();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('🏆', style: TextStyle(fontSize: 18)),
-              const SizedBox(width: 8),
-              Text(
-                'Bảng xếp hạng tuần này',
-                style: GoogleFonts.nunito(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              '🏆  Bảng xếp hạng',
+              style: GoogleFonts.workSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
+            ),
+            if (onSeeAll != null)
+              GestureDetector(
+                onTap: onSeeAll,
+                child: Text(
+                  'Xem tất cả →',
+                  style: GoogleFonts.workSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.blue,
+                  ),
                 ),
               ),
-              const Spacer(),
-              TextButton(
-                onPressed: onSeeAll,
-                child: const Text('Xem tất cả →'),
-              ),
-            ],
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.ink.withValues(alpha: 0.10)),
           ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: List.generate(displayEntries.length, (index) {
-                final entry = displayEntries[index];
-                final isMe = index == 0; // First entry is current user
-                return _buildEntryRow(entry, index + 1, isMe);
-              }),
-            ),
+          child: Column(
+            children: List.generate(displayEntries.length, (index) {
+              final entry = displayEntries[index];
+              final isMe = index == 0;
+              return _buildEntryRow(entry, index + 1, isMe);
+            }),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildEntryRow(LeaderboardEntry entry, int rank, bool isMe) {
-    final rankEmoji = rank == 1
+    final rankStr = rank == 1
         ? '🥇'
         : rank == 2
             ? '🥈'
@@ -126,41 +113,42 @@ class LeaderboardPreview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isMe ? AppColors.catLight : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        color: isMe ? AppColors.surfaceSubtle : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+        border: Border(
+          bottom: BorderSide(color: AppColors.ink.withValues(alpha: 0.06)),
+        ),
       ),
       child: Row(
         children: [
           Text(
-            rankEmoji.toString(),
-            style: GoogleFonts.nunito(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+            rankStr,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               isMe ? 'Bạn' : entry.username,
-              style: GoogleFonts.nunito(
+              style: GoogleFonts.workSans(
                 fontSize: 14,
-                fontWeight: isMe ? FontWeight.bold : FontWeight.w500,
-                color: AppColors.textPrimary,
+                fontWeight: isMe ? FontWeight.w600 : FontWeight.w500,
+                color: AppColors.ink,
               ),
             ),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('⭐', style: TextStyle(fontSize: 14)),
-              const SizedBox(width: 4),
               Text(
-                '${entry.xp}',
-                style: GoogleFonts.nunito(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textSecondary,
+                '${entry.xp} XP',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.inkSoft,
                 ),
               ),
             ],

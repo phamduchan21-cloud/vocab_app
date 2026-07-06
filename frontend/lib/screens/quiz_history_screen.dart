@@ -7,7 +7,6 @@ import '../models/quiz_result.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/error_state_widget.dart';
-import '../widgets/app_drawer.dart';
 
 class QuizHistoryScreen extends StatefulWidget {
   const QuizHistoryScreen({super.key});
@@ -26,7 +25,9 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    return '${date.day}/${date.month}/${date.year} '
+        '${date.hour.toString().padLeft(2, '0')}:'
+        '${date.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -34,11 +35,21 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
     final quiz = context.watch<QuizProvider>();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Lịch sử làm bài'),
-        centerTitle: true,
+        title: Text(
+          'Lịch sử làm bài',
+          style: GoogleFonts.workSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            color: AppColors.ink,
+          ),
+        ),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.ink,
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
-      drawer: const AppDrawer(),
       body: _buildBody(context, quiz),
     );
   }
@@ -64,45 +75,67 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
       );
     }
 
-    // Tính tổng kết
+    // Stats summary
     double avgScore = 0;
     if (quiz.history.isNotEmpty) {
-      avgScore = quiz.history.fold(0.0, (sum, item) => sum + item.scorePercent) / quiz.history.length;
+      avgScore = quiz.history.fold<double>(
+            0.0,
+            (sum, item) => sum + item.scorePercent,
+          ) /
+          quiz.history.length;
     }
 
     return RefreshIndicator(
       onRefresh: () => quiz.fetchHistory(),
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 60),
         children: [
-          // Summary card
+          // â”€â”€ Summary card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.ink.withValues(alpha: 0.14),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _summaryItem('${quiz.history.length}', 'Bài đã làm'),
-                _summaryItem('${avgScore.toStringAsFixed(0)}%', 'Điểm TB'),
                 _summaryItem(
-                  '${quiz.history.fold(0, (sum, item) => sum + item.correctAnswers)}/${quiz.history.fold(0, (sum, item) => sum + item.totalQuestions)}',
+                  '${quiz.history.length}',
+                  'Bài đã làm',
+                ),
+                _summaryItem(
+                  '${avgScore.round()}%',
+                  'Điểm TB',
+                ),
+                _summaryItem(
+                  '${quiz.history.fold(0, (sum, item) => sum + item.correctAnswers)}'
+                  '/${quiz.history.fold(0, (sum, item) => sum + item.totalQuestions)}',
                   'Đúng/Tổng',
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          // List
+          const SizedBox(height: 22),
+
+          // â”€â”€ Section title â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Text(
+              'Các bài đã làm',
+              style: GoogleFonts.workSans(
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                color: AppColors.ink,
+              ),
+            ),
+          ),
+
+          // â”€â”€ History list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           ...quiz.history.map((item) => _buildHistoryItem(item)),
         ],
       ),
@@ -114,18 +147,18 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
       children: [
         Text(
           value,
-          style: GoogleFonts.nunito(
+          style: GoogleFonts.ibmPlexMono(
             fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: GoogleFonts.nunito(
+          style: GoogleFonts.workSans(
             fontSize: 12,
-            color: Colors.white.withValues(alpha: 0.85),
+            color: AppColors.inkSoft,
           ),
         ),
       ],
@@ -133,49 +166,47 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
   }
 
   Widget _buildHistoryItem(QuizResult item) {
-    final color = item.scorePercent >= 80
-        ? AppColors.primary
-        : item.scorePercent >= 50
-            ? AppColors.accent1
-            : AppColors.accent2;
+    final score = item.scorePercent;
+    final color = score >= 80
+        ? AppColors.success
+        : score >= 50
+            ? AppColors.warning
+            : AppColors.danger;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.ink.withValues(alpha: 0.10),
+        ),
       ),
       child: InkWell(
         onTap: () => _showDetailDialog(context, item),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               // Score circle mini
               SizedBox(
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     CircularProgressIndicator(
-                      value: item.scorePercent / 100,
-                      strokeWidth: 4,
-                      backgroundColor: const Color(0xFFF3F4F6),
-                      valueColor: AlwaysStoppedAnimation<Color>(color),
+                      value: score / 100,
+                      strokeWidth: 3,
+                      backgroundColor: AppColors.surfaceSubtle,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(color),
                     ),
                     Text(
-                      '${item.scorePercent.toStringAsFixed(0)}%',
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.bold,
+                      '${score.round()}%',
+                      style: GoogleFonts.ibmPlexMono(
+                        fontWeight: FontWeight.w600,
                         color: color,
                         fontSize: 13,
                       ),
@@ -190,25 +221,35 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
                   children: [
                     Text(
                       item.quizType,
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w600,
                         fontSize: 15,
-                        color: AppColors.textPrimary,
+                        color: AppColors.ink,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${item.correctAnswers}/${item.totalQuestions} câu đúng',
-                      style: GoogleFonts.nunito(fontSize: 13, color: AppColors.textSecondary),
+                      style: GoogleFonts.workSans(
+                        fontSize: 13,
+                        color: AppColors.inkSoft,
+                      ),
                     ),
                     Text(
                       _formatDate(item.completedAt),
-                      style: GoogleFonts.nunito(fontSize: 12, color: AppColors.textHint),
+                      style: GoogleFonts.workSans(
+                        fontSize: 12,
+                        color: AppColors.textHint,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: AppColors.textHint),
+              Icon(
+                Icons.chevron_right,
+                color: AppColors.textHint,
+                size: 20,
+              ),
             ],
           ),
         ),
@@ -220,10 +261,17 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
         title: Text(
           'Chi tiết bài làm',
-          style: GoogleFonts.nunito(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          style: GoogleFonts.workSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: AppColors.ink,
+          ),
         ),
         content: SizedBox(
           width: double.maxFinite,
@@ -231,38 +279,55 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _detailRow('Loại:', item.quizType),
+              _detailRow('Loáº¡i:', item.quizType),
               const SizedBox(height: 6),
               _detailRow('Ngày:', _formatDate(item.completedAt)),
               const SizedBox(height: 6),
-              _detailRow('Điểm:', '${item.correctAnswers}/${item.totalQuestions} (${item.scorePercent.toStringAsFixed(0)}%)'),
+              _detailRow(
+                'Điểm:',
+                '${item.correctAnswers}/${item.totalQuestions} '
+                    '(${item.scorePercent.round()}%)',
+              ),
               if (item.details != null && item.details!.isNotEmpty) ...[
                 const SizedBox(height: 14),
-                const Divider(),
+                const Divider(height: 1),
                 const SizedBox(height: 8),
                 ...item.details!.asMap().entries.map((entry) {
-                  final detail = entry.value as Map<String, dynamic>;
-                  final isCorrect = detail['selected'] == detail['correctAnswer'];
+                    final detail = entry.value as Map<String, dynamic>;
+                  final correctAnswer =
+                      detail['correct_answer'] ?? detail['correctAnswer'];
+                  final isCorrect = detail['selected'] == correctAnswer;
                   return Container(
                     margin: const EdgeInsets.only(bottom: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: isCorrect
-                          ? AppColors.primary.withValues(alpha: 0.05)
-                          : AppColors.accent2.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
+                          ? AppColors.success.withValues(alpha: 0.06)
+                          : AppColors.danger.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
                         Icon(
-                          isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                          isCorrect
+                              ? Icons.check_circle_rounded
+                              : Icons.cancel_rounded,
                           size: 18,
-                          color: isCorrect ? AppColors.primary : AppColors.accent2,
+                          color: isCorrect
+                              ? AppColors.success
+                              : AppColors.danger,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Câu ${entry.key + 1}: ${isCorrect ? 'Đúng' : 'Sai'}',
-                          style: GoogleFonts.nunito(color: AppColors.textPrimary, fontSize: 14),
+                          'Câu ${entry.key + 1}: '
+                              '${isCorrect ? 'Đúng' : 'Sai'}',
+                          style: GoogleFonts.workSans(
+                            color: AppColors.ink,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
@@ -275,7 +340,13 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Đóng', style: GoogleFonts.nunito(color: AppColors.primary)),
+            child: Text(
+              'Đóng',
+              style: GoogleFonts.workSans(
+                fontWeight: FontWeight.w600,
+                color: AppColors.blue,
+              ),
+            ),
           ),
         ],
       ),
@@ -288,10 +359,22 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
       children: [
         SizedBox(
           width: 60,
-          child: Text(label, style: GoogleFonts.nunito(color: AppColors.textSecondary, fontSize: 14)),
+          child: Text(
+            label,
+            style: GoogleFonts.workSans(
+              color: AppColors.inkSoft,
+              fontSize: 14,
+            ),
+          ),
         ),
         Expanded(
-          child: Text(value, style: GoogleFonts.nunito(color: AppColors.textPrimary, fontSize: 14)),
+          child: Text(
+            value,
+            style: GoogleFonts.workSans(
+              color: AppColors.ink,
+              fontSize: 14,
+            ),
+          ),
         ),
       ],
     );

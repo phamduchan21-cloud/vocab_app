@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app.dart';
 import '../models/vocabulary.dart';
+import 'speaker_button.dart';
 
 class VocabCard extends StatelessWidget {
   final Vocabulary vocab;
@@ -12,13 +13,13 @@ class VocabCard extends StatelessWidget {
 
   Color get _topicColor {
     final topicColors = {
-      'general': AppColors.primary,
-      'giao tiếp': AppColors.secondary,
-      'du lịch': AppColors.accent1,
-      'công việc': AppColors.catPurple,
-      'học tập': AppColors.catPink,
+      'general': AppColors.blue,
+      'giao tiáº¿p': AppColors.warning,
+      'du lá»‹ch': AppColors.success,
+      'cÃ´ng viá»‡c': AppColors.blue,
+      'há»c táº­p': AppColors.warning,
     };
-    return topicColors[vocab.topic.toLowerCase()] ?? AppColors.primary;
+    return topicColors[vocab.topic.toLowerCase()] ?? AppColors.blue;
   }
 
   @override
@@ -26,18 +27,14 @@ class VocabCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.ink.withValues(alpha: 0.10),
+        ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         onTap: onEdit,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -45,22 +42,18 @@ class VocabCard extends StatelessWidget {
             children: [
               // Avatar letter
               Container(
-                width: 50,
-                height: 50,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [_topicColor, _topicColor.withValues(alpha: 0.7)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
+                  color: _topicColor,
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
                   child: Text(
                     vocab.word.isNotEmpty ? vocab.word[0].toUpperCase() : '?',
-                    style: GoogleFonts.nunito(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.workSans(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
@@ -74,17 +67,17 @@ class VocabCard extends StatelessWidget {
                   children: [
                     Text(
                       vocab.word,
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: AppColors.textPrimary,
+                        color: AppColors.ink,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       vocab.meaning,
-                      style: GoogleFonts.nunito(
-                        color: AppColors.textSecondary,
+                      style: GoogleFonts.workSans(
+                        color: AppColors.inkSoft,
                         fontSize: 14,
                       ),
                       maxLines: 1,
@@ -99,41 +92,40 @@ class VocabCard extends StatelessWidget {
                 children: [
                   if (vocab.topic.isNotEmpty && vocab.topic != 'general')
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: _topicColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: _topicColor.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         vocab.topic,
-                        style: GoogleFonts.nunito(
-                          fontSize: 11,
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 10,
                           color: _topicColor,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   if (onEdit != null) ...[
+                    SpeakerButton(text: vocab.word, size: 26),
                     const SizedBox(width: 4),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.catLight,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 18),
-                        color: AppColors.primary,
-                        onPressed: onEdit,
-                        splashRadius: 20,
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      color: AppColors.inkSoft,
+                      onPressed: onEdit,
+                      splashRadius: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
                   ],
                   if (onDelete != null)
                     IconButton(
                       icon: const Icon(Icons.delete_outline, size: 18),
-                      color: AppColors.accent2,
+                      color: AppColors.danger,
                       onPressed: onDelete,
-                      splashRadius: 20,
+                      splashRadius: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
                 ],
               ),

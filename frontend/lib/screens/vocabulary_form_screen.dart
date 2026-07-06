@@ -26,7 +26,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
   bool _showCustomTopic = false;
   final _customTopicController = TextEditingController();
 
-  final _topics = ['general', 'giao tiếp', 'du lịch', 'công việc', 'học tập'];
+  final _topics = ['general', 'giao tiáº¿p', 'du lá»‹ch', 'cÃ´ng viá»‡c', 'há»c táº­p'];
 
   @override
   void initState() {
@@ -65,7 +65,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Không thể tải thông tin từ vựng'),
+            content: const Text('KhÃ´ng thá»ƒ táº£i thÃ´ng tin tá»« vá»±ng'),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -101,7 +101,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isEditMode ? 'Cập nhật thành công' : 'Thêm từ vựng thành công'),
+            content: Text(_isEditMode ? 'Cáº­p nháº­t thÃ nh cÃ´ng' : 'ThÃªm tá»« vá»±ng thÃ nh cÃ´ng'),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             backgroundColor: AppColors.primary,
@@ -113,7 +113,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Không thể lưu từ vựng. Vui lòng thử lại.'),
+            content: const Text('KhÃ´ng thá»ƒ lÆ°u tá»« vá»±ng. Vui lÃ²ng thá»­ láº¡i.'),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             backgroundColor: AppColors.accent2,
@@ -129,7 +129,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditMode ? 'Sửa từ' : 'Thêm từ mới'),
+        title: Text(_isEditMode ? 'Sá»­a tá»«' : 'ThÃªm tá»« má»›i'),
         centerTitle: true,
       ),
       body: _isLoading && _isEditMode && _wordController.text.isEmpty
@@ -146,37 +146,37 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
                     TextFormField(
                       controller: _wordController,
                       decoration: const InputDecoration(
-                        labelText: 'Từ vựng *',
-                        hintText: 'Nhập từ cần học',
+                        labelText: 'Tá»« vá»±ng *',
+                        hintText: 'Nháº­p tá»« cáº§n há»c',
                         prefixIcon: Icon(Icons.text_fields),
                       ),
-                      validator: (v) => v == null || v.trim().isEmpty ? 'Vui lòng nhập từ vựng' : null,
+                      validator: (v) => v == null || v.trim().isEmpty ? 'Vui lÃ²ng nháº­p tá»« vá»±ng' : null,
                     ),
                     const SizedBox(height: 16),
                     // Meaning
                     TextFormField(
                       controller: _meaningController,
                       decoration: const InputDecoration(
-                        labelText: 'Nghĩa *',
-                        hintText: 'Nhập nghĩa của từ',
+                        labelText: 'NghÄ©a *',
+                        hintText: 'Nháº­p nghÄ©a cá»§a tá»«',
                         prefixIcon: Icon(Icons.translate),
                       ),
-                      validator: (v) => v == null || v.trim().isEmpty ? 'Vui lòng nhập nghĩa' : null,
+                      validator: (v) => v == null || v.trim().isEmpty ? 'Vui lÃ²ng nháº­p nghÄ©a' : null,
                     ),
                     const SizedBox(height: 16),
                     // Example
                     TextFormField(
                       controller: _exampleController,
                       decoration: const InputDecoration(
-                        labelText: 'Ví dụ',
-                        hintText: 'Nhập câu ví dụ (không bắt buộc)',
+                        labelText: 'VÃ­ dá»¥',
+                        hintText: 'Nháº­p cÃ¢u vÃ­ dá»¥ (khÃ´ng báº¯t buá»™c)',
                         prefixIcon: Icon(Icons.format_quote),
                       ),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 16),
                     // Topic selector
-                    const Text('Chủ đề', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                    const Text('Chá»§ Ä‘á»', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -199,15 +199,15 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              topic == 'general' ? 'Tổng hợp' : topic,
-                              style: GoogleFonts.nunito(
+                              topic == 'general' ? 'Tá»•ng há»£p' : topic,
+                              style: GoogleFonts.workSans(
                                 fontSize: 14,
                                 fontWeight: !_showCustomTopic && _selectedTopic == topic
-                                    ? FontWeight.bold
+                                    ? FontWeight.w600
                                     : FontWeight.w500,
                                 color: !_showCustomTopic && _selectedTopic == topic
                                     ? Colors.white
-                                    : AppColors.textSecondary,
+                                    : AppColors.inkSoft,
                               ),
                             ),
                           ),
@@ -218,18 +218,18 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
-                              color: _showCustomTopic ? AppColors.catLight : const Color(0xFFF3F4F6),
+                              color: _showCustomTopic ? AppColors.surfaceSubtle : const Color(0xFFF3F4F6),
                               borderRadius: BorderRadius.circular(12),
                               border: _showCustomTopic
-                                  ? Border.all(color: AppColors.primary, width: 2)
+                                  ? Border.all(color: AppColors.blue, width: 2)
                                   : null,
                             ),
                             child: Text(
-                              _showCustomTopic ? 'Nhập chủ đề...' : 'Thêm mới +',
-                              style: GoogleFonts.nunito(
+                              _showCustomTopic ? 'Nháº­p chá»§ Ä‘á»...' : 'ThÃªm má»›i +',
+                              style: GoogleFonts.workSans(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: _showCustomTopic ? AppColors.primary : AppColors.textSecondary,
+                                color: _showCustomTopic ? AppColors.blue : AppColors.inkSoft,
                               ),
                             ),
                           ),
@@ -241,7 +241,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
                       TextFormField(
                         controller: _customTopicController,
                         decoration: const InputDecoration(
-                          hintText: 'Nhập chủ đề của bạn',
+                          hintText: 'Nháº­p chá»§ Ä‘á» cá»§a báº¡n',
                           prefixIcon: Icon(Icons.edit),
                         ),
                       ),
@@ -280,7 +280,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : Text(_isEditMode ? 'Cập nhật' : 'Lưu từ vựng'),
+                              : Text(_isEditMode ? 'Cáº­p nháº­t' : 'LÆ°u tá»« vá»±ng'),
                         ),
                       ),
                     ),

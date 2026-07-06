@@ -27,10 +27,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    await context.read<AuthProvider>().login(
+    final auth = context.read<AuthProvider>();
+    await auth.login(
       _emailController.text.trim(),
       _passwordController.text,
     );
+    // Nếu login thành công → chuyển hướng ngay
+    if (auth.isAuthenticated && mounted) {
+      context.go('/');
+    }
   }
 
   @override

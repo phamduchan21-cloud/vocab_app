@@ -50,7 +50,7 @@ class VocabularyProvider extends ChangeNotifier {
     // Auth state changed, no special handling needed
   }
 
-  Future<void> fetchAll({String? search, String? topic}) async {
+  Future<void> fetchAll({String? search, String? topic, int? limit}) async {
     _isLoading = true;
     _errorMessage = null;
     _currentPage = 1;
@@ -59,6 +59,7 @@ class VocabularyProvider extends ChangeNotifier {
     try {
       final result = await _service.getList(
         page: _currentPage,
+        limit: limit ?? 20,
         search: search ?? _searchQuery,
         topic: topic ?? _selectedTopic,
       );

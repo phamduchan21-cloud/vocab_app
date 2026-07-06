@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
 from database import init_db, close_db
-from routers import auth, vocabulary, quiz, dashboard, gamification, mock_test
+from routers import auth, vocabulary, quiz, dashboard, gamification, mock_test, ai
 
 
 @asynccontextmanager
@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Ứng dụng Học Từ Vựng API",
     description="FastAPI backend cho ứng dụng học từ vựng tích hợp Supabase",
-    version="1.0.0",
+    version="1.1.0",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -44,6 +44,7 @@ app.include_router(quiz.router)
 app.include_router(dashboard.router)
 app.include_router(gamification.router)
 app.include_router(mock_test.router)
+app.include_router(ai.router)
 
 
 @app.get("/")
@@ -51,7 +52,7 @@ async def root():
     """Root endpoint — health check."""
     return {
         "message": "Ứng dụng Học Từ Vựng API",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "docs": "/docs",
     }
 

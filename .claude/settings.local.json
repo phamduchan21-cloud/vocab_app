@@ -39,7 +39,13 @@
       "Bash(git add *)",
       "Bash(git commit -m 'Fix: Add pronunciation field, SSL connect args, skip init_db on Supabase *)",
       "Bash(flutter build *)",
-      "Bash(npx vercel *)"
+      "Bash(npx vercel *)",
+      "Read(//c/Users/admin/.claude/projects/D--AppHocTuVung/55a09bca-2b62-476c-8be1-975fb33fb431/subagents/workflows/wf_08fa5bc5-286/**)",
+      "Bash(vercel --version)",
+      "Bash(npm i *)",
+      "Skill(run)",
+      "Bash(ls venv/bin/activate)",
+      "Bash(ls venv/Scripts/activate)"
     ]
   }
 }

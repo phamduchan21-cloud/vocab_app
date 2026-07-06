@@ -14,10 +14,22 @@ class QuizService {
         .toList();
   }
 
-  Future<List<Map<String, dynamic>>> generateQuiz({int count = 5}) async {
-    final response = await _api.post('/api/quiz/generate', body: {
+  Future<List<Map<String, dynamic>>> generateQuiz({
+    int count = 5,
+    String? topic,
+    String? skillType,
+  }) async {
+    final body = <String, dynamic>{
       'count': count,
-    });
+    };
+    if (topic != null && topic.isNotEmpty && topic != 'all') {
+      body['topic'] = topic;
+    }
+    if (skillType != null && skillType.isNotEmpty) {
+      body['skill_type'] = skillType;
+    }
+
+    final response = await _api.post('/api/quiz/generate', body: body);
     return (response['questions'] as List)
         .map((q) => q as Map<String, dynamic>)
         .toList();
@@ -26,11 +38,17 @@ class QuizService {
   Future<QuizResult> submitQuiz({
     required String quizType,
     required List<Map<String, dynamic>> answers,
+    String? topic,
   }) async {
-    final response = await _api.post('/api/quiz/submit', body: {
+    final body = <String, dynamic>{
       'quiz_type': quizType,
       'answers': answers,
-    });
+    };
+    if (topic != null && topic.isNotEmpty && topic != 'all') {
+      body['topic'] = topic;
+    }
+
+    final response = await _api.post('/api/quiz/submit', body: body);
     return QuizResult.fromJson(response);
   }
 

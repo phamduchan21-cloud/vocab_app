@@ -149,7 +149,7 @@ class LoadingWidget extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               message!,
-              style: GoogleFonts.nunito(fontSize: 16, color: AppColors.textSecondary),
+              style: GoogleFonts.workSans(fontSize: 16, color: AppColors.inkSoft),
             ),
           ],
         ],

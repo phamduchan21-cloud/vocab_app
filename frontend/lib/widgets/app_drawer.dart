@@ -11,102 +11,131 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final user = auth.user;
+    final username =
+        user?.userMetadata?['username'] as String? ?? user?.email ?? 'Người dùng';
+    final email = user?.email ?? '';
+    final avatarLetter =
+        username.isNotEmpty ? username[0].toUpperCase() : 'V';
 
     return Drawer(
       child: Container(
-        color: Colors.white,
+        color: AppColors.surface,
         child: Column(
           children: [
-            // Header gradient với avatar
+            // â”€â”€â”€ Header: Dark sidebar style â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 48, 20, 24),
               decoration: const BoxDecoration(
-                gradient: AppTheme.catGradient,
+                color: AppColors.ink,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Avatar circle
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.blue,
+                      borderRadius: BorderRadius.circular(24),
                     ),
-                    child: const Icon(
-                      Icons.auto_stories_rounded,
-                      size: 32,
-                      color: Colors.white,
+                    alignment: Alignment.center,
+                    child: Text(
+                      avatarLetter,
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   Text(
-                    auth.user?.email ?? 'Người dùng',
-                    style: GoogleFonts.nunito(
-                      color: Colors.white,
+                    username,
+                    style: GoogleFonts.workSans(
+                      color: const Color(0xFFEDE6D3),
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (auth.user?.email != null)
+                  if (email.isNotEmpty) ...[
+                    const SizedBox(height: 2),
                     Text(
-                      auth.user!.email!,
-                      style: GoogleFonts.nunito(
-                        color: Colors.white.withValues(alpha: 0.8),
+                      email,
+                      style: GoogleFonts.workSans(
+                        color: const Color(0xFF9AA3B8),
                         fontSize: 13,
                       ),
                     ),
+                  ],
                 ],
               ),
             ),
-            // Menu items
+            // â”€â”€â”€ Menu items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Expanded(
               child: ListView(
-                padding: EdgeInsets.zero,
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                 children: [
                   _buildMenuItem(
                     context,
-                    Icons.dashboard_rounded,
-                    'Dashboard',
+                    Icons.home_outlined,
+                    'Trang chủ',
                     '/',
-                    AppColors.primary,
                   ),
                   _buildMenuItem(
                     context,
-                    Icons.menu_book_rounded,
-                    'Từ vựng',
-                    '/vocabulary',
-                    AppColors.primary,
+                    Icons.style_outlined,
+                    'Flashcard',
+                    '/flashcard',
                   ),
                   _buildMenuItem(
                     context,
-                    Icons.quiz_rounded,
-                    'Quiz',
+                    Icons.quiz_outlined,
+                    'Quiz nhanh',
                     '/quiz',
-                    AppColors.secondary,
                   ),
                   _buildMenuItem(
                     context,
-                    Icons.history_rounded,
-                    'Lịch sử',
-                    '/quiz/history',
-                    AppColors.accent1,
+                    Icons.assignment_outlined,
+                    'Mini-test',
+                    '/test',
                   ),
+                  _buildMenuItem(
+                    context,
+                    Icons.bookmark_border,
+                    'Đã lưu',
+                    '/bookmark',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.bar_chart_outlined,
+                    'Tiến độ',
+                    '/progress',
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.person_outlined,
+                    'Hồ sơ',
+                    '/profile',
+                  ),
+                  const SizedBox(height: 8),
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Divider(),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Divider(height: 1),
                   ),
                   _buildLogoutItem(context),
                 ],
               ),
             ),
-            // Version
+            // â”€â”€â”€ Version â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Text(
-                'MeuBeu v1.0.0',
-                style: GoogleFonts.nunito(
-                  fontSize: 12,
+                'VocaEng v1.0.0',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 11,
                   color: AppColors.textHint,
                 ),
               ),
@@ -122,42 +151,52 @@ class AppDrawer extends StatelessWidget {
     IconData icon,
     String title,
     String? route,
-    Color color,
   ) {
-    final isActive = route != null && ModalRoute.of(context)?.settings.name == route;
+    final isActive =
+        route != null && ModalRoute.of(context)?.settings.name == route;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      decoration: BoxDecoration(
-        color: isActive ? AppColors.catLight : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      margin: const EdgeInsets.symmetric(vertical: 1.5),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-        child: ListTile(
-          leading: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isActive ? color.withValues(alpha: 0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: isActive ? color : AppColors.textSecondary, size: 22),
-          ),
-          title: Text(
-            title,
-            style: GoogleFonts.nunito(
-              color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-              fontSize: 15,
-            ),
-          ),
-          trailing: route != null
-              ? Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 20)
-              : null,
+        child: InkWell(
           onTap: () {
             Navigator.pop(context);
             if (route != null) context.go(route);
           },
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isActive ? AppColors.surfaceSubtle : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: isActive ? AppColors.ink : AppColors.inkSoft,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: GoogleFonts.workSans(
+                    fontSize: 14,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                    color: isActive ? AppColors.ink : AppColors.textSecondary,
+                  ),
+                ),
+                const Spacer(),
+                if (route != null)
+                  Icon(
+                    Icons.chevron_right,
+                    size: 16,
+                    color: AppColors.textHint,
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -165,31 +204,36 @@ class AppDrawer extends StatelessWidget {
 
   Widget _buildLogoutItem(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      margin: const EdgeInsets.symmetric(vertical: 1.5),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-        child: ListTile(
-          leading: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.accent2.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.logout_rounded, color: AppColors.accent2, size: 22),
-          ),
-          title: Text(
-            'Đăng xuất',
-            style: GoogleFonts.nunito(
-              color: AppColors.accent2,
-              fontWeight: FontWeight.w500,
-              fontSize: 15,
-            ),
-          ),
+        child: InkWell(
           onTap: () {
             Navigator.pop(context);
             context.read<AuthProvider>().logout();
           },
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.logout_rounded,
+                  size: 18,
+                  color: AppColors.danger,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Đăng xuất',
+                  style: GoogleFonts.workSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.danger,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

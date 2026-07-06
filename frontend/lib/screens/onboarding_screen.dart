@@ -11,7 +11,8 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerProviderStateMixin {
+class _OnboardingScreenState extends State<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
   late PageController _pageController;
   int _currentPage = 0;
   final int _totalPages = 9; // 1 chào + 8 câu hỏi
@@ -47,7 +48,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
         curve: Curves.easeOutCubic,
       );
     } else {
-      // Câu cuối → chuyển login
       context.go('/login');
     }
   }
@@ -60,6 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -103,10 +104,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
           height: 10,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            gradient: isDone || isCurrent
-                ? AppTheme.primaryGradient
-                : null,
-            color: isDone || isCurrent ? null : const Color(0xFFE5E7EB),
+            color: isDone || isCurrent
+                ? AppColors.blue
+                : const Color(0xFFE5E7EB),
           ),
         );
       }),
@@ -120,7 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(),
-          // Mèo
+          // Cat
           AnimatedBuilder(
             animation: _bounceAnim,
             builder: (context, child) => Transform.translate(
@@ -137,11 +137,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.catLight,
+              color: AppColors.surfaceSubtle,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.ink.withValues(alpha: 0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -150,20 +150,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
             child: Column(
               children: [
                 Text(
-                  'Chào bạn! 🐱',
-                  style: GoogleFonts.nunito(
+                  'ChÃ o báº¡n! ðŸ±',
+                  style: GoogleFonts.workSans(
                     fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.blue,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tớ là Meu!',
-                  style: GoogleFonts.nunito(
+                  'Tá»› lÃ  Meu!',
+                  style: GoogleFonts.workSans(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primaryDark,
+                    color: AppColors.blue,
                   ),
                 ),
               ],
@@ -172,13 +172,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
           // Speech bubble tail
           CustomPaint(
             size: const Size(24, 12),
-            painter: _TrianglePainter(AppColors.catLight),
+            painter: _TrianglePainter(AppColors.surfaceSubtle),
           ),
           const Spacer(),
           Text(
             'Hãy trả lời 8 câu hỏi nhỏ\nđể tớ hiểu bạn hơn nhé!',
             textAlign: TextAlign.center,
-            style: GoogleFonts.nunito(
+            style: GoogleFonts.workSans(
               fontSize: 15,
               color: AppColors.textSecondary,
               height: 1.5,
@@ -200,7 +200,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
       child: Column(
         children: [
           const SizedBox(height: 20),
-          // Mèo nhỏ + câu hỏi
+          // Cat + question
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -220,15 +220,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.catLight,
+                    color: AppColors.surfaceSubtle,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     questionData['question'] as String,
-                    style: GoogleFonts.nunito(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                    style: GoogleFonts.workSans(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
                       height: 1.4,
                     ),
                   ),
@@ -237,16 +237,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
             ],
           ),
           const SizedBox(height: 24),
-          // Các lựa chọn
+          // Options
           Expanded(
             child: ListView(
               physics: const BouncingScrollPhysics(),
-              children: (questionData['options'] as List<Map<String, dynamic>>).map((opt) {
+              children:
+                  (questionData['options'] as List<Map<String, dynamic>>)
+                      .map((opt) {
                 final value = opt['value'] as String;
                 final icon = opt['icon'] as String?;
                 final isSelected = isSingle
                     ? selectedSingle == value
-                    : (_answers[index] as List<String>?)?.contains(value) ?? false;
+                    : (_answers[index] as List<String>?)
+                            ?.contains(value) ??
+                        false;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: _buildOptionCard(
@@ -258,7 +262,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
                         if (isSingle) {
                           _answers[index] = value;
                         } else {
-                          final current = (_answers[index] as List<String>?)?.toList() ?? <String>[];
+                          final current = (_answers[index]
+                                  as List<String>?)
+                                  ?.toList() ??
+                              <String>[];
                           if (current.contains(value)) {
                             current.remove(value);
                           } else {
@@ -290,16 +297,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.catLight : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected ? AppColors.surfaceSubtle : AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? AppColors.primary : const Color(0xFFE5E7EB),
+            color: isSelected ? AppColors.blue : const Color(0xFFE5E7EB),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.15),
+                color: AppColors.blue.withValues(alpha: 0.12),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -314,10 +321,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.nunito(
-                  fontSize: 16,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                style: GoogleFonts.workSans(
+                  fontSize: 15,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? AppColors.blue : AppColors.ink,
                 ),
               ),
             ),
@@ -327,9 +334,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
                 height: 24,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: AppTheme.primaryGradient,
+                  color: AppColors.blue,
                 ),
-                child: const Icon(Icons.check, color: Colors.white, size: 16),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 16,
+                ),
               ),
           ],
         ),
@@ -348,13 +359,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
         height: 56,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: _canProceed ? AppTheme.primaryButtonGradient : null,
-            color: _canProceed ? null : const Color(0xFFE5E7EB),
+            borderRadius: BorderRadius.circular(14),
+            color: _canProceed ? AppColors.blue : const Color(0xFFE5E7EB),
             boxShadow: _canProceed
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.blue.withValues(alpha: 0.3),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -365,11 +375,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
             onPressed: _canProceed ? _goNext : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
-              foregroundColor: _canProceed ? Colors.white : AppColors.textHint,
+              foregroundColor:
+                  _canProceed ? Colors.white : AppColors.textHint,
               elevation: 0,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
             child: Row(
@@ -377,19 +388,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
               children: [
                 Text(
                   buttonText,
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.workSans(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                if (isLastPage)
-                  const SizedBox(width: 8)
-                else
-                  const SizedBox(width: 8),
-                if (isLastPage)
-                  const Icon(Icons.auto_stories_rounded, size: 22)
-                else
-                  const Icon(Icons.arrow_forward_rounded, size: 22),
+                const SizedBox(width: 8),
+                Icon(
+                  isLastPage
+                      ? Icons.auto_stories_rounded
+                      : Icons.arrow_forward_rounded,
+                  size: 22,
+                ),
               ],
             ),
           ),

@@ -39,19 +39,19 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text(
           'Xoá từ vựng',
-          style: GoogleFonts.nunito(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          style: GoogleFonts.workSans(fontWeight: FontWeight.w600, color: AppColors.ink),
         ),
         content: Text(
           'Bạn có chắc muốn xoá từ "${vocab.word}"?',
-          style: GoogleFonts.nunito(color: AppColors.textSecondary),
+          style: GoogleFonts.workSans(color: AppColors.inkSoft),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Huỷ', style: GoogleFonts.nunito(color: AppColors.textSecondary)),
+            child: Text('Huỷ', style: GoogleFonts.workSans(fontWeight: FontWeight.w600, color: AppColors.inkSoft)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -59,11 +59,11 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
               context.read<VocabularyProvider>().delete(vocab.id);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.accent2,
+              backgroundColor: AppColors.danger,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: Text('Xoá', style: GoogleFonts.nunito()),
+            child: Text('Xoá', style: GoogleFonts.workSans(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -110,7 +110,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Tìm kiếm từ vựng...',
-                      hintStyle: GoogleFonts.nunito(color: AppColors.textHint),
+                      hintStyle: GoogleFonts.workSans(color: AppColors.textHint),
                       prefixIcon: const Icon(Icons.search, color: AppColors.textHint),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -172,10 +172,10 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
           ),
           child: Text(
             label == 'all' ? 'Tất cả' : label,
-            style: GoogleFonts.nunito(
+            style: GoogleFonts.workSans(
               fontSize: 13,
-              fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-              color: selected ? Colors.white : AppColors.textSecondary,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+              color: selected ? Colors.white : AppColors.inkSoft,
             ),
           ),
         ),

@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     # Frontend URL for CORS
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # AI API Keys (optional — service falls back gracefully if not set)
+    GEMINI_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
+
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",

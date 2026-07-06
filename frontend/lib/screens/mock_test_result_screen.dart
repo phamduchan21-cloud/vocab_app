@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:math' as math;
 import '../app.dart';
 import '../models/mock_test.dart';
 
@@ -11,122 +12,179 @@ class MockTestResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final levelColor = _getLevelColor(result.predictedLevel);
+    final score = result.scorePercent;
+    final grade = _calculateGrade(score);
+    final level = _englishLevel(score);
+    final levelColor = _levelColor(level);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Kết quả thi thử', style: GoogleFonts.nunito(fontWeight: FontWeight.bold, fontSize: 18)),
-        centerTitle: true,
+        title: Text(
+          'Kết quả thi thử',
+          style: GoogleFonts.workSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: AppColors.ink,
+          ),
+        ),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.ink,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close, color: AppColors.ink),
           onPressed: () => context.go('/'),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(32, 32, 32, 60),
         child: Column(
           children: [
-            // Score circle
-            Container(
-              width: 180,
-              height: 180,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [levelColor, levelColor.withValues(alpha: 0.6)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(color: levelColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 6)),
-                ],
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${result.scorePercent.toStringAsFixed(0)}%',
-                      style: GoogleFonts.nunito(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    Text(
-                      result.predictedLevel,
-                      style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white70),
-                    ),
-                  ],
-                ),
-              ),
+            // ── Postmark score circle ──────────────────────
+            _PostmarkScore(
+              score: result.scorePercent.round(),
+              total: result.totalQuestions,
+              color: levelColor,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Dự đoán cấp độ TOPIK',
-              style: GoogleFonts.nunito(fontSize: 13, color: AppColors.textSecondary),
-            ),
+            const SizedBox(height: 20),
 
+            // ── Title ─────────────────────────────────────
+            Text(
+              'Hoàn thành bài kiểm tra!',
+              style: GoogleFonts.workSans(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Bạn đạt trình độ $level',
+              style: GoogleFonts.workSans(
+                fontSize: 15,
+                color: AppColors.inkSoft,
+              ),
+            ),
             const SizedBox(height: 24),
 
-            // Stats
+            // ── Stats row ─────────────────────────────────
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2)),
-                ],
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.ink.withValues(alpha: 0.14),
+                ),
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _statItem('📝', '${result.totalQuestions}', 'Tổng câu'),
-                  Container(width: 1, height: 40, color: AppColors.textHint.withValues(alpha: 0.3)),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: AppColors.ink.withValues(alpha: 0.10),
+                  ),
                   _statItem('✅', '${result.correctAnswers}', 'Đúng'),
-                  Container(width: 1, height: 40, color: AppColors.textHint.withValues(alpha: 0.3)),
-                  _statItem('❌', '${result.totalQuestions - result.correctAnswers}', 'Sai'),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: AppColors.ink.withValues(alpha: 0.10),
+                  ),
+                  _statItem('❌',
+                      '${result.totalQuestions - result.correctAnswers}',
+                      'Sai'),
                 ],
               ),
             ),
+            const SizedBox(height: 16),
 
-            const SizedBox(height: 24),
-
-            // Level info
+            // ── Level info card ──────────────────────────
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: levelColor.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: levelColor.withValues(alpha: 0.2)),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: levelColor.withValues(alpha: 0.2),
+                ),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  Text('🏆', style: TextStyle(fontSize: 40, color: levelColor)),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Bạn đạt trình độ ${result.predictedLevel}',
-                    style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: levelColor.withValues(alpha: 0.12),
+                      border: Border.all(color: levelColor, width: 2),
+                    ),
+                    child: Center(
+                      child: Text(
+                        grade,
+                        style: GoogleFonts.workSans(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: levelColor,
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _getLevelDescription(result.predictedLevel),
-                    style: GoogleFonts.nunito(fontSize: 13, color: AppColors.textSecondary),
-                    textAlign: TextAlign.center,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Trình độ $level · Xếp loại $grade',
+                          style: GoogleFonts.workSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _levelDescription(level),
+                          style: GoogleFonts.workSans(
+                            fontSize: 13,
+                            color: AppColors.inkSoft,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 28),
 
-            const SizedBox(height: 24),
-
-            // Actions
+            // ── Actions ─────────────────────────────────
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => context.go('/'),
                     icon: const Icon(Icons.home_rounded, size: 20),
-                    label: Text('Về trang chủ', style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.bold)),
+                    label: Text(
+                      'Về trang chủ',
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
                     style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      foregroundColor: AppColors.inkSoft,
+                      side: BorderSide(
+                        color: AppColors.ink.withValues(alpha: 0.14),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
@@ -134,14 +192,23 @@ class MockTestResultScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => context.pop(),
+                    onPressed: () => context.go('/test'),
                     icon: const Icon(Icons.refresh_rounded, size: 20),
-                    label: Text('Làm lại', style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.bold)),
+                    label: Text(
+                      'Làm lại',
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.blue,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 0,
                     ),
                   ),
                 ),
@@ -159,29 +226,180 @@ class MockTestResultScreen extends StatelessWidget {
         children: [
           Text(emoji, style: const TextStyle(fontSize: 28)),
           const SizedBox(height: 4),
-          Text(value, style: GoogleFonts.nunito(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-          Text(label, style: GoogleFonts.nunito(fontSize: 12, color: AppColors.textSecondary)),
+          Text(
+            value,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
+          ),
+          Text(
+            label,
+            style: GoogleFonts.workSans(
+              fontSize: 12,
+              color: AppColors.inkSoft,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Color _getLevelColor(String level) {
-    final num = int.tryParse(level.replaceAll('급', '')) ?? 1;
-    if (num >= 5) return const Color(0xFF8B5CF6);
-    if (num >= 3) return const Color(0xFF34D399);
-    return const Color(0xFFFB923C);
+  String _calculateGrade(double percent) {
+    if (percent >= 90) return 'A';
+    if (percent >= 75) return 'B';
+    if (percent >= 50) return 'C';
+    return 'D';
   }
 
-  String _getLevelDescription(String level) {
-    final num = int.tryParse(level.replaceAll('급', '')) ?? 1;
-    switch (num) {
-      case 6: return 'Trình độ cao cấp — Có thể giao tiếp trôi chảy trong mọi tình huống.';
-      case 5: return 'Trình độ cao cấp — Có thể sử dụng tiếng Hàn thành thạo trong công việc.';
-      case 4: return 'Trình độ trung cấp — Có thể giao tiếp tương đối tốt trong cuộc sống.';
-      case 3: return 'Trình độ trung cấp — Có thể giao tiếp cơ bản trong sinh hoạt hàng ngày.';
-      case 2: return 'Trình độ sơ cấp — Có thể giao tiếp đơn giản trong các tình huống quen thuộc.';
-      default: return 'Trình độ sơ cấp — Bắt đầu làm quen với tiếng Hàn.';
+  String _englishLevel(double percent) {
+    if (percent >= 90) return 'C1';
+    if (percent >= 75) return 'B2';
+    if (percent >= 60) return 'B1';
+    if (percent >= 40) return 'A2';
+    return 'A1';
+  }
+
+  Color _levelColor(String level) {
+    switch (level) {
+      case 'C1':
+        return AppColors.success;
+      case 'B2':
+        return AppColors.blue;
+      case 'B1':
+        return AppColors.warning;
+      case 'A2':
+        return AppColors.warning;
+      default:
+        return AppColors.danger;
     }
   }
+
+  String _levelDescription(String level) {
+    switch (level) {
+      case 'C1':
+        return 'Trình độ cao cấp — Có thể giao tiếp trôi chảy trong mọi tình huống.';
+      case 'B2':
+        return 'Trình độ trung cao cấp — Có thể sử dụng ngôn ngữ thành thạo.';
+      case 'B1':
+        return 'Trình độ trung cấp — Có thể giao tiếp cơ bản trong sinh hoạt.';
+      case 'A2':
+        return 'Trình độ sơ cấp — Có thể giao tiếp đơn giản.';
+      default:
+        return 'Trình độ mới bắt đầu — Làm quen với ngôn ngữ.';
+    }
+  }
+}
+
+// ─── POSTMARK SCORE CIRCLE ───────────────────────────────────────
+
+class _PostmarkScore extends StatelessWidget {
+  final int score;
+  final int total;
+  final Color color;
+
+  const _PostmarkScore({
+    required this.score,
+    required this.total,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 140,
+      height: 140,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 2.5),
+        color: AppColors.surface,
+      ),
+      child: CustomPaint(
+        painter: _PostmarkDashPainter(color: color),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(flex: 2),
+            Text(
+              '$score%',
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 32,
+                fontWeight: FontWeight.w600,
+                color: color,
+                height: 1.0,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$total câu',
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+                color: color.withValues(alpha: 0.7),
+                height: 1.0,
+              ),
+            ),
+            const Spacer(flex: 2),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PostmarkDashPainter extends CustomPainter {
+  final Color color;
+
+  _PostmarkDashPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 10;
+
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    const dashWidth = 4.0;
+    const dashSpace = 4.0;
+    final totalDashLen = dashWidth + dashSpace;
+    final circumference = 2 * math.pi * radius;
+    final dashCount = (circumference / totalDashLen).floor();
+
+    canvas.save();
+    for (int i = 0; i < dashCount; i++) {
+      final startAngle = (2 * math.pi / dashCount) * i;
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        (2 * math.pi / dashCount) * (dashWidth / totalDashLen),
+        false,
+        paint,
+      );
+    }
+    canvas.restore();
+
+    final stripePaint = Paint()
+      ..color = color.withValues(alpha: 0.08)
+      ..strokeWidth = 1;
+    const stripeGap = 4.0;
+    final rect = Rect.fromCircle(center: center, radius: radius - 2);
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
+    for (double y = rect.top; y < rect.bottom; y += stripeGap * 2) {
+      canvas.drawLine(
+        Offset(rect.left, y + stripeGap),
+        Offset(rect.right, y + stripeGap),
+        stripePaint,
+      );
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

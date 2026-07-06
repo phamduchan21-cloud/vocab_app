@@ -107,6 +107,8 @@ class VocabularyResponse(BaseModel):
     meaning: str
     example: Optional[str] = None
     topic: str = "general"
+    pronunciation: Optional[str] = None
+    review_count: int = 0
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
