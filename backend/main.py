@@ -2,9 +2,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from core.config import settings
-from database import init_db, close_db
+from database import init_db, close_db, async_session_factory
 from routers import auth, vocabulary, quiz, dashboard, gamification, mock_test, ai
 
 
@@ -28,11 +29,15 @@ app = FastAPI(
     redirect_slashes=False,
 )
 
-# CORS middleware — allow all origins for development
+# CORS — use FRONTEND_URL in production, * for dev
+origins = ["*"]
+if settings.FRONTEND_URL and "localhost" not in settings.FRONTEND_URL:
+    origins = [settings.FRONTEND_URL]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -59,5 +64,12 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
-    return {"status": "ok"}
+    """Health check endpoint with DB connectivity verification."""
+    db_ok = False
+    try:
+        async with async_session_factory() as session:
+            await session.execute(text("SELECT 1"))
+            db_ok = True
+    except Exception:
+        db_ok = False
+    return {"status": "ok" if db_ok else "degraded", "database": "connected" if db_ok else "disconnected"}

@@ -1,5 +1,3 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../models/dashboard_data.dart';
 import '../models/profile_data.dart';
 import '../models/quiz_result.dart';
@@ -42,9 +40,7 @@ class ProfileService {
   }
 
   Future<void> updateDisplayName(String displayName) async {
-    await Supabase.instance.client.auth.updateUser(
-      UserAttributes(data: {'username': displayName}),
-    );
+    await _api.put('/api/auth/profile', body: {'username': displayName});
   }
 
   Future<UserProfile> getProfile() async {

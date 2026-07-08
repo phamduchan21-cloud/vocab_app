@@ -52,7 +52,8 @@
       "Bash(find /d -maxdepth 2 -name \"*stich*\" -o -name \"*.zip\")",
       "Bash(unzip -l stitch_creative_design_workspace.zip)",
       "Bash(unzip -o stitch_creative_design_workspace.zip -d stitch_designs)",
-      "Bash(pip list *)"
+      "Bash(pip list *)",
+      "Bash(git commit *)"
     ]
   },
   "enabledPlugins": {

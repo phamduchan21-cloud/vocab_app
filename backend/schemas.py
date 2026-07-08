@@ -176,7 +176,7 @@ class QuizResultResponse(BaseModel):
     correct_answers: int
     score_percent: float
     completed_at: Optional[datetime] = None
-    details: Any = None
+    details: Optional[List[QuizAnswer]] = None
 
     model_config = {"from_attributes": True}
 

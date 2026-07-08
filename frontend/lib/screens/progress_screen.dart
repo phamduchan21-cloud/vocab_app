@@ -146,7 +146,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   String _formatNumber(int n) {
-    if (n == 0) return '0';
+    if (n <= 0) return '0';
     final s = n.toString();
     if (s.length <= 3) return s;
     final result = StringBuffer();

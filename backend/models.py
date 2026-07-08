@@ -36,6 +36,7 @@ class User(Base):
     quiz_results = relationship("QuizResult", back_populates="user", lazy="select")
     daily_activities = relationship("UserDailyActivity", back_populates="user", lazy="select")
     achievements = relationship("UserAchievement", back_populates="user", lazy="select")
+    mock_tests = relationship("MockTest", back_populates="user", lazy="select")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email})>"
@@ -165,6 +166,8 @@ class MockTest(Base):
     topic = Column(String(50), nullable=True)                                  # Chủ đề được kiểm tra
     answers = Column(JSON, default=[])
     completed_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="mock_tests")
 
     def __repr__(self):
         return f"<MockTest(id={self.id}, level={self.test_level}, grade={self.grade})>"
