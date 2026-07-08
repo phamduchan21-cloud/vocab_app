@@ -62,6 +62,7 @@ class VocabularyService:
     async def get_list(
         self, user_id: str, page: int = 1, limit: int = 20,
         search: Optional[str] = None, topic: Optional[str] = None,
+        sort_by: str = "created_at", sort_dir: str = "desc",
     ) -> tuple:
         base_query = select(Vocabulary).where(Vocabulary.user_id == user_id)
         if search:
@@ -70,7 +71,9 @@ class VocabularyService:
             base_query = base_query.where(Vocabulary.topic == topic)
         count_query = select(func.count()).select_from(base_query.subquery())
         total = await self.db.scalar(count_query) or 0
-        query = base_query.order_by(Vocabulary.created_at.desc()).offset((page - 1) * limit).limit(limit)
+        sort_col = getattr(Vocabulary, sort_by, Vocabulary.created_at)
+        order = sort_col.desc() if sort_dir == "desc" else sort_col.asc()
+        query = base_query.order_by(order).offset((page - 1) * limit).limit(limit)
         result = await self.db.execute(query)
         items = list(result.scalars().all())
         return items, total

@@ -70,16 +70,20 @@ async def list_vocabularies(
     limit: int = Query(default=20, ge=1, le=100),
     search: Optional[str] = Query(default=None),
     topic: Optional[str] = Query(default=None),
+    sort_by: str = Query(default="created_at", pattern="^(created_at|word|review_count|next_review_date)$"),
+    sort_dir: str = Query(default="desc", pattern="^(asc|desc)$"),
     service: VocabularyService = Depends(get_vocab_service),
     current_user: User = Depends(get_current_user),
 ):
-    """Lấy danh sách từ vựng của người dùng với phân trang và tìm kiếm."""
+    """Lấy danh sách từ vựng của người dùng với phân trang, tìm kiếm và sắp xếp."""
     items, total = await service.get_list(
         user_id=current_user.id,
         page=page,
         limit=limit,
         search=search,
         topic=topic,
+        sort_by=sort_by,
+        sort_dir=sort_dir,
     )
 
     pages = math.ceil(total / limit) if total > 0 else 0
