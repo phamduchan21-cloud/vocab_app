@@ -24,30 +24,9 @@ class ApiAuthException implements Exception {
 
 class ApiService {
   http.Client? _client;
-  Timer? _refreshTimer;
   static const Duration _timeout = Duration(seconds: 30);
-  static const Duration _refreshLeadTime = Duration(minutes: 5);
 
   http.Client get _http => _client ??= http.Client();
-
-  ApiService() {
-    _scheduleRefresh();
-  }
-
-  void _scheduleRefresh() {
-    _refreshTimer?.cancel();
-    final session = Supabase.instance.client.auth.currentSession;
-    if (session?.expiresAt == null) return;
-    final expiresAt = DateTime.fromMillisecondsSinceEpoch(session!.expiresAt! * 1000);
-    final delta = expiresAt.difference(DateTime.now()) - _refreshLeadTime;
-    if (delta.isNegative) return;
-    _refreshTimer = Timer(delta, () async {
-      try {
-        await Supabase.instance.client.auth.refreshSession();
-      } catch (_) {}
-      _scheduleRefresh(); // re-schedule for next cycle
-    });
-  }
 
   String? _getToken() {
     final session = Supabase.instance.client.auth.currentSession;
@@ -123,15 +102,12 @@ class ApiService {
     Map<String, dynamic>? body,
   ) async {
     if (response.statusCode == 401) {
-      // Attempt token refresh once
       try {
         final refreshed = await Supabase.instance.client.auth.refreshSession();
         if (refreshed.session != null) {
-          // Retry with fresh token
           return _request(method, endpoint, queryParams: queryParams, body: body);
         }
       } catch (_) {
-        // Refresh failed — sign out to trigger redirect to login
         await Supabase.instance.client.auth.signOut();
       }
       throw ApiAuthException('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
@@ -151,7 +127,6 @@ class ApiService {
   }
 
   void dispose() {
-    _refreshTimer?.cancel();
     _client?.close();
     _client = null;
   }

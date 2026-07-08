@@ -41,7 +41,10 @@ class _HeroStatsBarState extends State<HeroStatsBar>
     _floatController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
-    )..repeat(reverse: true);
+    );
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) _floatController.repeat(reverse: true);
+    });
     _floatAnim = Tween<double>(begin: 0, end: -5).animate(
       CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
     );
