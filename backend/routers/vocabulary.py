@@ -152,7 +152,7 @@ async def get_seed_topics(
     return {"topics": await service.get_seed_topics()}
 
 
-@router.get("/seed-vocab")
+@router.get("/seed-vocab", response_model=PaginatedResponse)
 async def get_seed_vocab(
     topic: Optional[str] = Query(default=None),
     lesson_id: Optional[int] = Query(default=None),

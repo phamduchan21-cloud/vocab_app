@@ -281,7 +281,7 @@ class AIService:
             except Exception as e:
                 errors.append(f"{provider.__class__.__name__}: {e}")
                 continue
-        raise Exception(f"All AI providers failed: {'; '.join(errors)}")
+        raise RuntimeError(f"All AI providers failed: {'; '.join(errors)}")
 
     async def generate_mock_questions(self, vocabs: list, count: int, level: str, topic: str) -> list[dict]:
         """Generate mock test questions — delegates to provider."""

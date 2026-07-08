@@ -80,13 +80,16 @@ async def get_me(current_user: User = Depends(get_current_user)):
     )
 
 
+def _get_dash_service(db: AsyncSession = Depends(get_db)) -> DashboardService:
+    return DashboardService(db)
+
+
 @router.get("/profile", response_model=UserProfileResponse)
 async def get_profile(
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    ds: DashboardService = Depends(_get_dash_service),
 ):
     """Lấy hồ sơ chi tiết kèm thống kê học tập."""
-    ds = DashboardService(db)
     stats = await ds.get_user_stats(user_id=current_user.id)
 
     return UserProfileResponse(
