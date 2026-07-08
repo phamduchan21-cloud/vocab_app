@@ -10,6 +10,7 @@ import '../providers/profile_provider.dart';
 import '../providers/topic_provider.dart';
 
 import '../widgets/error_state_widget.dart';
+import '../widgets/loading_widget.dart';
 import '../widgets/leaderboard_preview.dart';
 import '../widgets/topic_grid.dart';
 import '../widgets/hero_stats_bar.dart';
@@ -418,7 +419,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildLoading() {
-    return const Center(child: CircularProgressIndicator());
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SkeletonLoading(type: SkeletonType.card),
+          SizedBox(height: 16),
+          SkeletonLoading(type: SkeletonType.grid, count: 4),
+          SizedBox(height: 16),
+          SkeletonLoading(type: SkeletonType.card, count: 2),
+          SizedBox(height: 16),
+          SkeletonLoading(type: SkeletonType.list, count: 5),
+        ],
+      ),
+    );
   }
 
   Widget _buildError(DashboardProvider dashboard) {
