@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mini-test</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Nunito:wght@400;600;700;800&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#fefcff",
+                        "tertiary": "#824500",
+                        "primary": "#004ac6",
+                        "background": "#f8f9fa",
+                        "primary-container": "#2563eb",
+                        "surface-tint": "#0053db",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-subtle": "#F1F3F5",
+                        "on-tertiary-fixed": "#2f1500",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "ink-soft": "#6B7280",
+                        "blue-bg": "#EFF6FF",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "secondary-container": "#2170e4",
+                        "on-tertiary-container": "#ffede1",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e1e3e4",
+                        "secondary": "#0058be",
+                        "outline-variant": "#c3c6d7",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1d",
+                        "tertiary-container": "#a65900",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "inverse-primary": "#b4c5ff",
+                        "on-secondary-fixed": "#001a42",
+                        "on-error-container": "#93000a",
+                        "success-bg": "#ECFDF5",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "success": "#059669",
+                        "danger-bg": "#FEF2F2",
+                        "on-surface": "#191c1d",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container-low": "#f3f4f5",
+                        "on-primary-container": "#eeefff",
+                        "surface": "#FFFFFF",
+                        "surface-bright": "#f8f9fa",
+                        "outline": "#737686",
+                        "on-primary-fixed": "#00174b",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-surface-variant": "#434655",
+                        "danger": "#DC2626",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary-fixed": "#d8e2ff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d9dadb",
+                        "ink": "#1A1D23",
+                        "warning-bg": "#FFFBEB",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#edeeef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "sidebar-width": "230px",
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Work Sans"],
+                        "display-brand": ["Nunito"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "headline-md": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "headline-lg": ["Work Sans"],
+                        "body-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; background-color: #f8f9fa; }
+        .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24 md:pb-0 md:pl-sidebar-width flex flex-col antialiased">
+<!-- Navigation Drawer (Desktop) -->
+<nav class="hidden md:flex h-full w-[230px] rounded-r-xl bg-surface dark:bg-inverse-surface shadow-lg fixed left-0 top-0 flex-col p-4 z-40">
+<div class="flex items-center gap-3 mb-8 px-2">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm bg-blue-bg" data-alt="A stylized, modern flat illustration of a friendly cat mascot in blue tones, serving as a user profile avatar. Clean lines, solid colors, friendly expression. Professional educational app context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7zlKX5TOL9Yp0LKSuBKGhuFxu9wEPJwRnxr_-69fgWY3s3k28cNTD-jcgplj6FuLTROuoWs_sGCRKDm7VriTNcJF2oM0LqlfqvNenZ8ZCz4MY3nNXwQGYoQLKwP55DrocH8IUcrFdZPwhXbVwwNs8HdxEpzqGGIK4xHzlXJ8dmKMBk1IObqGjw9byshZM6INDz-dYE8q4YvUkPzzHNireyHVWRlFjGSJv1dp3Q1Lcwcb3lEx8uT8e9YfYosomVBMjB1apDbzt7DA"/>
+<div>
+<div class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim">MeuBeu Learner</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Level B2 Upper Intermediate</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 flex-grow">
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined">star</span>
+<span class="font-body-md text-body-md">Daily Goal</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg bg-blue-bg text-primary font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+<span class="font-body-md text-body-md">Tests</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-body-md text-body-md">Leaderboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+</div>
+<a class="flex items-center gap-4 px-4 py-3 mt-auto rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</nav>
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-on-background flex items-center justify-between px-4 h-16 shadow-sm md:shadow-none z-30">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 text-on-surface-variant hover:bg-surface-subtle transition-colors rounded-full scale-98 active:opacity-80 transition-all">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Mini-test</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-subtle transition-colors rounded-full scale-98 active:opacity-80 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img class="w-8 h-8 rounded-full object-cover md:hidden" data-alt="A stylized, modern flat illustration of a friendly cat mascot in blue tones, serving as a user profile avatar. Clean lines, solid colors, friendly expression. Professional educational app context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtE6OGtonJrnhjg6qjPhPDLdbNvWR1-33Gcezclkz3zOtOBqIX5m-zaaZ8VhWHt_XCo443mWCF2oUu6hSWjuG6veRoI37Be4po6jn_fEGryIbFWNxwh-SsYP9fNRM1nMHv5Ud9nru-02vYKryI0-GUA-bycVeIqtSNm-a8nmmPIXyXlkclm_vph0mqJTk-2nhuKIlNisUVUcZayc6i_ZUgdP6l--EHnl-fF22tBjv_FC3ALk5phr3bO_Ig4-P97GVunqxqwsSKAuc"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow p-4 md:p-margin-desktop max-w-4xl mx-auto w-full space-y-8">
+<!-- Level Selection Section -->
+<section class="space-y-4">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Chọn cấp độ</h2>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<!-- Beginner Card -->
+<label class="cursor-pointer group">
+<input class="peer sr-only" name="test_level" type="radio" value="beginner"/>
+<div class="h-full bg-surface rounded-xl p-4 border border-success/30 shadow-sm transition-all duration-200 peer-checked:bg-success-bg peer-checked:border-success peer-checked:shadow-md hover:shadow-md">
+<div class="flex justify-between items-start mb-3">
+<div class="w-10 h-10 rounded-full bg-success-bg flex items-center justify-center text-success">
+<span class="material-symbols-outlined text-[20px]">emoji_nature</span>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-outline-variant peer-checked:border-success peer-checked:bg-success flex items-center justify-center transition-colors">
+<div class="w-2.5 h-2.5 rounded-full bg-surface opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1 flex items-center gap-2">
+<span>🌱</span> Cơ bản
+                        </h3>
+<div class="flex items-center gap-3 font-body-md text-body-md text-ink-soft">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">format_list_numbered</span> 10 questions</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 15 mins</span>
+</div>
+</div>
+</label>
+<!-- Intermediate Card (Selected) -->
+<label class="cursor-pointer group">
+<input checked="" class="peer sr-only" name="test_level" type="radio" value="intermediate"/>
+<div class="h-full bg-surface rounded-xl p-4 border-2 border-transparent shadow-sm transition-all duration-200 peer-checked:bg-blue-bg peer-checked:border-primary peer-checked:shadow-md hover:shadow-md">
+<div class="flex justify-between items-start mb-3">
+<div class="w-10 h-10 rounded-full bg-warning-bg flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]">psychology</span>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-outline-variant peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-colors">
+<div class="w-2.5 h-2.5 rounded-full bg-surface opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1 flex items-center gap-2">
+<span>🌿</span> Trung cấp
+                        </h3>
+<div class="flex items-center gap-3 font-body-md text-body-md text-ink-soft">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">format_list_numbered</span> 20 questions</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 30 mins</span>
+</div>
+</div>
+</label>
+<!-- Advanced Card -->
+<label class="cursor-pointer group">
+<input class="peer sr-only" name="test_level" type="radio" value="advanced"/>
+<div class="h-full bg-surface rounded-xl p-4 border border-danger/30 shadow-sm transition-all duration-200 peer-checked:bg-danger-bg peer-checked:border-danger peer-checked:shadow-md hover:shadow-md">
+<div class="flex justify-between items-start mb-3">
+<div class="w-10 h-10 rounded-full bg-danger-bg flex items-center justify-center text-danger">
+<span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-outline-variant peer-checked:border-danger peer-checked:bg-danger flex items-center justify-center transition-colors">
+<div class="w-2.5 h-2.5 rounded-full bg-surface opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1 flex items-center gap-2">
+<span>🔥</span> Nâng cao
+                        </h3>
+<div class="flex items-center gap-3 font-body-md text-body-md text-ink-soft">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">format_list_numbered</span> 30 questions</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 45 mins</span>
+</div>
+</div>
+</label>
+</div>
+</section>
+<!-- Topic Selection Section -->
+<section class="space-y-4">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Chọn chủ đề (tuỳ chọn)</h2>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full font-body-md text-body-md bg-ink text-surface transition-colors">Tất cả</button>
+<button class="px-4 py-2 rounded-full font-body-md text-body-md bg-surface border border-outline-variant text-on-surface hover:bg-surface-subtle transition-colors">Greetings</button>
+<button class="px-4 py-2 rounded-full font-body-md text-body-md bg-surface border border-outline-variant text-on-surface hover:bg-surface-subtle transition-colors">Family</button>
+<button class="px-4 py-2 rounded-full font-body-md text-body-md bg-surface border border-outline-variant text-on-surface hover:bg-surface-subtle transition-colors">Food</button>
+<button class="px-4 py-2 rounded-full font-body-md text-body-md bg-surface border border-outline-variant text-on-surface hover:bg-surface-subtle transition-colors">Travel</button>
+</div>
+</section>
+<!-- CTA Button -->
+<div class="pt-4 pb-8 border-b border-surface-variant">
+<button class="w-full md:w-auto md:px-12 py-4 bg-primary text-surface font-headline-md text-headline-md rounded-xl shadow-sm hover:bg-primary-container transition-colors flex items-center justify-center gap-2 active:scale-95">
+<span class="material-symbols-outlined">play_arrow</span> Bắt đầu kiểm tra
+            </button>
+</div>
+<!-- History Section -->
+<section class="space-y-6">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Lịch sử kiểm tra</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Trend Chart -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-surface-variant flex flex-col justify-between">
+<h3 class="font-body-md text-body-md text-ink-soft mb-4">Điểm trung bình (7 ngày qua)</h3>
+<div class="h-24 w-full relative flex items-end justify-between px-2">
+<div class="w-4 bg-primary/20 rounded-t-sm h-[40%] relative"><div class="absolute -top-6 -left-1 text-[10px] text-ink-soft">45</div></div>
+<div class="w-4 bg-primary/40 rounded-t-sm h-[60%] relative"><div class="absolute -top-6 -left-1 text-[10px] text-ink-soft">60</div></div>
+<div class="w-4 bg-primary/60 rounded-t-sm h-[55%] relative"><div class="absolute -top-6 -left-1 text-[10px] text-ink-soft">55</div></div>
+<div class="w-4 bg-primary/80 rounded-t-sm h-[80%] relative"><div class="absolute -top-6 -left-1 text-[10px] text-ink-soft">80</div></div>
+<div class="w-4 bg-primary rounded-t-sm h-[95%] relative"><div class="absolute -top-6 -left-1 text-[10px] font-bold text-primary">95</div></div>
+</div>
+</div>
+<!-- Recent Items -->
+<div class="md:col-span-2 space-y-3">
+<!-- History Item 1 -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-surface-variant flex items-center justify-between hover:bg-surface-subtle transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-variant" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4"></path>
+<path class="text-success" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="95, 100" stroke-width="4"></path>
+</svg>
+<span class="absolute font-mono-data text-mono-data font-semibold text-on-surface">95%</span>
+</div>
+<div>
+<h4 class="font-body-lg text-body-lg font-medium text-on-surface">Mini-test #42</h4>
+<div class="font-label-sm text-label-sm text-ink-soft flex items-center gap-2">
+<span>Hôm qua, 14:30</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="px-2 py-0.5 bg-blue-bg text-primary rounded-full text-[10px] font-medium">Trung cấp</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<!-- History Item 2 -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-surface-variant flex items-center justify-between hover:bg-surface-subtle transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-variant" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4"></path>
+<path class="text-tertiary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="80, 100" stroke-width="4"></path>
+</svg>
+<span class="absolute font-mono-data text-mono-data font-semibold text-on-surface">80%</span>
+</div>
+<div>
+<h4 class="font-body-lg text-body-lg font-medium text-on-surface">Mini-test #41</h4>
+<div class="font-label-sm text-label-sm text-ink-soft flex items-center gap-2">
+<span>3 ngày trước</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="px-2 py-0.5 bg-blue-bg text-primary rounded-full text-[10px] font-medium">Trung cấp</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface dark:bg-inverse-surface shadow-sm flex justify-around items-center h-20 px-2 pb-safe border-t border-surface-variant/50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-subtle p-2 rounded-xl scale-95 transition-transform duration-200 w-16" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-sm text-label-sm mt-1">Learn</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold hover:bg-blue-bg dark:hover:bg-secondary-container p-2 rounded-xl scale-95 transition-transform duration-200 w-16" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+<span class="font-label-sm text-label-sm mt-1">Tests</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-subtle p-2 rounded-xl scale-95 transition-transform duration-200 w-16" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-sm text-label-sm mt-1">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-subtle p-2 rounded-xl scale-95 transition-transform duration-200 w-16" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

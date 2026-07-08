@@ -35,9 +35,10 @@ class AuthProvider extends ChangeNotifier {
       );
       if (response.user == null) {
         _errorMessage = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
-        // Không set _user ở đây — để listener xử lý
+      } else {
+        // Set _user NGAY lập tức — không chờ listener
+        _user = response.user;
       }
-      // Listener sẽ cập nhật _user và gọi notifyListeners khi auth state thay đổi
     } on AuthException catch (e) {
       _errorMessage = _mapAuthError(e.message);
     } catch (e) {
@@ -61,8 +62,10 @@ class AuthProvider extends ChangeNotifier {
       );
       if (response.user == null) {
         _errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
+      } else {
+        // Set _user NGAY lập tức
+        _user = response.user;
       }
-      // Listener sẽ cập nhật _user và gọi notifyListeners
     } on AuthException catch (e) {
       _errorMessage = _mapAuthError(e.message);
     } catch (e) {

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MeuBeu - Tạo tài khoản mới</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Nunito:wght@400;600;700;800&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "success-bg": "#ECFDF5",
+                        "on-secondary-fixed": "#001a42",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "success": "#059669",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary": "#0058be",
+                        "on-primary-container": "#eeefff",
+                        "primary": "#004ac6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-subtle": "#F1F3F5",
+                        "tertiary-container": "#a65900",
+                        "surface": "#FFFFFF",
+                        "ink": "#1A1D23",
+                        "on-tertiary": "#ffffff",
+                        "warning-bg": "#FFFBEB",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline-variant": "#c3c6d7",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "danger-bg": "#FEF2F2",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-tertiary-container": "#ffede1",
+                        "ink-soft": "#6B7280",
+                        "blue-bg": "#EFF6FF",
+                        "secondary-container": "#2170e4",
+                        "on-surface": "#191c1d",
+                        "on-primary-fixed": "#00174b",
+                        "outline": "#737686",
+                        "primary-fixed": "#dbe1ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#0053db",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-secondary-container": "#fefcff",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "on-secondary-fixed-variant": "#004395",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#2563eb",
+                        "surface-dim": "#d9dadb",
+                        "inverse-primary": "#b4c5ff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d8e2ff",
+                        "inverse-surface": "#2e3132",
+                        "tertiary-fixed": "#ffdcc3",
+                        "tertiary": "#824500",
+                        "danger": "#DC2626",
+                        "surface-container-low": "#f3f4f5",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#434655"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "sidebar-width": "230px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Work Sans", "sans-serif"],
+                        "mono-data": ["IBM Plex Mono", "monospace"],
+                        "display-brand": ["Nunito", "sans-serif"],
+                        "headline-sm": ["Work Sans", "sans-serif"],
+                        "body-lg": ["Work Sans", "sans-serif"],
+                        "headline-lg": ["Work Sans", "sans-serif"],
+                        "headline-lg-mobile": ["Work Sans", "sans-serif"],
+                        "label-sm": ["Work Sans", "sans-serif"],
+                        "headline-md": ["Work Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #004ac6 0%, #00174b 100%);
+        }
+        .gradient-btn {
+            background: linear-gradient(90deg, #2563eb 0%, #004ac6 100%);
+            transition: all 0.3s ease;
+        }
+        .gradient-btn:hover {
+            background: linear-gradient(90deg, #004ac6 0%, #00174b 100%);
+            transform: scale(0.98);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4 md:p-8 text-on-surface font-body-md antialiased">
+<!-- Suppressed Shell: Linear/Transactional Page (Sign-up) -->
+<main class="w-full max-w-md mx-auto">
+<!-- Brand Logo / Header -->
+<div class="text-center mb-8">
+<h1 class="font-display-brand text-on-primary mb-2 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined fill-icon text-[40px]">pets</span>
+                MeuBeu
+            </h1>
+</div>
+<!-- Glassmorphism Card -->
+<div class="glass-card rounded-[24px] p-6 md:p-8 w-full shadow-lg">
+<div class="mb-8 text-center">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-ink mb-2">Tạo tài khoản mới</h2>
+<p class="font-body-md text-body-md text-ink-soft">Bắt đầu hành trình chinh phục ngoại ngữ cùng Meu</p>
+</div>
+<form class="space-y-5">
+<!-- Username -->
+<div>
+<label class="block font-label-sm text-label-sm text-ink mb-1.5 ml-1" for="username">Tên người dùng</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" data-icon="person">person</span>
+<input class="w-full bg-background border border-surface-variant rounded-[10px] py-3 pl-10 pr-4 font-body-md text-body-md text-ink focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-ink-soft" id="username" name="username" placeholder="Nhập tên của bạn" type="text"/>
+</div>
+</div>
+<!-- Email -->
+<div>
+<label class="block font-label-sm text-label-sm text-ink mb-1.5 ml-1" for="email">Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" data-icon="mail">mail</span>
+<input class="w-full bg-background border border-surface-variant rounded-[10px] py-3 pl-10 pr-4 font-body-md text-body-md text-ink focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-ink-soft" id="email" name="email" placeholder="example@email.com" type="email"/>
+</div>
+</div>
+<!-- Password -->
+<div>
+<label class="block font-label-sm text-label-sm text-ink mb-1.5 ml-1" for="password">Mật khẩu</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" data-icon="lock">lock</span>
+<input class="w-full bg-background border border-surface-variant rounded-[10px] py-3 pl-10 pr-10 font-body-md text-body-md text-ink focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-ink-soft" id="password" name="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility_off">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Confirm Password -->
+<div>
+<label class="block font-label-sm text-label-sm text-ink mb-1.5 ml-1" for="confirm-password">Xác nhận mật khẩu</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" data-icon="lock_reset">lock_reset</span>
+<input class="w-full bg-background border border-surface-variant rounded-[10px] py-3 pl-10 pr-10 font-body-md text-body-md text-ink focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-ink-soft" id="confirm-password" name="confirm-password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility_off">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Sign Up Button -->
+<button class="w-full gradient-btn text-on-primary font-headline-sm text-headline-sm py-3.5 rounded-[12px] shadow-sm flex items-center justify-center gap-2 mt-2" type="submit">
+                    Đăng ký
+                    <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Social Login Divider -->
+<div class="mt-6 flex items-center gap-4">
+<div class="flex-1 h-px bg-surface-variant"></div>
+<span class="font-label-sm text-label-sm text-ink-soft uppercase tracking-wider">Hoặc</span>
+<div class="flex-1 h-px bg-surface-variant"></div>
+</div>
+<!-- Social Buttons -->
+<div class="mt-6 flex gap-3">
+<button class="flex-1 bg-surface border border-surface-variant rounded-[12px] py-2.5 flex items-center justify-center hover:bg-surface-subtle transition-colors">
+<img alt="Google" class="w-5 h-5" data-alt="A small, crisp Google logo icon on a clean white background, simple and recognizable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDViaCb1Tj7N3ZYwl7pKC9kIewjdiFZbD8YJHs3WRdsFBR_-ZPsuqvoihEAwYeXD3RJGA42o9tOM6HRnUSBZcuLZuQkWFwaJVl-5fKjVY6rihNOzmJAireUK63T3wN_ldeYUEKb92yhL8aeR0ukXW1a8-j6y7eX-FipZ6vfIKDgVl2iNvV4sNbLvyWF_opGHHWllvlutpX2JhsIjiwKRrv8YWDmb-KEQFl-BhkO-zq2Vk2GdMxSHLtWGdXJ4z_HeXAudnyAnTz4UNw"/>
+</button>
+<button class="flex-1 bg-surface border border-surface-variant rounded-[12px] py-2.5 flex items-center justify-center hover:bg-surface-subtle transition-colors">
+<img alt="Facebook" class="w-5 h-5" data-alt="A small, crisp Facebook logo icon on a clean white background, simple and recognizable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC30cJ06kWgx74WCDJZATR5IDym4iCw1UXuTaqSOwZzy8q0y3YyijJR5IQUGQl7bWMEhIkpAlsQc5QrVN30H_52PTB33SP9tBg09g_uj2Y9r2W8r2nunQNAjEvVWdSYiLKQPFBClIO7XUt_1Cpxce_da3kLDh6N1Qj7wzOEjrcLRb_0dW6OOJvBpv8_opifyUvB3FXUfEw8xKSKWE2_NQU-h9XaW-aymmxK79-3N7mJ6b1GEJ_IQQz_1xfKK-p4DQpqAsFwd_o8a0Q"/>
+</button>
+</div>
+<!-- Footer -->
+<div class="mt-8 text-center">
+<p class="font-body-md text-body-md text-ink-soft">
+                    Đã có tài khoản? 
+                    <a class="text-primary font-semibold hover:underline" href="#">Đăng nhập</a>
+</p>
+</div>
+</div>
+</main>
+</body></html>

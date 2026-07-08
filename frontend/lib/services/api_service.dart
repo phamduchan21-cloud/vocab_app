@@ -23,8 +23,10 @@ class ApiAuthException implements Exception {
 }
 
 class ApiService {
-  final http.Client _client = http.Client();
+  http.Client? _client;
   static const Duration _timeout = Duration(seconds: 30);
+
+  http.Client get _http => _client ??= http.Client();
 
   String? _getToken() {
     final session = Supabase.instance.client.auth.currentSession;
@@ -42,14 +44,37 @@ class ApiService {
     return headers;
   }
 
-  Future<dynamic> get(String endpoint, {Map<String, String>? queryParams}) async {
+  Future<dynamic> _request(
+    String method,
+    String endpoint, {
+    Map<String, String>? queryParams,
+    Map<String, dynamic>? body,
+  }) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}$endpoint')
+        .replace(queryParameters: queryParams);
     try {
-      final uri = Uri.parse('${ApiConfig.baseUrl}$endpoint')
-          .replace(queryParameters: queryParams);
-      final response = await _client
-          .get(uri, headers: _headers())
-          .timeout(_timeout);
-      return _handleResponse(response);
+      late http.Response response;
+      switch (method) {
+        case 'GET':
+          response = await _http.get(uri, headers: _headers()).timeout(_timeout);
+          break;
+        case 'POST':
+          response = await _http
+              .post(uri, headers: _headers(), body: body != null ? jsonEncode(body) : null)
+              .timeout(_timeout);
+          break;
+        case 'PUT':
+          response = await _http
+              .put(uri, headers: _headers(), body: body != null ? jsonEncode(body) : null)
+              .timeout(_timeout);
+          break;
+        case 'DELETE':
+          response = await _http.delete(uri, headers: _headers()).timeout(_timeout);
+          break;
+        default:
+          throw ArgumentError('Unsupported method: $method');
+      }
+      return _handleResponse(response, method, endpoint, queryParams, body);
     } on SocketException {
       throw ApiException(0, 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
     } on TimeoutException {
@@ -57,50 +82,36 @@ class ApiService {
     }
   }
 
-  Future<dynamic> post(String endpoint, {Map<String, dynamic>? body}) async {
-    try {
-      final uri = Uri.parse('${ApiConfig.baseUrl}$endpoint');
-      final response = await _client
-          .post(uri, headers: _headers(), body: body != null ? jsonEncode(body) : null)
-          .timeout(_timeout);
-      return _handleResponse(response);
-    } on SocketException {
-      throw ApiException(0, 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
-    } on TimeoutException {
-      throw ApiException(0, 'Yêu cầu đã hết thời gian chờ. Vui lòng thử lại.');
-    }
-  }
+  Future<dynamic> get(String endpoint, {Map<String, String>? queryParams}) =>
+      _request('GET', endpoint, queryParams: queryParams);
 
-  Future<dynamic> put(String endpoint, {Map<String, dynamic>? body}) async {
-    try {
-      final uri = Uri.parse('${ApiConfig.baseUrl}$endpoint');
-      final response = await _client
-          .put(uri, headers: _headers(), body: body != null ? jsonEncode(body) : null)
-          .timeout(_timeout);
-      return _handleResponse(response);
-    } on SocketException {
-      throw ApiException(0, 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
-    } on TimeoutException {
-      throw ApiException(0, 'Yêu cầu đã hết thời gian chờ. Vui lòng thử lại.');
-    }
-  }
+  Future<dynamic> post(String endpoint, {Map<String, dynamic>? body}) =>
+      _request('POST', endpoint, body: body);
 
-  Future<dynamic> delete(String endpoint) async {
-    try {
-      final uri = Uri.parse('${ApiConfig.baseUrl}$endpoint');
-      final response = await _client
-          .delete(uri, headers: _headers())
-          .timeout(_timeout);
-      return _handleResponse(response);
-    } on SocketException {
-      throw ApiException(0, 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
-    } on TimeoutException {
-      throw ApiException(0, 'Yêu cầu đã hết thời gian chờ. Vui lòng thử lại.');
-    }
-  }
+  Future<dynamic> put(String endpoint, {Map<String, dynamic>? body}) =>
+      _request('PUT', endpoint, body: body);
 
-  dynamic _handleResponse(http.Response response) {
+  Future<dynamic> delete(String endpoint) =>
+      _request('DELETE', endpoint);
+
+  Future<dynamic> _handleResponse(
+    http.Response response,
+    String method,
+    String endpoint,
+    Map<String, String>? queryParams,
+    Map<String, dynamic>? body,
+  ) async {
     if (response.statusCode == 401) {
+      // Attempt token refresh once
+      try {
+        final refreshed = await Supabase.instance.client.auth.refreshSession();
+        if (refreshed.session != null) {
+          // Retry with fresh token
+          return _request(method, endpoint, queryParams: queryParams, body: body);
+        }
+      } catch (_) {
+        // Refresh failed — force re-login
+      }
       throw ApiAuthException('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
     }
     if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -118,6 +129,7 @@ class ApiService {
   }
 
   void dispose() {
-    _client.close();
+    _client?.close();
+    _client = null;
   }
 }

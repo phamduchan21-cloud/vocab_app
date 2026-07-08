@@ -26,7 +26,7 @@ class ErrorStateWidget extends StatelessWidget {
             const CatWidget(size: 100, expression: CatExpression.sad),
             const SizedBox(height: 24),
             Text(
-              'Ráº¥t tiáº¿c!',
+              'Rất tiếc!',
               style: GoogleFonts.workSans(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,

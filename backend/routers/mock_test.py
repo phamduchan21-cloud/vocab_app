@@ -71,7 +71,7 @@ async def submit_mock_test(
     return result
 
 
-@router.get("/available-topics")
+@router.get("/available-topics", response_model=dict)
 async def get_available_topics(
     service: MockTestService = Depends(get_mock_test_service),
     current_user: User = Depends(get_current_user),

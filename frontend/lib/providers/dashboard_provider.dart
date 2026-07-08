@@ -22,7 +22,7 @@ class DashboardProvider extends ChangeNotifier {
 
   /// Safely execute an API call with timeout.
   /// Returns null on failure so one failing call doesn't crash the whole batch.
-  Future<T?> _safeGet<T>(Future<T> Function() fn, {Duration timeout = const Duration(seconds: 10)}) async {
+  Future<T?> _safeGet<T>(Future<T> Function() fn, {Duration timeout = const Duration(seconds: 5)}) async {
     try {
       return await fn().timeout(timeout);
     } catch (e) {
@@ -68,8 +68,10 @@ class DashboardProvider extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    // Reset state trước khi load lại
+    _isLoading = false; // đảm bảo không bị block bởi check _isLoading trong loadDashboard
     _data = null;
+    _errorMessage = null;
+    notifyListeners();
     await loadDashboard();
   }
 }

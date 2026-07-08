@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MeuBeu AI Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;family=Nunito:wght@700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-tertiary": "#ffffff",
+                        "success-bg": "#ECFDF5",
+                        "on-secondary-container": "#fefcff",
+                        "background": "#f8f9fa",
+                        "tertiary": "#824500",
+                        "secondary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "danger-bg": "#FEF2F2",
+                        "primary-container": "#2563eb",
+                        "on-primary-container": "#eeefff",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1d",
+                        "warning-bg": "#FFFBEB",
+                        "tertiary-container": "#a65900",
+                        "surface": "#FFFFFF",
+                        "surface-subtle": "#F1F3F5",
+                        "surface-container": "#edeeef",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "surface-container-low": "#f3f4f5",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-dim": "#d9dadb",
+                        "secondary": "#0058be",
+                        "ink": "#1A1D23",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-primary": "#ffffff",
+                        "ink-soft": "#6B7280",
+                        "surface-tint": "#0053db",
+                        "surface-bright": "#f8f9fa",
+                        "on-background": "#191c1d",
+                        "outline": "#737686",
+                        "on-tertiary-fixed": "#2f1500",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-primary-fixed": "#00174b",
+                        "primary": "#004ac6",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-secondary-fixed": "#001a42",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434655",
+                        "surface-container-high": "#e7e8e9",
+                        "blue-bg": "#EFF6FF",
+                        "outline-variant": "#c3c6d7",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-container": "#ffede1",
+                        "error": "#ba1a1a",
+                        "success": "#059669",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "danger": "#DC2626",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "sidebar-width": "230px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "headline-md": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "display-brand": ["Nunito"],
+                        "headline-lg-mobile": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "display-brand": ["48px", {"lineHeight": "56px", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        .chat-bubble-ai {
+            border-bottom-left-radius: 4px !important;
+        }
+        
+        .chat-bubble-user {
+            border-bottom-right-radius: 4px !important;
+        }
+        
+        /* Hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface h-screen flex flex-col md:flex-row overflow-hidden font-body-md">
+<!-- Desktop Sidebar (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col w-sidebar-width bg-ink h-full text-surface z-40 fixed left-0 top-0 pt-6">
+<div class="px-6 mb-8 flex items-center gap-3">
+<span class="font-display-brand text-headline-md text-primary-fixed">VocaEng</span>
+</div>
+<nav class="flex-1 px-3 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-outline-variant hover:bg-surface-container-high/10 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-sm text-body-md">Home</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-outline-variant hover:bg-surface-container-high/10 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">quiz</span>
+<span class="font-label-sm text-body-md">Quiz</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-outline-variant hover:bg-surface-container-high/10 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">style</span>
+<span class="font-label-sm text-body-md">Flashcard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-outline-variant hover:bg-surface-container-high/10 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">assignment</span>
+<span class="font-label-sm text-body-md">Test</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-primary-fixed bg-secondary-container/20 font-bold transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-sm text-body-md">Meu AI Chat</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-outline-variant hover:bg-surface-container-high/10 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-body-md">Profile</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full md:ml-sidebar-width relative w-full">
+<!-- TopAppBar (Shared Component styling applied) -->
+<header class="w-full top-0 sticky bg-surface z-30 flex items-center justify-between px-margin-mobile h-14 w-full shadow-sm">
+<div class="flex items-center gap-3">
+<button class="md:hidden text-on-surface-variant hover:bg-surface-container-low rounded-full p-2 active:scale-95 duration-150 transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-blue-bg flex items-center justify-center overflow-hidden border border-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="A highly detailed illustration of a cute, friendly orange tabby cat wearing tiny academic glasses, set against a soft light blue background. The aesthetic is clean, modern, and vector-like, consistent with a professional educational app's mascot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnzruJPoe5xfdSn3xhvOjt29ToSrSE_A08Zhy5qhKDOQ6O2XEqJvo0Sg_sF0eSH9x-OiQ2d5G4K2_NlnX799-fWhMV6NcLtmrftWE1UvDnBxGsfcsnSeiFWaUzui1J7enovhL3E5pA5DTD6NUcc1JeOAZDlycbShYWzFUsGgaK1nIUm2fc59xdy5JBMpFLjeKxQjn2i3Zj3l8Xpymr1Pbe0zJKJs8ia_kS7rCO0IX33JoTaB_xchxi6bwG7F3LH5hAqGzDUBJrztk"/>
+</div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Meu - AI Assistant</span>
+<span class="font-label-sm text-label-sm text-success flex items-center gap-1">
+                            Online
+                        </span>
+</div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:bg-surface-container-low rounded-full p-2 active:scale-95 duration-150 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<!-- Chat Canvas -->
+<div class="flex-1 overflow-y-auto bg-background p-4 md:p-8 flex flex-col gap-6 no-scrollbar pb-32">
+<!-- Date Divider -->
+<div class="flex justify-center my-2">
+<span class="font-label-sm text-label-sm text-ink-soft bg-surface-container-low px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- AI Message -->
+<div class="flex gap-3 max-w-[85%] md:max-w-2xl">
+<div class="w-8 h-8 rounded-full bg-blue-bg flex-shrink-0 mt-auto mb-1 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A small avatar image of a friendly cartoon cat face, designed in a flat, modern, minimalist style with soft pastel colors, suitable for an educational AI chatbot interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOEr_keT8mYvzVi_oCZnRHhq9sh2fQ2wYk815HT-1DEKCwVoSV5QfWx2WekOeoiW6q_LOPqyIzxsM7UIFs-WctMvMkeYnhHJldQJ6K89psHWJe_Hb5esWllKfzcDKaslhMi2-2q9fJuJ6xeBXf4X8gWIhmOjIeNLnH1-eoC7z8AMx4rMNFVXzcaX8eWDThjesj69DoxH6vzgDsIAgzRun2F8nlilR8UZYvCB510HxEqVISsre9-P-4BHRpZIxUzI426tocCJgl2SY"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="bg-surface text-on-surface p-4 rounded-2xl chat-bubble-ai shadow-sm border border-surface-container-highest font-body-lg text-body-lg">
+                        Meow! I'm Meu. Ready to practice some English today? What topic would you like to focus on?
+                    </div>
+<span class="font-label-sm text-label-sm text-ink-soft ml-2">10:42 AM</span>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-3 max-w-[85%] md:max-w-2xl self-end">
+<div class="flex flex-col gap-1 items-end">
+<div class="bg-primary text-surface p-4 rounded-2xl chat-bubble-user shadow-sm font-body-lg text-body-lg">
+                        Let's practice vocabulary related to traveling.
+                    </div>
+<span class="font-label-sm text-label-sm text-ink-soft mr-2">10:43 AM</span>
+</div>
+</div>
+<!-- AI Message with Rich Content (Flashcard Style) -->
+<div class="flex gap-3 max-w-[85%] md:max-w-2xl">
+<div class="w-8 h-8 rounded-full bg-blue-bg flex-shrink-0 mt-auto mb-1 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A small avatar image of a friendly cartoon cat face, designed in a flat, modern, minimalist style with soft pastel colors, suitable for an educational AI chatbot interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWyArzZ4evs0_fwinP5LIsJ3Dy-tEAqAdgAJVu-4tD9xhUmzya8tZG3hcgWaDIR3qHqhavv5wbCQU-07Q0y7ziGBJ8WdrxOl3Ux7hn8rt7cFn4V0HhPMbeEhDJu26qT0fDL-7ZhKaH5SlHgsSr4jYNEdQJBwk6GtInBo_Xy-i9BcssRdYSz1E7dlLtswCnDmQls6gJ4xc2FtpW4NbTiq7H3Df7oGU9QTa0OuyALm-am2oeHqIeyyvJdwC8Z_74R48pBOjuCjjbP-E"/>
+</div>
+<div class="flex flex-col gap-1 w-full">
+<div class="bg-surface text-on-surface p-4 rounded-2xl chat-bubble-ai shadow-sm border border-surface-container-highest font-body-lg text-body-lg mb-2">
+                        Purrfect! Let's start with a useful word:
+                    </div>
+<!-- Integrated Flashcard UI Pattern -->
+<div class="bg-surface rounded-xl shadow-sm border border-surface-container-highest overflow-hidden w-full max-w-sm mb-1 hover:shadow-md transition-shadow">
+<div class="bg-blue-bg p-4 flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-3xl">flight_takeoff</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+<div class="p-4">
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-1">Itinerary</h3>
+<p class="font-mono-data text-mono-data text-primary mb-3">/aɪˈtɪnəreri/</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">
+<span class="font-bold text-on-surface">Noun:</span> A planned route or journey.
+                            </p>
+<div class="bg-surface-container-low p-3 rounded-lg border-l-2 border-primary">
+<p class="font-body-md text-body-md text-ink italic">"We need to finalize our itinerary before booking the hotels."</p>
+</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft ml-2">10:43 AM</span>
+</div>
+</div>
+</div>
+<!-- Input Area (Fixed at bottom) -->
+<div class="absolute bottom-0 left-0 w-full glass-panel border-t border-surface-container-highest p-4 md:px-8 flex flex-col gap-3 pb-[calc(1rem+4rem)] md:pb-4 z-20">
+<!-- Suggestion Chips -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 w-full">
+<button class="whitespace-nowrap px-4 py-2 rounded-full border-1.5 border-outline-variant text-on-surface-variant font-label-sm text-body-md hover:bg-blue-bg hover:text-primary hover:border-primary transition-all active:scale-95">
+                    Explain more
+                </button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full border-1.5 border-outline-variant text-on-surface-variant font-label-sm text-body-md hover:bg-blue-bg hover:text-primary hover:border-primary transition-all active:scale-95">
+                    Give an example
+                </button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full border-1.5 border-outline-variant text-on-surface-variant font-label-sm text-body-md hover:bg-blue-bg hover:text-primary hover:border-primary transition-all active:scale-95">
+                    Next word
+                </button>
+</div>
+<!-- Input Bar -->
+<div class="flex items-center gap-2">
+<button class="p-3 text-on-surface-variant hover:text-primary hover:bg-blue-bg rounded-full transition-colors active:scale-95 flex-shrink-0">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<div class="flex-1 bg-background rounded-full border border-surface-container-highest flex items-center px-4 py-1 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all shadow-sm">
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-lg text-body-lg text-on-surface placeholder-ink-soft py-2" placeholder="Type a message..." type="text"/>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+<button class="w-12 h-12 bg-primary text-surface rounded-full flex items-center justify-center hover:bg-on-secondary-fixed-variant shadow-sm transition-colors active:scale-95 flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface shadow-[0_-1px_0_0_rgba(0,0,0,0.05)] shadow-lg h-16">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-1 w-16 hover:bg-surface-container-low rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-1 w-16 hover:bg-surface-container-low rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">quiz</span>
+<span class="font-label-sm text-label-sm mt-1">Quiz</span>
+</a>
+<!-- Active Chat Tab representing AI Assistant intention -->
+<a class="flex flex-col items-center justify-center text-primary font-bold bg-blue-bg rounded-xl p-1 w-16 shadow-sm active:scale-98 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-sm text-label-sm mt-1">Chat</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-1 w-16 hover:bg-surface-container-low rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">assignment</span>
+<span class="font-label-sm text-label-sm mt-1">Test</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-1 w-16 hover:bg-surface-container-low rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

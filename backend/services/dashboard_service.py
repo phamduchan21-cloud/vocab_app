@@ -49,116 +49,71 @@ class DashboardService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_stats(self, user_id: str) -> DashboardResponse:
-        """Get expanded dashboard statistics, including streak/xp/gems/level."""
-
-        # ── 1. Vocabulary count ──────────────────────────────────────
-        vocab_count_query = (
-            select(func.count())
-            .select_from(Vocabulary)
-            .where(Vocabulary.user_id == user_id)
+    async def _get_quiz_aggregates(self, user_id: str):
+        """Single query: count, sum correct, sum total from QuizResult."""
+        row = await self.db.execute(
+            select(
+                func.count().label("count"),
+                func.coalesce(func.sum(QuizResult.correct_answers), 0).label("correct"),
+                func.coalesce(func.sum(QuizResult.total_questions), 0).label("total"),
+            ).where(QuizResult.user_id == user_id)
         )
-        vocab_count = await self.db.scalar(vocab_count_query) or 0
+        r = row.one()
+        return r.count, r.correct, r.total
 
-        # ── 2. Quiz stats ────────────────────────────────────────────
-        quiz_count_query = (
-            select(func.count())
-            .select_from(QuizResult)
-            .where(QuizResult.user_id == user_id)
-        )
-        quiz_count = await self.db.scalar(quiz_count_query) or 0
-
-        correct_sum_query = (
-            select(func.coalesce(func.sum(QuizResult.correct_answers), 0))
-            .where(QuizResult.user_id == user_id)
-        )
-        correct_answers = await self.db.scalar(correct_sum_query) or 0
-
-        total_questions_query = (
-            select(func.coalesce(func.sum(QuizResult.total_questions), 0))
-            .where(QuizResult.user_id == user_id)
-        )
-        total_questions = await self.db.scalar(total_questions_query) or 0
-
-        accuracy_rate = 0.0
-        if total_questions > 0:
-            accuracy_rate = round((correct_answers / total_questions) * 100, 2)
-
-        # ── 3. XP & Streak ────────────────────────────────────────────
-        total_xp_query = (
+    async def _get_xp_total(self, user_id: str) -> int:
+        return await self.db.scalar(
             select(func.coalesce(func.sum(UserDailyActivity.xp_earned), 0))
             .where(UserDailyActivity.user_id == user_id)
-        )
-        total_xp = await self.db.scalar(total_xp_query) or 0
+        ) or 0
 
-        # Gems = XP / 10 (đơn giản hoá)
+    async def get_stats(self, user_id: str) -> DashboardResponse:
+        """Get expanded dashboard statistics."""
+        vocab_count = await self.db.scalar(
+            select(func.count()).select_from(Vocabulary).where(Vocabulary.user_id == user_id)
+        ) or 0
+
+        quiz_count, correct_answers, total_questions = await self._get_quiz_aggregates(user_id)
+        accuracy_rate = round((correct_answers / total_questions) * 100, 2) if total_questions > 0 else 0.0
+
+        total_xp = await self._get_xp_total(user_id)
         gems = total_xp // 10
-
-        # Level
         level, level_title = calc_level(total_xp)
-
-        # Streak: đếm số ngày gần nhất có activity liên tục
         streak = await self._calc_streak(user_id)
-
-        # Weekly progress
         weekly_progress = await self._calc_weekly_progress(user_id)
 
-        # ── 4. Recent items ──────────────────────────────────────────
         recent_vocabs = await self._get_recent_vocabs(user_id, limit=5)
         recent_quizzes = await self._get_recent_quizzes(user_id, limit=5)
 
         return DashboardResponse(
-            streak=streak,
-            xp=total_xp,
-            gems=gems,
-            level=level,
-            level_title=level_title,
+            streak=streak, xp=total_xp, gems=gems,
+            level=level, level_title=level_title,
             weekly_progress=weekly_progress,
-            vocab_count=vocab_count,
-            quiz_count=quiz_count,
-            correct_answers=correct_answers,
-            accuracy_rate=accuracy_rate,
-            recent_vocabs=recent_vocabs,
-            recent_quizzes=recent_quizzes,
+            vocab_count=vocab_count, quiz_count=quiz_count,
+            correct_answers=correct_answers, accuracy_rate=accuracy_rate,
+            recent_vocabs=recent_vocabs, recent_quizzes=recent_quizzes,
         )
 
     async def get_user_stats(self, user_id: str) -> UserStatsResponse:
-        """Chỉ lấy header stats (streak/xp/gems/level) — nhẹ hơn get_stats."""
-        total_xp_query = (
-            select(func.coalesce(func.sum(UserDailyActivity.xp_earned), 0))
-            .where(UserDailyActivity.user_id == user_id)
-        )
-        total_xp = await self.db.scalar(total_xp_query) or 0
+        """Header stats — uses same aggregates."""
+        vocab_count = await self.db.scalar(
+            select(func.count()).select_from(Vocabulary).where(Vocabulary.user_id == user_id)
+        ) or 0
+        quiz_count, correct_answers, total_questions = await self._get_quiz_aggregates(user_id)
+        accuracy_rate = round((correct_answers / total_questions) * 100, 2) if total_questions > 0 else 0.0
 
+        total_xp = await self._get_xp_total(user_id)
         gems = total_xp // 10
         level, level_title = calc_level(total_xp)
         streak = await self._calc_streak(user_id)
         weekly_progress = await self._calc_weekly_progress(user_id)
 
-        vocab_count_query = select(func.count()).select_from(Vocabulary).where(Vocabulary.user_id == user_id)
-        vocab_count = await self.db.scalar(vocab_count_query) or 0
-
-        quiz_count_query = select(func.count()).select_from(QuizResult).where(QuizResult.user_id == user_id)
-        quiz_count = await self.db.scalar(quiz_count_query) or 0
-
-        correct_sum_query = select(func.coalesce(func.sum(QuizResult.correct_answers), 0)).where(QuizResult.user_id == user_id)
-        correct_answers = await self.db.scalar(correct_sum_query) or 0
-
-        total_questions_query = select(func.coalesce(func.sum(QuizResult.total_questions), 0)).where(QuizResult.user_id == user_id)
-        total_questions = await self.db.scalar(total_questions_query) or 0
-        accuracy_rate = round((correct_answers / total_questions) * 100, 2) if total_questions > 0 else 0.0
-
         return UserStatsResponse(
-            streak=streak,
-            xp=total_xp,
-            gems=gems,
-            level=level,
-            level_title=level_title,
+            streak=streak, xp=total_xp, gems=gems,
+            level=level, level_title=level_title,
             weekly_progress=weekly_progress,
-            vocab_count=vocab_count,
-            quiz_count=quiz_count,
-            correct_answers=correct_answers,
-            accuracy_rate=accuracy_rate,
+            vocab_count=vocab_count, quiz_count=quiz_count,
+            correct_answers=correct_answers, accuracy_rate=accuracy_rate,
         )
 
     # ─── Today Review ──────────────────────────────────────────────────
@@ -226,82 +181,62 @@ class DashboardService:
     # ─── Topic Progress ────────────────────────────────────────────────
 
     async def get_topic_progress(self, user_id: str) -> TopicProgressResponse:
-        """Thống kê tiến độ theo từng chủ đề."""
+        """Thống kê tiến độ theo từng chủ đề — 1 query, tính mastered in-memory."""
         query = select(Vocabulary).where(Vocabulary.user_id == user_id)
         result = await self.db.execute(query)
         all_vocabs = list(result.scalars().all())
 
-        # Nhóm theo topic
+        # Nhóm theo topic — tính luôn mastered trong 1 pass
         topic_map: dict = {}
         for v in all_vocabs:
             topic = v.topic or "general"
             if topic not in topic_map:
-                topic_map[topic] = {"total": 0, "correct": 0, "wrong": 0}
-            topic_map[topic]["total"] += 1
-            topic_map[topic]["correct"] += v.times_correct or 0
-            topic_map[topic]["wrong"] += v.times_wrong or 0
+                topic_map[topic] = {"total": 0, "correct": 0, "wrong": 0, "mastered": 0}
+            t = topic_map[topic]
+            t["total"] += 1
+            t["correct"] += v.times_correct or 0
+            t["wrong"] += v.times_wrong or 0
+            if v.review_count is not None and v.review_count >= 3 and (v.times_correct or 0) > (v.times_wrong or 0):
+                t["mastered"] += 1
 
         topics = []
         for topic, stats in topic_map.items():
-            total = stats["total"]
-            correct = stats["correct"]
-            wrong = stats["wrong"]
-            # Mastered: words with review_count >= 3 và times_correct > times_wrong
-            mastered_query = select(func.count()).select_from(Vocabulary).where(
-                Vocabulary.user_id == user_id,
-                Vocabulary.topic == topic,
-                Vocabulary.review_count >= 3,
-                Vocabulary.times_correct > Vocabulary.times_wrong,
-            )
-            mastered = await self.db.scalar(mastered_query) or 0
-
-            total_attempts = correct + wrong
-            accuracy = round((correct / total_attempts) * 100, 1) if total_attempts > 0 else 0.0
-
+            total_attempts = stats["correct"] + stats["wrong"]
+            accuracy = round((stats["correct"] / total_attempts) * 100, 1) if total_attempts > 0 else 0.0
             topics.append(TopicProgressItem(
-                topic=topic,
-                total=total,
-                mastered=mastered,
-                accuracy=accuracy,
+                topic=topic, total=stats["total"],
+                mastered=stats["mastered"], accuracy=accuracy,
             ))
 
-        # Sort: nhiều từ nhất lên trước
         topics.sort(key=lambda t: t.total, reverse=True)
-
         return TopicProgressResponse(topics=topics)
 
     # ─── Weekly Activity ───────────────────────────────────────────────
 
     async def get_weekly_activity(self, user_id: str) -> WeeklyActivityResponse:
-        """Lấy hoạt động 7 ngày gần nhất."""
-        days = []
+        """Lấy hoạt động 7 ngày gần nhất — 1 range query thay vì 7 queries."""
         today = date.today()
+        week_ago = today - timedelta(days=6)
 
-        for i in range(6, -1, -1):  # 7 ngày: từ 6 ngày trước đến hôm nay
-            d = today - timedelta(days=i)
-
-            query = select(UserDailyActivity).where(
+        rows = await self.db.execute(
+            select(UserDailyActivity).where(
                 UserDailyActivity.user_id == user_id,
-                UserDailyActivity.activity_date == d,
+                UserDailyActivity.activity_date >= week_ago,
+                UserDailyActivity.activity_date <= today,
             )
-            result = await self.db.execute(query)
-            activity = result.scalar_one_or_none()
+        )
+        activity_map = {r.activity_date: r for r in rows.scalars().all()}
 
-            if activity:
-                days.append(WeeklyActivityDay(
-                    date=d.isoformat(),
-                    xp=activity.xp_earned or 0,
-                    quizzes=activity.quiz_done or 0,
-                    learned=(activity.vocab_learned or 0) + (activity.vocab_reviewed or 0),
-                ))
-            else:
-                days.append(WeeklyActivityDay(
-                    date=d.isoformat(),
-                    xp=0,
-                    quizzes=0,
-                    learned=0,
-                ))
-
+        days = []
+        for i in range(6, -1, -1):
+            d = today - timedelta(days=i)
+            a = activity_map.get(d)
+            days.append(WeeklyActivityDay(
+                date=d.isoformat(),
+                xp=a.xp_earned or 0 if a else 0,
+                quizzes=a.quiz_done or 0 if a else 0,
+                learned=((a.vocab_learned or 0) + (a.vocab_reviewed or 0)) if a else 0,
+            ))
         return WeeklyActivityResponse(days=days)
 
     # ─── Skills (Migii TOPIK inspired) ──────────────────────────────────
@@ -309,60 +244,36 @@ class DashboardService:
     async def get_skills(self, user_id: str) -> SkillsResponse:
         """Thống kê 4 kỹ năng: Nghe hiểu, Đọc hiểu, Từ vựng, Ngữ pháp.
 
-        Dữ liệu được tính từ quiz_results theo quiz_type.
-        Nếu chưa có quiz nào, trả về 0 cho tất cả kỹ năng.
+        Dùng 1 query GROUP BY thay vì 12 queries riêng lẻ.
         """
-        # Định nghĩa 4 kỹ năng
+        rows = await self.db.execute(
+            select(
+                QuizResult.quiz_type,
+                func.count().label("total"),
+                func.coalesce(func.sum(QuizResult.correct_answers), 0).label("correct"),
+                func.coalesce(func.sum(QuizResult.total_questions), 0).label("total_q"),
+            ).where(QuizResult.user_id == user_id)
+             .group_by(QuizResult.quiz_type)
+        )
+        agg = {r.quiz_type: r for r in rows.fetchall()}
+
         skill_defs = [
-            {"type": "listening", "title": "Nghe hiểu"},
-            {"type": "reading", "title": "Đọc hiểu"},
-            {"type": "vocabulary", "title": "Từ vựng"},
-            {"type": "grammar", "title": "Ngữ pháp"},
+            ("listening", "Nghe hiểu"),
+            ("reading", "Đọc hiểu"),
+            ("vocabulary", "Từ vựng"),
+            ("grammar", "Ngữ pháp"),
         ]
-
         skills = []
-        for sd in skill_defs:
-            quiz_type = sd["type"]
-
-            # Đếm số quiz theo loại
-            count_query = select(func.count()).select_from(QuizResult).where(
-                QuizResult.user_id == user_id,
-                QuizResult.quiz_type == quiz_type,
-            )
-            total = await self.db.scalar(count_query) or 0
-
-            # Tổng correct_answers và total_questions
-            correct_sum_query = select(
-                func.coalesce(func.sum(QuizResult.correct_answers), 0)
-            ).where(
-                QuizResult.user_id == user_id,
-                QuizResult.quiz_type == quiz_type,
-            )
-            correct = await self.db.scalar(correct_sum_query) or 0
-
-            total_q_query = select(
-                func.coalesce(func.sum(QuizResult.total_questions), 0)
-            ).where(
-                QuizResult.user_id == user_id,
-                QuizResult.quiz_type == quiz_type,
-            )
-            total_q = await self.db.scalar(total_q_query) or 0
-
-            # Accuracy
+        for qt, title in skill_defs:
+            r = agg.get(qt)
+            total = r.total if r else 0
+            correct = r.correct if r else 0
+            total_q = r.total_q if r else 0
             accuracy = round((correct / total_q) * 100, 1) if total_q > 0 else 0.0
-
-            # XP: mỗi câu đúng = 10 XP
-            xp = correct * 10
-
             skills.append(SkillItem(
-                type=quiz_type,
-                title=sd["title"],
-                accuracy=accuracy,
-                xp=xp,
-                completed=total,
-                total=max(total, 1),
+                type=qt, title=title, accuracy=accuracy,
+                xp=correct * 10, completed=total, total=max(total, 1),
             ))
-
         return SkillsResponse(skills=skills)
 
     # ─── Private helpers ───────────────────────────────────────────────

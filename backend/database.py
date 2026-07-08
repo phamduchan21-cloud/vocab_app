@@ -12,11 +12,21 @@ if settings.DATABASE_URL and "sqlite" not in settings.DATABASE_URL:
 
 
 # Create async engine
+_pool_kwargs = {}
+if "sqlite" not in settings.DATABASE_URL:
+    _pool_kwargs = dict(
+        pool_size=5,
+        max_overflow=5,
+        pool_timeout=30,
+        pool_pre_ping=True,
+    )
+
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=False,
     future=True,
     connect_args=_connect_args,
+    **_pool_kwargs,
 )
 
 # Create async session factory

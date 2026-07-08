@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VocaEng - Hồ sơ &amp; Tiến độ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;family=Nunito:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#adc6ff",
+                        "success-bg": "#ECFDF5",
+                        "on-secondary-fixed": "#001a42",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary": "#0058be",
+                        "on-primary-container": "#eeefff",
+                        "success": "#059669",
+                        "surface-subtle": "#F1F3F5",
+                        "primary": "#004ac6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#a65900",
+                        "surface": "#FFFFFF",
+                        "ink": "#1A1D23",
+                        "on-tertiary": "#ffffff",
+                        "warning-bg": "#FFFBEB",
+                        "inverse-on-surface": "#f0f1f2",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "danger-bg": "#FEF2F2",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary-container": "#ffede1",
+                        "ink-soft": "#6B7280",
+                        "blue-bg": "#EFF6FF",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-primary-fixed": "#00174b",
+                        "secondary-container": "#2170e4",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#0053db",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "outline": "#737686",
+                        "primary-fixed": "#dbe1ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "background": "#f8f9fa",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-secondary-container": "#fefcff",
+                        "on-secondary-fixed-variant": "#004395",
+                        "primary-container": "#2563eb",
+                        "surface-dim": "#d9dadb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d8e2ff",
+                        "inverse-surface": "#2e3132",
+                        "inverse-primary": "#b4c5ff",
+                        "error": "#ba1a1a",
+                        "tertiary": "#824500",
+                        "danger": "#DC2626",
+                        "tertiary-fixed": "#ffdcc3",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#434655",
+                        "surface-container-low": "#f3f4f5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "sidebar-width": "230px",
+                        "margin-desktop": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "headline-md": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "display-brand": ["Nunito"],
+                        "headline-sm": ["Work Sans"],
+                        "body-lg": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; background-color: #f8f9fa; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .tab-btn.active { border-bottom: 2px solid theme('colors.primary'); color: theme('colors.primary'); font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface h-screen w-full flex flex-col md:flex-row overflow-hidden">
+<!-- Mobile Top App Bar -->
+<header class="md:hidden w-full top-0 sticky bg-surface dark:bg-on-surface flat no shadows flex items-center justify-between px-margin-mobile h-16 w-full z-40">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity scale-down-98 transition-transform duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Hồ sơ &amp; Tiến độ</h1>
+<button class="w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity scale-down-98 transition-transform duration-200">
+<img class="w-full h-full object-cover" data-alt="A brightly lit close up photo of an optimistic young Vietnamese learner in a casual setting looking happy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_TfnGeQq3P7WU2GCbKfXZp9Hp_w-ROGyU4pSCNnWiAmWMUPz45xCg6g3WFDKAvaeSujrppY9Zgo-VwArIRBk0NgicNtEPy-HxuQLr0Knhj4C4sX7AaeX5snViPb-AlM0bJXG7AamM3XyrcSfss_xgmnLyQQEmDExaTLO75lrhaThbjwNgSoOsHHKafFhKJGTPWH7UF-mwHGN5hISkHucuAFzpLZ20S45hluq2LEKlAaTQswBgcV25-7P7ZrlVrKfZ33b2fzIwCQc"/>
+</button>
+</header>
+<!-- Desktop Navigation Drawer -->
+<aside class="hidden md:flex flex-col h-full w-[230px] rounded-r-xl bg-surface dark:bg-on-surface shadow-md py-4 z-40 shrink-0">
+<div class="px-4 flex items-center mb-8 gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A bright, friendly illustrated cat mascot avatar 'MeuBeu' on a light blue background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0uTCtD12OTiTSM8SVWZ10k2HbqKd8ywBPe-jkTP4GS_AjvJn84zb4ye5IqeK9SJUaRGQkD2nh96s9mYcqvq7nRK20s1iaUKeDJEG4Tad6bt4IYVKNBexdGCyJ355uAq5IgiyICkHJdXkH0KcZ66HPlTi0hRBNEeLjKXbYxp--sOOJ_r91PpzIcNLhIq406MfMRmus1d8VyM2NwNIPKY99WBklB44s-6Ed-ukIYovpRjNEAk5THZCu1AD_7KjJ0aF-4LrxYWp3yNw"/>
+</div>
+<div class="left_align">
+<div class="font-headline-sm text-headline-sm text-primary font-bold truncate">VocaEng Explorer</div>
+<div class="font-label-sm text-label-sm text-ink-soft truncate">Level 12 Learner</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2 font-body-md text-body-md text-on-surface-variant px-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">home</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span>Quiz</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">style</span>
+<span>Flashcards</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span>Test</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-blue-bg text-primary rounded-lg mx-2 font-semibold" href="#">
+<span class="material-symbols-outlined fill">person</span>
+<span>Profile</span>
+</a>
+<div class="h-px w-full bg-outline-variant/20 my-2"></div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">bolt</span>
+<span>Daily Goals</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">bookmark</span>
+<span>Saved Words</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto pb-24 md:pb-8 hide-scroll relative">
+<div class="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop py-6 flex flex-col gap-6">
+<!-- Desktop Header -->
+<div class="hidden md:flex justify-between items-center mb-2">
+<h1 class="font-display-brand text-display-brand text-primary">Hồ sơ &amp; Tiến độ</h1>
+</div>
+<!-- Hero Profile Card -->
+<section class="bg-gradient-to-br from-primary to-secondary-container rounded-xl p-6 text-on-primary shadow-sm relative overflow-hidden">
+<!-- Decorative background elements -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20"></div>
+<div class="absolute bottom-0 left-1/2 w-40 h-40 bg-white opacity-10 rounded-full blur-xl"></div>
+<div class="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
+<!-- Avatar & Basic Info -->
+<div class="flex items-center gap-4 w-full md:w-auto">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-on-primary/30 shrink-0 shadow-lg">
+<img class="w-full h-full object-cover" data-alt="A brightly lit close up photo of an optimistic young Vietnamese learner in a casual setting looking happy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABSJrdpmtnyuer8cgYPRoqrauY6qgY0aRS7OHDrPmRsfsCFVs2hJ52DWlsD3tDkIwLvNKQAcVrXpGRo1z29I70a6lanLGZ-rCSfmcqWNc8zOVCC2WIe5F9TW_VUo4Wu68a8j19Co_tH6O8cyaDfQks7RB4M3jbeGY10RvyaD3VPMigxMj0e_0ZvPNOVdaeMwZNzuukxhNylEDgNPBZ9hsSjazGyniVi3F4WgC9oPNIywKwZwD0y_hJDJWcc7nTVUjbvD_B45aMAI8"/>
+</div>
+<div class="flex-1">
+<h2 class="font-headline-md text-headline-md font-bold text-on-primary">MeuBeu Explorer</h2>
+<p class="font-body-md text-body-md text-on-primary-container opacity-90">user@example.com</p>
+<span class="inline-block mt-2 px-2 py-0.5 bg-success-bg text-success font-label-sm text-label-sm font-semibold rounded text-xs uppercase tracking-wider">Level B2</span>
+</div>
+</div>
+<!-- Core Stats List -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:flex-1 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-on-primary/20 md:pl-6">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-primary-container opacity-80 uppercase tracking-wide">Level</span>
+<span class="font-headline-sm text-headline-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">stars</span> 12</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-primary-container opacity-80 uppercase tracking-wide">XP</span>
+<span class="font-headline-sm text-headline-sm font-bold">1,230</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-primary-container opacity-80 uppercase tracking-wide">Streak</span>
+<span class="font-headline-sm text-headline-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm text-warning-bg">local_fire_department</span> 7</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-primary-container opacity-80 uppercase tracking-wide">Gems</span>
+<span class="font-headline-sm text-headline-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm text-tertiary-fixed-dim">diamond</span> 150</span>
+</div>
+</div>
+</div>
+<!-- Daily Goal Progress -->
+<div class="relative z-10 mt-6 pt-4 border-t border-on-primary/20">
+<div class="flex justify-between items-end mb-2">
+<span class="font-body-md text-body-md font-medium">Mục tiêu hôm nay</span>
+<span class="font-body-md text-body-md font-bold">42/50 từ</span>
+</div>
+<div class="w-full bg-on-primary/20 rounded-full h-2 overflow-hidden">
+<div class="bg-warning-bg h-2 rounded-full" style="width: 84%"></div>
+</div>
+</div>
+</section>
+<!-- Tab Navigation -->
+<div class="flex border-b border-outline-variant/30 mt-2">
+<button class="tab-btn active px-4 py-3 font-body-md text-body-md text-ink-soft hover:bg-surface-subtle transition-colors flex-1 text-center" onclick="switchTab('overview')">Tổng quan</button>
+<button class="tab-btn px-4 py-3 font-body-md text-body-md text-ink-soft hover:bg-surface-subtle transition-colors flex-1 text-center" onclick="switchTab('progress')">Tiến độ</button>
+</div>
+<!-- Tab Content: Tổng quan (Overview) -->
+<div class="tab-content active flex flex-col gap-6" id="tab-overview">
+<!-- Mini Stat Cards Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-outline-variant/10 flex flex-col hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded-full bg-blue-bg text-primary flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-ink">42</span>
+<span class="font-label-sm text-label-sm text-ink-soft">Từ đã học</span>
+</div>
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-outline-variant/10 flex flex-col hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded-full bg-danger-bg text-danger flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">local_fire_department</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-ink">7</span>
+<span class="font-label-sm text-label-sm text-ink-soft">Ngày liên tiếp</span>
+</div>
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-outline-variant/10 flex flex-col hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded-full bg-warning-bg text-tertiary-container flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">military_tech</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-ink">72%</span>
+<span class="font-label-sm text-label-sm text-ink-soft">Điểm Quiz</span>
+</div>
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-outline-variant/10 flex flex-col hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded-full bg-success-bg text-success flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">star</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-ink">1,230</span>
+<span class="font-label-sm text-label-sm text-ink-soft">Tổng XP</span>
+</div>
+</div>
+<!-- Recent Activity List -->
+<section class="bg-surface rounded-xl p-6 shadow-sm border border-outline-variant/10">
+<h3 class="font-headline-sm text-headline-sm font-bold text-ink mb-4">Hoạt động gần đây</h3>
+<div class="flex flex-col gap-0">
+<!-- Item 1 -->
+<div class="flex items-center justify-between py-4 border-b border-ink/10 last:border-0">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-subtle flex items-center justify-center">
+<span class="material-symbols-outlined text-ink-soft">quiz</span>
+</div>
+<div>
+<h4 class="font-body-lg text-body-lg font-semibold text-ink">Vocabulary Quiz: Business</h4>
+<p class="font-body-md text-body-md text-ink-soft">Hôm nay, 10:30 AM</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md font-bold text-success">+50 XP</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between py-4 border-b border-ink/10 last:border-0">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-subtle flex items-center justify-center">
+<span class="material-symbols-outlined text-ink-soft">style</span>
+</div>
+<div>
+<h4 class="font-body-lg text-body-lg font-semibold text-ink">Flashcards: Travel</h4>
+<p class="font-body-md text-body-md text-ink-soft">Hôm qua, 8:15 PM</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md font-bold text-success">+30 XP</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Tab Content: Tiến độ (Progress) -->
+<div class="tab-content flex flex-col gap-6" id="tab-progress">
+<!-- Heatmap / Activity Grid -->
+<section class="bg-surface rounded-xl p-6 shadow-sm border border-outline-variant/10">
+<h3 class="font-headline-sm text-headline-sm font-bold text-ink mb-4">Lịch học</h3>
+<div class="flex gap-1 flex-wrap">
+<!-- Simulated Heatmap Grid -->
+<script>
+                            for(let i=0; i<60; i++) {
+                                let opacity = Math.random() > 0.5 ? Math.random() : 0.1;
+                                document.write(`<div class="w-4 h-4 rounded-sm bg-success" style="opacity: ${Math.max(0.1, opacity)}"></div>`);
+                            }
+                        </script>
+</div>
+</section>
+<!-- Settings List (Mock) -->
+<section class="bg-surface rounded-xl p-6 shadow-sm border border-outline-variant/10">
+<h3 class="font-headline-sm text-headline-sm font-bold text-ink mb-4">Tài khoản</h3>
+<div class="flex flex-col">
+<button class="flex items-center justify-between py-3 border-b border-ink/10 hover:bg-surface-subtle transition-colors text-left">
+<span class="font-body-md text-body-md text-ink">Mục tiêu hàng ngày</span>
+<span class="material-symbols-outlined text-ink-soft">chevron_right</span>
+</button>
+<button class="flex items-center justify-between py-3 border-b border-ink/10 hover:bg-surface-subtle transition-colors text-left">
+<span class="font-body-md text-body-md text-ink">Từ đã lưu</span>
+<span class="material-symbols-outlined text-ink-soft">chevron_right</span>
+</button>
+<button class="flex items-center justify-between py-3 hover:bg-danger-bg transition-colors text-left mt-2 rounded">
+<span class="font-body-md text-body-md text-danger font-semibold">Đăng xuất</span>
+</button>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-2 bg-surface border-t border-outline-variant/10 rounded-t-xl z-50 shadow-sm bg-surface dark:bg-on-surface text-primary dark:text-primary-fixed-dim font-label-sm text-label-sm">
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span>Home</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span>Quiz</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">style</span>
+<span>Flashcards</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span>Test</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary dark:text-primary-fixed font-semibold hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined fill">person</span>
+<span>Profile</span>
+</a>
+</nav>
+<script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+    </script>
+</body></html>

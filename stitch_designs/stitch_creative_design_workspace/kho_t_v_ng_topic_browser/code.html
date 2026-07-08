@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kho từ vựng - VocaEng</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;family=Nunito:wght@700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-tertiary-container": "#ffede1",
+                        "danger-bg": "#FEF2F2",
+                        "danger": "#DC2626",
+                        "surface-container": "#edeeef",
+                        "inverse-primary": "#b4c5ff",
+                        "success-bg": "#ECFDF5",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d9dadb",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-subtle": "#F1F3F5",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "blue-bg": "#EFF6FF",
+                        "background": "#f8f9fa",
+                        "outline-variant": "#c3c6d7",
+                        "ink": "#1A1D23",
+                        "tertiary-container": "#a65900",
+                        "on-secondary-fixed": "#001a42",
+                        "tertiary": "#824500",
+                        "secondary-fixed": "#d8e2ff",
+                        "secondary": "#0058be",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-surface": "#191c1d",
+                        "on-primary-fixed": "#00174b",
+                        "on-background": "#191c1d",
+                        "outline": "#737686",
+                        "primary": "#004ac6",
+                        "on-error": "#ffffff",
+                        "primary-container": "#2563eb",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "ink-soft": "#6B7280",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-secondary": "#ffffff",
+                        "success": "#059669",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-variant": "#e1e3e4",
+                        "secondary-container": "#2170e4",
+                        "surface-tint": "#0053db",
+                        "tertiary-fixed": "#ffdcc3",
+                        "on-surface-variant": "#434655",
+                        "on-secondary-container": "#fefcff",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-on-surface": "#f0f1f2",
+                        "warning-bg": "#FFFBEB",
+                        "surface": "#FFFFFF",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#2f1500"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        "12px": "12px",
+                        "14px": "14px",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        unit: "4px",
+                        "margin-mobile": "16px",
+                        gutter: "16px",
+                        "sidebar-width": "230px",
+                        "margin-desktop": "24px"
+                    },
+                    fontFamily: {
+                        "body-lg": ["Work Sans"],
+                        "headline-sm": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "label-sm": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "display-brand": ["Nunito"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "headline-md": ["Work Sans"]
+                    },
+                    fontSize: {
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "mono-data": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+                        "headline-lg": ["28px", { lineHeight: "36px", fontWeight: "700" }],
+                        "display-brand": ["48px", { lineHeight: "56px", fontWeight: "700" }],
+                        "headline-lg-mobile": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+                        "headline-md": ["22px", { lineHeight: "28px", fontWeight: "600" }]
+                    }
+                }
+            }
+        };
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-bright text-on-surface font-body-md antialiased md:flex md:h-screen md:overflow-hidden pb-20 md:pb-0">
+<!-- Desktop Navigation Drawer -->
+<nav class="hidden md:flex flex-col bg-surface h-full w-[230px] rounded-r-xl shadow-md fixed left-0 top-0 py-4 z-40">
+<div class="px-4 mb-8">
+<h1 class="font-display-brand text-headline-md text-primary">VocaEng</h1>
+</div>
+<div class="px-4 flex items-center gap-3 mb-6">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant/30" data-alt="A stylized 2D vector illustration of an orange cat wearing glasses and studying a book, friendly and encouraging expression, modern flat design style suitable for an educational app avatar. Clean white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAago847ojN3SkEz0O7lUcgGDm0hCeuiJbbu1wq2TSS4agZzEixU9aWXMB10Vk1dLWC2JZPYucVUNhBm4fLQ_jF1uRHBSHQkw8cC46tLlJ4Pek84kIPAFtXYpJsLVJ56hY1hoPRphpc3xaEulI4GnfhBYrrhIbvEu8N579TYo6EXq9NOHXUMwohqFFZ8VOcDdqOQS8BRxPJyqjJR3Fy-CGLFXudo-llPGna2XqddzbmJCzQN2DDaoTcvXf1M8JHi_SyOAug-Uhbn1w"/>
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface">VocaEng Explorer</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Level 12 Learner</p>
+</div>
+</div>
+<ul class="flex flex-col gap-2 mt-4 flex-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<span class="font-body-md text-body-md">Daily Goals</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span class="font-body-md text-body-md">Saved Words</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-body-md text-body-md">Leaderboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Canvas -->
+<main class="w-full md:ml-[230px] md:h-full md:overflow-y-auto bg-surface-bright">
+<!-- TopAppBar -->
+<header class="flex flex-col w-full top-0 sticky bg-surface px-margin-mobile pt-4 pb-2 z-30">
+<div class="flex items-center justify-between h-16 w-full">
+<button aria-label="Menu" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2 rounded-full hover:bg-surface-subtle">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-display-brand text-headline-lg-mobile md:text-headline-lg text-primary text-center flex-1">Kho từ vựng</h1>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A stylized 2D vector illustration of an orange cat wearing glasses and studying a book, friendly and encouraging expression, modern flat design style suitable for an educational app avatar. Clean white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJV3QEmrSWJRus8YJC1fDKlWsSPGaFZ3W8hU-4NqU_WGrBxT6_Qfb8swoNEjziuOpmthuFfufxB2iGcOCHTrcIobE_ykoSTNAF3XQqSCivJhjPZffvHRNa7tLGrUqFI-usoWeXratknnvP1w6ZKpNPDyGZXm6Sxn1Plis27Nwl1q-PEWa5RPw-i4PQ3-J9n3bteHm3sJgYUVVGPenK_89gIm6ewAnH0hrRGOttwQWaxD6t0LlxdzzkOdi9kCaQjh4sy-H6SEWOIKQ"/>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="mt-2 w-full max-w-2xl mx-auto">
+<div class="relative flex items-center w-full h-12 rounded-[10px] focus-within:shadow-sm bg-background overflow-hidden border border-transparent focus-within:border-primary transition-colors">
+<div class="grid place-items-center h-full w-12 text-ink-soft">
+<span class="material-symbols-outlined text-xl" data-icon="search">search</span>
+</div>
+<input class="peer h-full w-full outline-none text-body-md font-body-md text-on-surface bg-transparent pr-2" id="search" placeholder="Tìm chủ đề từ vựng..." type="text"/>
+</div>
+</div>
+</header>
+<!-- Topics Grid -->
+<div class="px-margin-mobile md:px-margin-desktop py-6 max-w-5xl mx-auto">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+<!-- Topic Card 1 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        👋
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Greetings</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">30 từ</p>
+</div>
+</button>
+<!-- Topic Card 2 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        👨‍👩‍👧‍👦
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Family</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">45 từ</p>
+</div>
+</button>
+<!-- Topic Card 3 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        🔢
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Numbers</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">50 từ</p>
+</div>
+</button>
+<!-- Topic Card 4 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        ☀️
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Daily Routines</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">35 từ</p>
+</div>
+</button>
+<!-- Topic Card 5 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        🍕
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Food</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">60 từ</p>
+</div>
+</button>
+<!-- Topic Card 6 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        ✈️
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Travel</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">40 từ</p>
+</div>
+</button>
+<!-- Topic Card 7 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        🛍️
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Shopping</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">25 từ</p>
+</div>
+</button>
+<!-- Topic Card 8 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        🌤️
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Weather</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">20 từ</p>
+</div>
+</button>
+<!-- Topic Card 9 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        🏥
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Health</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">35 từ</p>
+</div>
+</button>
+<!-- Topic Card 10 -->
+<button class="bg-surface rounded-12px p-4 flex flex-col items-center justify-center gap-3 shadow-[0_2px_8px_-2px_rgba(26,29,35,0.08)] hover:scale-[0.98] transition-transform duration-200 border border-outline-variant/10 text-center w-full">
+<div class="w-12 h-12 bg-blue-bg rounded-14px flex items-center justify-center text-2xl">
+                        💼
+                    </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Work</h3>
+<p class="font-body-md text-body-md text-ink-soft mt-1">50 từ</p>
+</div>
+</button>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-2 bg-surface shadow-sm rounded-t-xl z-50">
+<button class="flex flex-col items-center justify-center w-16 h-full gap-1 text-ink-soft hover:bg-blue-bg scale-down-98 active:bg-surface-variant transition-all rounded-lg">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 h-full gap-1 text-ink-soft hover:bg-blue-bg scale-down-98 active:bg-surface-variant transition-all rounded-lg">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+<span class="font-label-sm text-label-sm">Quiz</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 h-full gap-1 text-ink-soft hover:bg-blue-bg scale-down-98 active:bg-surface-variant transition-all rounded-lg">
+<span class="material-symbols-outlined" data-icon="style">style</span>
+<span class="font-label-sm text-label-sm">Flashcards</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 h-full gap-1 text-ink-soft hover:bg-blue-bg scale-down-98 active:bg-surface-variant transition-all rounded-lg">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-sm text-label-sm">Test</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 h-full gap-1 text-ink-soft hover:bg-blue-bg scale-down-98 active:bg-surface-variant transition-all rounded-lg">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</nav>
+</body></html>

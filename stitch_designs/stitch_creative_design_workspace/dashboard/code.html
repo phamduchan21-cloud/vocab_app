@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VocaEng Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e1e3e4",
+                        "blue-bg": "#EFF6FF",
+                        "tertiary": "#824500",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary": "#0058be",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "on-primary-fixed": "#00174b",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-bright": "#f8f9fa",
+                        "ink-soft": "#6B7280",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#004ac6",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-high": "#e7e8e9",
+                        "secondary-container": "#2170e4",
+                        "warning-bg": "#FFFBEB",
+                        "primary-container": "#2563eb",
+                        "on-tertiary-fixed": "#2f1500",
+                        "success-bg": "#ECFDF5",
+                        "surface-dim": "#d9dadb",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#0053db",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "success": "#059669",
+                        "surface": "#FFFFFF",
+                        "tertiary-container": "#a65900",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#001a42",
+                        "ink": "#1A1D23",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-lowest": "#ffffff",
+                        "danger": "#DC2626",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#ffede1",
+                        "on-surface-variant": "#434655",
+                        "on-background": "#191c1d",
+                        "surface-subtle": "#F1F3F5",
+                        "danger-bg": "#FEF2F2",
+                        "outline": "#737686",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d8e2ff",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "surface-container": "#edeeef",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#eeefff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "sidebar-width": "230px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Work Sans"],
+                        "display-brand": ["Nunito"],
+                        "headline-md": ["Work Sans"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "body-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md text-body-md min-h-screen flex flex-col pb-24 md:flex-row md:pb-0">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-surface-dim z-40 transition-transform active:scale-95 duration-200">
+<div class="flex items-center justify-between px-4 h-16 w-full">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-subtle dark:hover:bg-inverse-surface text-primary dark:text-primary-fixed-dim">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-display-brand text-headline-md text-primary dark:text-primary-fixed-dim">VocaEng (MeuBeu)</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-subtle dark:hover:bg-inverse-surface text-primary dark:text-primary-fixed-dim">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-2xl mx-auto md:ml-sidebar-width">
+<!-- Hero Stats Bar -->
+<section class="px-margin-mobile pt-4">
+<div class="bg-gradient-to-br from-primary to-secondary rounded-xl p-5 text-on-primary shadow-sm relative overflow-hidden">
+<!-- Decorative subtle shapes -->
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-white opacity-10 rounded-full blur-xl"></div>
+<div class="absolute -bottom-6 -left-6 w-24 h-24 bg-white opacity-10 rounded-full blur-lg"></div>
+<div class="flex items-center gap-4 mb-4 relative z-10">
+<img class="w-14 h-14 rounded-full object-cover border-2 border-primary-fixed shadow-sm bg-primary-fixed" data-alt="A cheerful, highly detailed 3D avatar of a friendly cat mascot in a casual modern outfit, smiling brightly against a soft pastel blue background. The lighting is warm and volumetric, creating a premium light-mode aesthetic suitable for a language learning app profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0UF-5tTu3nmyEcs1rNfR1y4WUtYCtlx1-kywOTgUxPmQ5Tvel63vlMOehxg8ItQwPeavb3cksEp5lbPGLHmWs9I8jc1UckV3NCiWHVJhXAZtt-oPiWM0LKrTcfe661u-mx4LltcW3dTjKEbZvAqTXJ1SZYKr7VUT66gityvMc8xiUhv6RHYQOK_KRqHQVBo8YhgKI3eeI9_5eHkCEt80ZOLq9RSBJJYyxxoQfIHDE2r9TSQ-wtTBywm4oDZmUy-L2cAlgt2p5C5Y"/>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-primary">Hi, Learner! 👋</h2>
+<p class="font-label-sm text-label-sm text-primary-fixed opacity-90">Ready to master new words?</p>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mb-4 relative z-10 bg-on-primary/10 rounded-lg p-3 backdrop-blur-sm border border-white/10">
+<div class="flex flex-col items-center">
+<span class="font-headline-sm text-headline-sm flex items-center gap-1">12 <span class="text-lg">🔥</span></span>
+<span class="font-label-sm text-label-sm opacity-80">Streak</span>
+</div>
+<div class="flex flex-col items-center border-l border-r border-white/20">
+<span class="font-headline-sm text-headline-sm flex items-center gap-1">450 <span class="text-lg">⭐</span></span>
+<span class="font-label-sm text-label-sm opacity-80">XP</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-headline-sm text-headline-sm flex items-center gap-1">85 <span class="text-lg">💎</span></span>
+<span class="font-label-sm text-label-sm opacity-80">Gems</span>
+</div>
+</div>
+<div class="relative z-10">
+<div class="flex justify-between text-label-sm font-label-sm mb-1">
+<span>Daily Goal</span>
+<span>40/50 XP</span>
+</div>
+<div class="h-2 w-full bg-primary-fixed/30 rounded-full overflow-hidden">
+<div class="h-full bg-white rounded-full w-4/5"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Daily Tasks Grid (Bento Style) -->
+<section class="px-margin-mobile mt-6">
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-3">Daily Tasks</h3>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Task 1 -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-surface-container-highest active:scale-95 transition-transform duration-200">
+<div class="w-10 h-10 rounded-full bg-blue-bg text-secondary flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">style</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-semibold text-on-surface mb-1">Flashcards</h4>
+<p class="font-label-sm text-label-sm text-ink-soft mb-3">Review 20 words</p>
+<div class="flex items-center gap-2">
+<div class="h-1.5 flex-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/2 rounded-full"></div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary">50%</span>
+</div>
+</div>
+<!-- Task 2 -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-surface-container-highest active:scale-95 transition-transform duration-200">
+<div class="w-10 h-10 rounded-full bg-warning-bg text-tertiary-container flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">quiz</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-semibold text-on-surface mb-1">Quiz Practice</h4>
+<p class="font-label-sm text-label-sm text-ink-soft mb-3">Earn 15 XP</p>
+<div class="flex items-center gap-2">
+<div class="h-1.5 flex-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container w-0 rounded-full"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft">0%</span>
+</div>
+</div>
+<!-- Task 3 -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-surface-container-highest active:scale-95 transition-transform duration-200">
+<div class="w-10 h-10 rounded-full bg-danger-bg text-danger flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-semibold text-on-surface mb-1">Mock Test</h4>
+<p class="font-label-sm text-label-sm text-ink-soft mb-3">Weekly challenge</p>
+<div class="flex items-center gap-2">
+<div class="h-1.5 flex-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-danger w-full rounded-full"></div>
+</div>
+<span class="font-label-sm text-label-sm text-success">Done</span>
+</div>
+</div>
+<!-- Task 4 -->
+<div class="bg-surface rounded-xl p-4 shadow-sm border border-surface-container-highest active:scale-95 transition-transform duration-200">
+<div class="w-10 h-10 rounded-full bg-success-bg text-success flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">explore</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-semibold text-on-surface mb-1">Explore</h4>
+<p class="font-label-sm text-label-sm text-ink-soft mb-3">Learn 5 new words</p>
+<div class="flex items-center gap-2">
+<div class="h-1.5 flex-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-success w-4/5 rounded-full"></div>
+</div>
+<span class="font-label-sm text-label-sm text-success">80%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Topic of the Day -->
+<section class="px-margin-mobile mt-6">
+<div class="bg-blue-bg rounded-xl p-4 shadow-sm border border-secondary-fixed flex items-center gap-4 active:scale-95 transition-transform duration-200 cursor-pointer">
+<div class="w-16 h-16 rounded-lg bg-surface flex items-center justify-center flex-shrink-0 shadow-sm" data-alt="A stylized, modern, flat-design illustration of a steaming cup of coffee next to an open notebook and a pen on a bright sunny desk, utilizing a palette of bright blues and warm whites to fit a pristine light-mode educational UI." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBRFvgp6R-pVVEpZYuzLdAJVNDuCMVqaunb3kmnOKFd7EH8cxcyRl7x9pzW0mo_Q159NQOtL71o9wkPtNcwRadnAYBvXtHxb4SJHrIpeuBADGwsQ32mIP93d8dvZivERJGMQOVjrfNDxYdXGXi6fMNLTE1INW0XluIu8tAbN1G1XesVzPl2_aymwLYH2PFBaiV8Tsj3OJFXyZ6_4HXwwOypeejOJ3DbQoYFPZbGHbkf7GXrwm2CKM1mJGWISWCxidlkjmyNyXxB4no')">
+<!-- Icon fallback if image fails -->
+<span class="material-symbols-outlined text-3xl text-secondary opacity-50">local_cafe</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 bg-secondary text-on-secondary rounded text-[10px] font-bold uppercase tracking-wider">Topic of the Day</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">At the Coffee Shop</h3>
+<p class="font-label-sm text-label-sm text-ink-soft mt-1">15 words • 5 mins</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-secondary shadow-sm">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Weekly XP Chart -->
+<section class="px-margin-mobile mt-6 mb-8">
+<div class="bg-surface rounded-xl p-5 shadow-sm border border-surface-container-highest">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Weekly Progress</h3>
+<p class="font-label-sm text-label-sm text-ink-soft">XP earned this week</p>
+</div>
+<span class="font-headline-md text-headline-md text-primary">320 XP</span>
+</div>
+<!-- Simple CSS Bar Chart -->
+<div class="flex justify-between items-end h-32 gap-2">
+<!-- Mon -->
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end justify-center relative group">
+<div class="w-full bg-primary-fixed rounded-t-sm transition-all duration-300 group-hover:bg-primary" style="height: 40%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft">M</span>
+</div>
+<!-- Tue -->
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end justify-center relative group">
+<div class="w-full bg-primary-fixed rounded-t-sm transition-all duration-300 group-hover:bg-primary" style="height: 60%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft">T</span>
+</div>
+<!-- Wed (Today) -->
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end justify-center relative group">
+<div class="w-full bg-primary rounded-t-sm transition-all duration-300 shadow-[0_0_8px_rgba(37,99,235,0.4)]" style="height: 85%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold">W</span>
+</div>
+<!-- Thu -->
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end justify-center relative group">
+<div class="w-full bg-primary-fixed rounded-t-sm transition-all duration-300 group-hover:bg-primary" style="height: 30%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft">T</span>
+</div>
+<!-- Fri -->
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end justify-center relative group">
+<div class="w-full bg-primary-fixed rounded-t-sm transition-all duration-300 group-hover:bg-primary" style="height: 50%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft">F</span>
+</div>
+<!-- Sat -->
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end justify-center relative group">
+<div class="w-full bg-primary-fixed rounded-t-sm transition-all duration-300 group-hover:bg-primary" style="height: 10%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft">S</span>
+</div>
+<!-- Sun -->
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end justify-center relative group">
+<div class="w-full bg-primary-fixed rounded-t-sm transition-all duration-300 group-hover:bg-primary" style="height: 0%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-soft">S</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface dark:bg-surface-container-lowest shadow-[0_-2px_10px_rgba(0,0,0,0.05)] font-label-sm text-label-sm">
+<div class="flex justify-around items-center w-full px-2 py-3">
+<!-- Active Item: Home -->
+<button class="active:scale-90 transition-all duration-200 hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold w-16 rounded-lg py-1">
+<span class="material-symbols-outlined fill mb-1">home</span>
+<span>Home</span>
+</button>
+<button class="active:scale-90 transition-all duration-200 hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant w-16 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1">quiz</span>
+<span>Quiz</span>
+</button>
+<button class="active:scale-90 transition-all duration-200 hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant w-16 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1">style</span>
+<span>Flashcard</span>
+</button>
+<button class="active:scale-90 transition-all duration-200 hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant w-16 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1">assignment</span>
+<span>Test</span>
+</button>
+<button class="active:scale-90 transition-all duration-200 hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant w-16 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1">person</span>
+<span>Profile</span>
+</button>
+</div>
+</nav>
+<!-- Desktop Sidebar Placeholder (Hidden on mobile) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full w-sidebar-width bg-surface border-r border-surface-container-highest z-50 pt-16">
+<div class="flex-1 px-4 py-6 flex flex-col gap-2">
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-bg text-primary font-bold">
+<span class="material-symbols-outlined fill">home</span> Home
+            </button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-subtle text-on-surface-variant">
+<span class="material-symbols-outlined">quiz</span> Quiz
+            </button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-subtle text-on-surface-variant">
+<span class="material-symbols-outlined">style</span> Flashcard
+            </button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-subtle text-on-surface-variant">
+<span class="material-symbols-outlined">assignment</span> Test
+            </button>
+</div>
+<div class="p-4 border-t border-surface-container-highest">
+<button class="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-surface-subtle text-on-surface-variant">
+<span class="material-symbols-outlined">person</span> Profile
+            </button>
+</div>
+</aside>
+</body></html>

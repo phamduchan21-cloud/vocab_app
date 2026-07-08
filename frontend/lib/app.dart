@@ -111,19 +111,40 @@ class _CustomTransitionPage extends CustomTransitionPage<dynamic> {
 // ═══════════════════════════════════════════════════════
 
 class AppColors {
-  // ─── Core tokens ────────────────────────────────────
+  // ─── Stitch Material 3 Core tokens ─────────────────
   static const background = Color(0xFFF8F9FA);
   static const surface = Color(0xFFFFFFFF);
+  static const surfaceDim = Color(0xFFD9DADB);
+  static const surfaceBright = Color(0xFFF8F9FA);
+  static const surfaceContainerLowest = Color(0xFFFFFFFF);
+  static const surfaceContainerLow = Color(0xFFF3F4F5);
+  static const surfaceContainer = Color(0xFFEDEEEF);
+  static const surfaceContainerHigh = Color(0xFFE7E8E9);
+  static const surfaceContainerHighest = Color(0xFFE1E3E4);
+  static const surfaceVariant = Color(0xFFE1E3E4);
   static const surfaceSubtle = Color(0xFFF1F3F5);
+
+  // ─── On-colors ─────────────────────────────────────
+  static const onSurface = Color(0xFF191C1D);
+  static const onSurfaceVariant = Color(0xFF434655);
+  static const inverseSurface = Color(0xFF2E3132);
+  static const inverseOnSurface = Color(0xFFF0F1F2);
+
+  // ─── Ink (text) ────────────────────────────────────
   static const ink = Color(0xFF1A1D23);
   static const inkSoft = Color(0xFF6B7280);
   static const textHint = Color(0xFF9CA3AF);
 
-  // ─── Single accent: Cobalt Blue ────────────────────
+  // ─── Accent: Cobalt Blue ──────────────────────────
   static const blue = Color(0xFF2563EB);
+  static const blueDark = Color(0xFF004AC6);
   static const blueLight = Color(0xFF3B82F6);
-  static const blueDark = Color(0xFF1D4ED8);
   static const blueBg = Color(0xFFEFF6FF);
+  static const blueContainer = Color(0xFF2170E4);
+
+  // ─── Outline ───────────────────────────────────────
+  static const outline = Color(0xFF737686);
+  static const outlineVariant = Color(0xFFC3C6D7);
 
   // ─── Semantic ──────────────────────────────────────
   static const success = Color(0xFF059669);
@@ -132,6 +153,8 @@ class AppColors {
   static const dangerBg = Color(0xFFFEF2F2);
   static const warning = Color(0xFFD97706);
   static const warningBg = Color(0xFFFFFBEB);
+  static const tertiary = Color(0xFF824500);
+  static const tertiaryContainer = Color(0xFFA65900);
 
   // ─── Backward-compatible aliases ────────────────────
   static const primary = blue;
@@ -142,6 +165,23 @@ class AppColors {
   static const accent3 = success;
   static const textPrimary = ink;
   static const textSecondary = inkSoft;
+}
+
+// ─── Spacing & Radius tokens ──────────────────────────
+class AppSpacing {
+  static const double unit = 4;
+  static const double gutter = 16;
+  static const double marginMobile = 16;
+  static const double marginDesktop = 24;
+  static const double sidebarWidth = 230;
+}
+
+class AppRadius {
+  static const double sm = 4;
+  static const double md = 8;
+  static const double lg = 12;
+  static const double xl = 16;
+  static const double xxl = 24;
 }
 
 // ─── Gradients ─────────────────────────────────────────
@@ -166,6 +206,19 @@ class AppTheme {
 
   static const primaryButtonGradient = LinearGradient(
     colors: [AppColors.blue, AppColors.blueDark],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // ─── Stitch New Gradients ──────────────────────────
+  static const heroGradient = LinearGradient(
+    colors: [AppColors.blue, AppColors.blueContainer],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const aiGradient = LinearGradient(
+    colors: [Color(0xFF6366F1), Color(0xFFA855F7), Color(0xFFEC4899)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -198,20 +251,46 @@ class _VocabAppState extends State<VocabApp> {
     return MaterialApp.router(
       title: 'VocaEng',
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(),
+      theme: _buildLightTheme(),
+      darkTheme: _buildDarkTheme(),
+      themeMode: ThemeMode.system,
       routerConfig: _router,
     );
   }
 
-  ThemeData _buildTheme() {
+  ThemeData _buildLightTheme() {
     return ThemeData(
       useMaterial3: true,
       fontFamily: GoogleFonts.workSans().fontFamily,
       colorScheme: ColorScheme.light(
         primary: AppColors.blue,
-        secondary: AppColors.blueLight,
-        surface: AppColors.surface,
+        onPrimary: Colors.white,
+        primaryContainer: AppColors.blueContainer,
+        onPrimaryContainer: const Color(0xFFEEEFFF),
+        secondary: const Color(0xFF0058BE),
+        onSecondary: Colors.white,
+        secondaryContainer: AppColors.blueContainer,
+        onSecondaryContainer: const Color(0xFFFEFCFF),
+        tertiary: AppColors.tertiary,
+        onTertiary: Colors.white,
+        tertiaryContainer: AppColors.tertiaryContainer,
+        onTertiaryContainer: const Color(0xFFFFEDE1),
         error: AppColors.danger,
+        onError: Colors.white,
+        errorContainer: const Color(0xFFFFDAD6),
+        onErrorContainer: const Color(0xFF93000A),
+        surface: AppColors.surface,
+        onSurface: AppColors.onSurface,
+        surfaceContainerLowest: AppColors.surfaceContainerLowest,
+        surfaceContainerLow: AppColors.surfaceContainerLow,
+        surfaceContainer: AppColors.surfaceContainer,
+        surfaceContainerHigh: AppColors.surfaceContainerHigh,
+        surfaceContainerHighest: AppColors.surfaceContainerHighest,
+        onSurfaceVariant: AppColors.onSurfaceVariant,
+        outline: AppColors.outline,
+        outlineVariant: AppColors.outlineVariant,
+        inverseSurface: AppColors.inverseSurface,
+        inversePrimary: const Color(0xFFB4C5FF),
         brightness: Brightness.light,
       ),
       scaffoldBackgroundColor: AppColors.background,
@@ -318,24 +397,28 @@ class _VocabAppState extends State<VocabApp> {
         ),
       ),
 
-      // ─── Text — All Work Sans (no serif) ─────────────
+      // ─── Text — Stitch Typography ───────────────────
       textTheme: TextTheme(
+        // Nunito reserved for splash brand only
         headlineLarge: GoogleFonts.workSans(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,
           fontSize: 28,
           letterSpacing: -0.3,
+          height: 1.29,
         ),
         headlineMedium: GoogleFonts.workSans(
           color: AppColors.ink,
           fontWeight: FontWeight.w600,
           fontSize: 22,
           letterSpacing: -0.2,
+          height: 1.27,
         ),
         headlineSmall: GoogleFonts.workSans(
           color: AppColors.ink,
           fontWeight: FontWeight.w600,
           fontSize: 18,
+          height: 1.33,
         ),
         titleLarge: GoogleFonts.workSans(
           color: AppColors.ink,
@@ -355,14 +438,17 @@ class _VocabAppState extends State<VocabApp> {
         bodyLarge: GoogleFonts.workSans(
           color: AppColors.ink,
           fontSize: 16,
+          height: 1.5,
         ),
         bodyMedium: GoogleFonts.workSans(
-          color: AppColors.textSecondary,
+          color: AppColors.onSurfaceVariant,
           fontSize: 14,
+          height: 1.43,
         ),
         bodySmall: GoogleFonts.workSans(
           color: AppColors.textHint,
           fontSize: 12,
+          height: 1.33,
         ),
         labelLarge: GoogleFonts.workSans(
           color: AppColors.ink,
@@ -370,7 +456,7 @@ class _VocabAppState extends State<VocabApp> {
           fontSize: 14,
         ),
         labelMedium: GoogleFonts.ibmPlexMono(
-          color: AppColors.textSecondary,
+          color: AppColors.onSurfaceVariant,
           fontWeight: FontWeight.w500,
           fontSize: 12,
         ),
@@ -402,6 +488,74 @@ class _VocabAppState extends State<VocabApp> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
+      ),
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      fontFamily: GoogleFonts.workSans().fontFamily,
+      colorScheme: ColorScheme.dark(
+        primary: AppColors.blue,
+        onPrimary: Colors.white,
+        primaryContainer: AppColors.blueContainer,
+        onPrimaryContainer: const Color(0xFFEEEFFF),
+        secondary: const Color(0xFF0058BE),
+        onSecondary: Colors.white,
+        secondaryContainer: AppColors.blueContainer,
+        onSecondaryContainer: const Color(0xFFFEFCFF),
+        tertiary: AppColors.tertiary,
+        onTertiary: Colors.white,
+        tertiaryContainer: AppColors.tertiaryContainer,
+        onTertiaryContainer: const Color(0xFFFFEDE1),
+        error: AppColors.danger,
+        onError: Colors.white,
+        errorContainer: const Color(0xFFFFDAD6),
+        onErrorContainer: const Color(0xFF93000A),
+        surface: const Color(0xFF1E1E1E),
+        onSurface: const Color(0xFFE0E0E0),
+        surfaceContainerLowest: const Color(0xFF121212),
+        surfaceContainerLow: const Color(0xFF1E1E1E),
+        surfaceContainer: const Color(0xFF2C2C2C),
+        surfaceContainerHigh: const Color(0xFF3A3A3A),
+        surfaceContainerHighest: const Color(0xFF484848),
+        onSurfaceVariant: const Color(0xFFB0B0B0),
+        outline: const Color(0xFF666666),
+        outlineVariant: const Color(0xFF444444),
+        inverseSurface: const Color(0xFFE0E0E0),
+        inversePrimary: const Color(0xFFB4C5FF),
+        brightness: Brightness.dark,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      canvasColor: const Color(0xFF121212),
+      appBarTheme: const AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Color(0xFF1E1E1E),
+        foregroundColor: Color(0xFFE0E0E0),
+      ),
+      cardTheme: const CardThemeData(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        color: Color(0xFF1E1E1E),
+        surfaceTintColor: Colors.transparent,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Color(0xFF1E1E1E),
+        selectedItemColor: AppColors.blue,
+        unselectedItemColor: Color(0xFFB0B0B0),
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: Color(0xFF2C2C2C),
+        contentTextStyle: TextStyle(color: Color(0xFFE0E0E0)),
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: Color(0xFF1E1E1E),
       ),
     );
   }

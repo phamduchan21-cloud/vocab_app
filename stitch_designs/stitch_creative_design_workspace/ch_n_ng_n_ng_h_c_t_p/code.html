@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding - Choose Language - MeuBeu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#edeeef",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-primary": "#b4c5ff",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#eeefff",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#00174b",
+                        "error": "#ba1a1a",
+                        "tertiary": "#824500",
+                        "on-error": "#ffffff",
+                        "ink": "#1A1D23",
+                        "surface-dim": "#d9dadb",
+                        "primary-container": "#2563eb",
+                        "on-background": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "tertiary-container": "#a65900",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface": "#FFFFFF",
+                        "surface-container-low": "#f3f4f5",
+                        "on-tertiary-container": "#ffede1",
+                        "surface-container-highest": "#e1e3e4",
+                        "primary-fixed": "#dbe1ff",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#001a42",
+                        "danger-bg": "#FEF2F2",
+                        "inverse-surface": "#2e3132",
+                        "ink-soft": "#6B7280",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "outline-variant": "#c3c6d7",
+                        "primary": "#004ac6",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-secondary-container": "#fefcff",
+                        "blue-bg": "#EFF6FF",
+                        "success": "#059669",
+                        "warning-bg": "#FFFBEB",
+                        "surface-subtle": "#F1F3F5",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-fixed": "#ffdcc3",
+                        "success-bg": "#ECFDF5",
+                        "secondary-container": "#2170e4",
+                        "secondary": "#0058be",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e1e3e4",
+                        "on-surface-variant": "#434655",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#0053db",
+                        "on-surface": "#191c1d",
+                        "outline": "#737686",
+                        "secondary-fixed": "#d8e2ff",
+                        "danger": "#DC2626"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "24px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "sidebar-width": "230px"
+                    },
+                    "fontFamily": {
+                        "display-brand": ["Nunito"],
+                        "body-lg": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "headline-sm": ["Work Sans"],
+                        "headline-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col font-body-md text-body-md bg-background selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation for Onboarding (Linear Flow - specific style) -->
+<header class="w-full flex items-center justify-between px-margin-mobile md:px-margin-desktop py-4 bg-background">
+<button aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant scale-95 active:scale-90">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<!-- Progress Indicator -->
+<div class="flex gap-2 items-center">
+<div class="h-2 w-8 rounded-full bg-primary transition-all duration-300"></div>
+<div class="h-2 w-2 rounded-full bg-surface-container-highest"></div>
+<div class="h-2 w-2 rounded-full bg-surface-container-highest"></div>
+<div class="h-2 w-2 rounded-full bg-surface-container-highest"></div>
+</div>
+<div class="w-12 h-12"></div> <!-- Spacer for alignment -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col items-center px-margin-mobile md:px-margin-desktop py-8 md:py-12 w-full max-w-2xl mx-auto">
+<div class="text-center mb-8 w-full">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-2">Bạn muốn học ngôn ngữ gì?</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Chọn một ngôn ngữ để bắt đầu hành trình của bạn.</p>
+</div>
+<!-- Language Options Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-12">
+<!-- Option: English (Selected State) -->
+<button class="group flex items-center p-4 bg-blue-bg border-2 border-primary rounded-xl text-left transition-all duration-200 transform hover:scale-[0.99] relative overflow-hidden ring-4 ring-primary-fixed shadow-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container mr-4 shadow-sm relative">
+<img alt="English Flag" class="w-full h-full object-cover" data-alt="A glossy, highly detailed circular icon of the flag of the United Kingdom, specifically the Union Jack. The flag is depicted with vibrant, saturated reds, crisp whites, and deep blues. It is slightly stylized to look modern and approachable, fitting seamlessly into a clean, minimalist user interface typical of language learning applications. Soft, bright ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO_U57tBchSWzQ7TAmOFUvfzo-1F2dYWRpT0hTcvaFOoOFQZDPcqx44slwz4JuPohnD1y7VUg0atpsHGKE8YhLI9TvZ7hhRa4GqDenjJ7Zaopc0exsXywBE6tp-doUQvGoZJk92eJS-LfVV7yd2XcXo09wfZZmBLkDixAl8mViKKFJSYlKdBkPYmqbDt_JvIvbfpVjWmqgG0ZV9quA3wgA8tPQfTFt7oMsAOIurg8EhU8LpYxBaisEInKTy7L0BI518p4fvehM2p4"/>
+</div>
+<div class="flex-1">
+<span class="block font-headline-sm text-headline-sm text-primary">Tiếng Anh</span>
+<span class="block font-body-md text-body-md text-on-surface-variant mt-1">English</span>
+</div>
+<div class="absolute top-4 right-4 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</button>
+<!-- Option: Japanese -->
+<button class="group flex items-center p-4 bg-surface border border-outline-variant hover:border-outline rounded-xl text-left transition-all duration-200 transform hover:scale-[0.99] shadow-sm hover:shadow">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container mr-4 shadow-sm">
+<img alt="Japanese Flag" class="w-full h-full object-cover" data-alt="A highly detailed circular icon showing the flag of Japan, featuring a perfectly centered, vibrant red circle on a pristine white background. The icon is styled with a subtle 3D glossy effect, suitable for a modern educational app interface. The lighting is bright and even, creating a clean, friendly, and highly legible visual element." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5blqRNn32aWd5F1l8UuZQAGE-vTWbvNon1lJbROkkHkIpBCy_tDWZdz7LxLnxn6w-pLd6B26SU5a5x2bckx3jGjURide6fWkfS1uVor5gIEI_-EIA-g7UyZEo-NdkhGG3cRiHG4rpTvhgZst_YT6IKXcjkgMPOQjGqNFLmQDz085oCTxdafDOsNw0jEvjCig5cmMBztpnKE0t33N_76jCXy7HemeYV6jwvi1-3bTwUhaxJzOww17G2Vxoni7r47-D2FTV5MmR4ys"/>
+</div>
+<div class="flex-1">
+<span class="block font-headline-sm text-headline-sm text-on-surface">Tiếng Nhật</span>
+<span class="block font-body-md text-body-md text-on-surface-variant mt-1">日本語</span>
+</div>
+</button>
+<!-- Option: Korean -->
+<button class="group flex items-center p-4 bg-surface border border-outline-variant hover:border-outline rounded-xl text-left transition-all duration-200 transform hover:scale-[0.99] shadow-sm hover:shadow">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container mr-4 shadow-sm">
+<img alt="Korean Flag" class="w-full h-full object-cover" data-alt="A detailed, circular icon depicting the flag of South Korea (Taegeukgi). The central red and blue taegeuk symbol is crisp, surrounded by four black trigrams on a bright white background. The icon has a slight glossy finish and soft drop shadow, designed for a modern, friendly language learning UI set against a light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqHgkp4TIVxIx8kK0kes6XjwlppO5QRy7Zxuh_zmJfU_yRDZkuy9bJ-6IFykLwydzIXHiKjMKUZ6tBBuVP49GcKzdYxV2kPSMLNsGa-YRQs9M0NF6UwMJhCnSxWE0-1Tkh1n45uu5TLukv-3oHUmSPdtkQueis77AL4gT0MpK6ZURvN9vN5PWF6W81lj14T10mjcEBJYC5akpfHHH9k6Fg-w1GeXFABWQP_tFxfdRxKJatkTLmxfGVRKKw4cNeQDg9U_zZ44JRRmo"/>
+</div>
+<div class="flex-1">
+<span class="block font-headline-sm text-headline-sm text-on-surface">Tiếng Hàn</span>
+<span class="block font-body-md text-body-md text-on-surface-variant mt-1">한국어</span>
+</div>
+</button>
+<!-- Option: Chinese -->
+<button class="group flex items-center p-4 bg-surface border border-outline-variant hover:border-outline rounded-xl text-left transition-all duration-200 transform hover:scale-[0.99] shadow-sm hover:shadow">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container mr-4 shadow-sm">
+<img alt="Chinese Flag" class="w-full h-full object-cover" data-alt="A clean, circular icon representing the flag of China. It displays five vibrant yellow stars—one large and four small—on a rich, deep red background. The design is slightly stylized with a soft specular highlight, giving it a modern, polished appearance suitable for a friendly educational platform interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBog1p7S37CSjudiivMpZHa78srosBjBaQsyN8ebH4lGEfm5iUFbVBUuJ9KyssGXjerLF6GtAxGnRaMIfBPveVkzbLBPFz-0mHXk0eKe28wyON5Q0WzQcICTiknrDodPvN1yqah9TElHA_RdDWy0I63HVRrB8Y90efifmS4MTxSfhwfzGTs0T-EKsB8hD8CxXBTCIZG4v_lOQiQaMxEAroWYQTZT59KSL-IW12wLkLQIR_W1AEMEMpjnBEVCCbwoIjhHoTTxdribD4"/>
+</div>
+<div class="flex-1">
+<span class="block font-headline-sm text-headline-sm text-on-surface">Tiếng Trung</span>
+<span class="block font-body-md text-body-md text-on-surface-variant mt-1">中文</span>
+</div>
+</button>
+<!-- Option: French -->
+<button class="group flex items-center p-4 bg-surface border border-outline-variant hover:border-outline rounded-xl text-left transition-all duration-200 transform hover:scale-[0.99] shadow-sm hover:shadow">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container mr-4 shadow-sm">
+<img alt="French Flag" class="w-full h-full object-cover" data-alt="A circular, high-resolution icon of the flag of France. The vertical stripes of navy blue, white, and red are vivid and clearly defined. The icon features a subtle gloss and a delicate drop shadow, seamlessly integrating into a modern, light-themed user interface designed for a language learning application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBlCwkZeudsWVI9XGHp2HOGEp8FMaF-11-kR3Dv0Rbqino2xdDTzEG_ZiEMcInV71j0ZtyjS4iKcGP25S8V94QF2jskMoVaJyrA63oNr2xBMgVdCQiTtvWTWa56etW0jux2ZzIX2dnDLBLuMXaTcETV_XbbLMICmKNi1ohQRYZn0UJBolQN46auvhFG2Hb6SR04Xck8Lj8Mn3R0srRgGduURVQ1GPZwtgB-MKRBID3IQE_yfy8GA3vxwaML9qoASZop6ULQgrVHAE"/>
+</div>
+<div class="flex-1">
+<span class="block font-headline-sm text-headline-sm text-on-surface">Tiếng Pháp</span>
+<span class="block font-body-md text-body-md text-on-surface-variant mt-1">Français</span>
+</div>
+</button>
+<!-- Option: German -->
+<button class="group flex items-center p-4 bg-surface border border-outline-variant hover:border-outline rounded-xl text-left transition-all duration-200 transform hover:scale-[0.99] shadow-sm hover:shadow">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container mr-4 shadow-sm">
+<img alt="German Flag" class="w-full h-full object-cover" data-alt="A perfectly round, detailed icon depicting the flag of Germany with its horizontal bands of black, red, and gold. The colors are rich and solid, enhanced by a gentle 3D shine effect and a soft ambient shadow. It is designed to look approachable and professional within a bright, modern mobile app layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5Owr_tu6bGXqTvRJFCQdXiv1lyM6FxZ2Ofb3f6y2ExjynIJmC4AAD_kFXF8oQsgELgTIb2TMRRJtxkxSA4fgntyRwfC1dfRbckQGVDci2_Zu-xOBqt3vmQTWX92dHa99JUv2ox4Pza1Ek1J6Jf0SO0412i8cFodOnY9wvShJfwS0NsIxvIw9n9pJvU4nW6KfIJhgCwd27azcEWhSAyE-xKScmvly0vYoTGNB6C5mwzE2bhlLtfNcYydmo82swPamJxdnLkCoGNtY"/>
+</div>
+<div class="flex-1">
+<span class="block font-headline-sm text-headline-sm text-on-surface">Tiếng Đức</span>
+<span class="block font-body-md text-body-md text-on-surface-variant mt-1">Deutsch</span>
+</div>
+</button>
+</div>
+</main>
+<!-- Bottom Action Area -->
+<footer class="w-full px-margin-mobile md:px-margin-desktop py-4 bg-background pb-safe sticky bottom-0 border-t border-surface-variant z-10">
+<div class="max-w-2xl mx-auto w-full">
+<button class="w-full py-4 px-6 bg-primary text-on-primary font-headline-sm text-headline-sm rounded-xl transition-transform transform active:scale-95 shadow-sm hover:bg-surface-tint flex justify-center items-center">
+                Tiếp tục
+                <span class="material-symbols-outlined ml-2">arrow_forward</span>
+</button>
+</div>
+</footer>
+</body></html>

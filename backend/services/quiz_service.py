@@ -1,5 +1,6 @@
 import random
 import uuid
+import logging
 from typing import List, Optional, Tuple
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,8 @@ from schemas import (
     QuizQuestion,
 )
 from seed_data import SEED_VOCABULARIES
+
+logger = logging.getLogger(__name__)
 
 
 class QuizService:
@@ -161,8 +164,8 @@ class QuizService:
                     },
                 ),
             )
-        except Exception:
-            pass  # Gamification không critical
+        except Exception as e:
+            logger.error(f"Gamification recording failed: {e}")
 
         return QuizResultResponse(
             id=str(result.id),

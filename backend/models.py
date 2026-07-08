@@ -12,6 +12,7 @@ from sqlalchemy import (
     Text,
     JSON,
     Float,
+    Index,
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -42,6 +43,12 @@ class User(Base):
 
 class Vocabulary(Base):
     __tablename__ = "vocabularies"
+    __table_args__ = (
+        Index("idx_vocab_user_topic", "user_id", "topic"),
+        Index("idx_vocab_user_review", "user_id", "next_review_date"),
+        Index("idx_vocab_user_created", "user_id", "created_at"),
+        Index("idx_vocab_review_count", "review_count"),
+    )
 
     id = Column(String(36), primary_key=True)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -69,6 +76,10 @@ class Vocabulary(Base):
 
 class QuizResult(Base):
     __tablename__ = "quiz_results"
+    __table_args__ = (
+        Index("idx_quiz_user_type", "user_id", "quiz_type"),
+        Index("idx_quiz_user_completed", "user_id", "completed_at"),
+    )
 
     id = Column(String(36), primary_key=True)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -102,6 +113,10 @@ class QuizCategory(Base):
 class UserDailyActivity(Base):
     """Ghi lại hoạt động mỗi ngày của user — dùng cho streak & XP."""
     __tablename__ = "user_daily_activities"
+    __table_args__ = (
+        Index("idx_activity_user_date", "user_id", "activity_date", unique=True),
+        Index("idx_activity_date", "activity_date"),
+    )
 
     id = Column(String(36), primary_key=True)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)

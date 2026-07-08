@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quên Mật Khẩu - MeuBeu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Nunito:wght@700;800&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f3f4f5",
+                      "on-tertiary-fixed": "#2f1500",
+                      "success-bg": "#ECFDF5",
+                      "surface-container": "#edeeef",
+                      "surface-subtle": "#F1F3F5",
+                      "on-secondary-fixed-variant": "#004395",
+                      "on-background": "#191c1d",
+                      "primary": "#004ac6",
+                      "inverse-primary": "#b4c5ff",
+                      "on-primary": "#ffffff",
+                      "danger-bg": "#FEF2F2",
+                      "primary-container": "#2563eb",
+                      "ink": "#1A1D23",
+                      "error": "#ba1a1a",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "on-surface": "#191c1d",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb77d",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#00174b",
+                      "on-primary-container": "#eeefff",
+                      "warning-bg": "#FFFBEB",
+                      "ink-soft": "#6B7280",
+                      "tertiary": "#824500",
+                      "primary-fixed": "#dbe1ff",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "success": "#059669",
+                      "inverse-surface": "#2e3132",
+                      "surface": "#FFFFFF",
+                      "on-secondary-fixed": "#001a42",
+                      "inverse-on-surface": "#f0f1f2",
+                      "surface-container-highest": "#e1e3e4",
+                      "on-tertiary-container": "#ffede1",
+                      "on-surface-variant": "#434655",
+                      "tertiary-container": "#a65900",
+                      "surface-dim": "#d9dadb",
+                      "surface-bright": "#f8f9fa",
+                      "background": "#f8f9fa",
+                      "on-secondary-container": "#fefcff",
+                      "outline-variant": "#c3c6d7",
+                      "surface-container-high": "#e7e8e9",
+                      "secondary-fixed": "#d8e2ff",
+                      "surface-tint": "#0053db",
+                      "secondary-container": "#2170e4",
+                      "outline": "#737686",
+                      "surface-variant": "#e1e3e4",
+                      "danger": "#DC2626",
+                      "tertiary-fixed": "#ffdcc3",
+                      "error-container": "#ffdad6",
+                      "blue-bg": "#EFF6FF",
+                      "on-tertiary-fixed-variant": "#6e3900",
+                      "on-error-container": "#93000a",
+                      "secondary": "#0058be",
+                      "primary-fixed-dim": "#b4c5ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "unit": "4px",
+                      "gutter": "16px",
+                      "sidebar-width": "230px",
+                      "margin-desktop": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Work Sans"],
+                      "body-md": ["Work Sans"],
+                      "mono-data": ["IBM Plex Mono"],
+                      "headline-lg": ["Work Sans"],
+                      "label-sm": ["Work Sans"],
+                      "headline-sm": ["Work Sans"],
+                      "headline-md": ["Work Sans"],
+                      "display-brand": ["Nunito"],
+                      "body-lg": ["Work Sans"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-brand": ["48px", {"lineHeight": "56px", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col relative overflow-hidden">
+<!-- Background for Glassmorphism -->
+<div class="absolute inset-0 z-0 pointer-events-none">
+<div class="bg-cover bg-center w-full h-full opacity-70" data-alt="A soft, abstract, blurred background perfect for a language learning app. The color palette features gentle gradients of deep blue (#004ac6), soft white, and subtle hints of warm peach. The aesthetic is clean, modern, light-mode, and calming, evoking a sense of clarity and focus. No sharp edges, just smooth, flowing color transitions that create a premium frosted glass foundation." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBc0dPmyx-crWVNmSNsntNZVGjNKzlixZQoX0fLn3wINCpn9dy2laCcyx0sZLdeQZrTEyBtSeYgaxpMcPOKjUVSYxEQzDyUfe6LAsaiwhnaSD9iC2qSZPvwuMleacTO_8dVPVukNfb5J-3yXzkYhQMaCV9Re3cbemVPqy4EwuWSpfLDzhjWs4hxKdMMX-wxEAXy6qwd69KOO4R5lbepQESLHXmoQrBIGopCuyqWiQsBH95BlnO5XyFYsx5jFOpBb0l6GZTUPR5wpp4')"></div>
+</div>
+<!-- TopAppBar -->
+<header class="bg-background/80 backdrop-blur-md w-full top-0 left-0 flex items-center justify-between px-margin-mobile md:px-margin-desktop py-4 z-50 relative">
+<button class="scale-95 active:scale-90 transition-transform hover:opacity-80 p-2 -ml-2 rounded-full text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<span class="font-display-brand text-headline-md-mobile md:text-headline-md text-primary tracking-tight">MeuBeu</span>
+<div class="w-10"></div> <!-- Spacer for center alignment -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop relative z-10 pb-12">
+<div class="glass-panel w-full max-w-md rounded-[24px] p-8 flex flex-col gap-8 animate-fade-in-up">
+<!-- Step Indicator -->
+<div class="flex items-center justify-center gap-3">
+<div class="w-10 h-1.5 rounded-full bg-primary transition-all duration-300"></div>
+<div class="w-10 h-1.5 rounded-full bg-surface-variant transition-all duration-300"></div>
+<div class="w-10 h-1.5 rounded-full bg-surface-variant transition-all duration-300"></div>
+</div>
+<!-- Header -->
+<div class="flex flex-col items-center text-center gap-3">
+<div class="w-16 h-16 rounded-2xl bg-blue-bg flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-[32px]">lock_reset</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-ink">Quên mật khẩu?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Đừng lo lắng! Hãy nhập email liên kết với tài khoản của bạn để nhận mã khôi phục an toàn.
+                </p>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-6">
+<div class="flex flex-col gap-2 relative">
+<label class="font-label-sm text-label-sm text-ink-soft pl-1" for="email">Địa chỉ Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full bg-surface border border-outline-variant rounded-xl pl-12 pr-4 py-3.5 font-body-md text-body-md text-ink placeholder:text-outline-variant focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm" id="email" placeholder="ví dụ: hocvien@meubeu.com" type="email"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-headline-sm text-headline-sm py-4 rounded-xl hover:bg-primary-container active:scale-[0.98] transition-all shadow-md flex justify-center items-center gap-2 group mt-2" type="button">
+<span>Gửi mã xác nhận</span>
+<span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<!-- Back Action -->
+<div class="flex justify-center mt-2">
+<a class="inline-flex items-center gap-2 text-primary font-body-md text-body-md font-medium hover:text-primary-container transition-colors p-2 rounded-lg hover:bg-blue-bg/50" href="#">
+<span class="material-symbols-outlined text-[18px]">keyboard_backspace</span>
+<span>Quay lại Đăng nhập</span>
+</a>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interaction for input focus state simulation if needed, 
+        // Tailwind handles most of it, but keeping structure ready.
+        document.addEventListener('DOMContentLoaded', () => {
+            const emailInput = document.getElementById('email');
+            if(emailInput) {
+                emailInput.focus();
+            }
+        });
+    </script>
+</body></html>

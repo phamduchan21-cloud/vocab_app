@@ -31,7 +31,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (location.startsWith('/quiz')) return 1;
     if (location.startsWith('/flashcard')) return 2;
     if (location.startsWith('/test') || location.startsWith('/mock-test')) return 3;
-    if (location.startsWith('/profile') || location.startsWith('/progress') || location.startsWith('/bookmark')) return 4;
+    if (location.startsWith('/profile') ||
+        location.startsWith('/progress') ||
+        location.startsWith('/bookmark')) {
+      return 4;
+    }
     return 0;
   }
 
@@ -52,7 +56,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final username = user?.userMetadata?['username'] as String? ?? 'Bạn';
     final profile = context.watch<ProfileProvider>();
 
-    // KHÔNG dùng nested Scaffold — dùng LayoutBuilder với Container thay vì Scaffold con
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 768;
@@ -101,14 +104,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final data = dashboard.data!;
     final stats = data.stats;
     final review = data.review;
-    // Calculate daily progress from vocab count vs daily goal
     final dailyProgress = stats.vocabCount > 20 ? 8 : stats.vocabCount;
     final dailyGoal = profile.userProfile?.dailyWordGoal ?? 10;
-
-    // Check if there are quiz results
     final hasDoneQuizToday = stats.quizCount > 0;
 
-    // Featured topic (rotate based on day of week)
+    // Featured topic
     final topicNames = [
       'greetings', 'family', 'numbers', 'daily', 'food', 'travel',
       'shopping', 'weather', 'health', 'work', 'education',
@@ -116,7 +116,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
     final featuredTopic = topicNames[DateTime.now().day % topicNames.length];
 
-    // KHÔNG dùng GestureDetector bao bọc — nó chặn tap từ child InkWell
     return RefreshIndicator(
       onRefresh: () => dashboard.refresh(),
       child: SingleChildScrollView(
@@ -138,126 +137,223 @@ class _DashboardScreenState extends State<DashboardScreen> {
               englishLevel: profile.userProfile?.englishLevel,
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
 
-            // ─── Học tập hôm nay ─────────────────────────
+            // ─── Daily Tasks (Bento Grid - Stitch style) ─
             Text(
               '📅 Học tập hôm nay',
               style: GoogleFonts.workSans(
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.ink,
               ),
             ),
-            const SizedBox(height: 12),
-
-            DailyTaskCard(
-              emoji: '🗂️',
-              title: 'Ôn tập flashcard',
-              description: review.remaining > 0
-                  ? '$review.remaining từ cần ôn hôm nay'
-                  : 'Học từ mới để bắt đầu ôn tập',
-              meta: review.remaining > 0 ? '${review.remaining} từ' : null,
-              progress: review.total > 0 ? review.completed / review.total : 0,
-              isDone: review.total > 0 && review.remaining == 0,
-              accentColor: AppColors.blue,
-              onTap: () => context.go('/flashcard'),
-            ),
-
-            DailyTaskCard(
-              emoji: '⚡',
-              title: 'Luyện tập quiz',
-              description: hasDoneQuizToday
-                  ? 'Đã làm quiz hôm nay!'
-                  : 'Trắc nghiệm 4 đáp án theo chủ đề',
-              isDone: hasDoneQuizToday,
-              accentColor: AppColors.warning,
-              onTap: () => context.go('/quiz'),
-            ),
-
-            DailyTaskCard(
-              emoji: '📝',
-              title: 'Kiểm tra trình độ',
-              description: 'Mini-test tổng hợp theo cấp độ',
-              accentColor: AppColors.danger,
-              onTap: () => context.go('/test'),
-            ),
-
-            DailyTaskCard(
-              emoji: '📚',
-              title: 'Khám phá kho từ vựng',
-              description: 'Tham khảo 300+ từ theo 15 chủ đề',
-              meta: '15 chủ đề',
-              accentColor: AppColors.success,
-              onTap: () => context.go('/topics'),
-            ),
-
-            const SizedBox(height: 22),
-
-            // ─── Weekly Progress ─────────────────────────
-            WeeklyChart(
-              days: const [],
-              currentXp: stats.xp,
-              weeklyXpGoal: 500,
-            ),
-
-            const SizedBox(height: 22),
-
-            // ─── Featured Topic ─────────────────────────
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.blueLight, AppColors.blue],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(18),
+            const SizedBox(height: 14),
+            // Bento 2x2 grid
+            _AnimatedSection(
+              delayMs: 50,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isNarrow = constraints.maxWidth < 380;
+                  return isNarrow
+                      ? Column(
+                          children: [
+                            DailyTaskCard(
+                              icon: Icons.style,
+                              title: 'Ôn tập flashcard',
+                              description: review.remaining > 0
+                                  ? '$review.remaining từ cần ôn'
+                                  : 'Học từ mới',
+                              meta: review.remaining > 0 ? '${review.remaining} từ' : null,
+                              progress: review.total > 0 ? review.completed / review.total : 0,
+                              isDone: review.total > 0 && review.remaining == 0,
+                              accentColor: AppColors.blue,
+                              onTap: () => context.go('/flashcard'),
+                            ),
+                            const SizedBox(height: 10),
+                            DailyTaskCard(
+                              icon: Icons.quiz,
+                              title: 'Luyện tập quiz',
+                              description: hasDoneQuizToday
+                                  ? 'Đã làm quiz hôm nay!'
+                                  : 'Trắc nghiệm 4 đáp án',
+                              isDone: hasDoneQuizToday,
+                              accentColor: AppColors.warning,
+                              onTap: () => context.go('/quiz'),
+                            ),
+                            const SizedBox(height: 10),
+                            DailyTaskCard(
+                              icon: Icons.assignment,
+                              title: 'Kiểm tra trình độ',
+                              description: 'Mini-test tổng hợp',
+                              accentColor: AppColors.danger,
+                              onTap: () => context.go('/test'),
+                            ),
+                            const SizedBox(height: 10),
+                            DailyTaskCard(
+                              icon: Icons.explore,
+                              title: 'Khám phá kho từ',
+                              description: 'Tham khảo 300+ từ',
+                              meta: '15 chủ đề',
+                              accentColor: AppColors.success,
+                              onTap: () => context.go('/topics'),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DailyTaskCard(
+                                    icon: Icons.style,
+                                    title: 'Ôn tập flashcard',
+                                    description: review.remaining > 0
+                                        ? '$review.remaining từ cần ôn'
+                                        : 'Học từ mới',
+                                    meta: review.remaining > 0 ? '${review.remaining} từ' : null,
+                                    progress: review.total > 0 ? review.completed / review.total : 0,
+                                    isDone: review.total > 0 && review.remaining == 0,
+                                    accentColor: AppColors.blue,
+                                    onTap: () => context.go('/flashcard'),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: DailyTaskCard(
+                                    icon: Icons.quiz,
+                                    title: 'Luyện tập quiz',
+                                    description: hasDoneQuizToday
+                                        ? 'Đã làm quiz hôm nay!'
+                                        : 'Trắc nghiệm 4 đáp án',
+                                    isDone: hasDoneQuizToday,
+                                    accentColor: AppColors.warning,
+                                    onTap: () => context.go('/quiz'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DailyTaskCard(
+                                    icon: Icons.assignment,
+                                    title: 'Kiểm tra trình độ',
+                                    description: 'Mini-test tổng hợp',
+                                    accentColor: AppColors.danger,
+                                    onTap: () => context.go('/test'),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: DailyTaskCard(
+                                    icon: Icons.explore,
+                                    title: 'Khám phá kho từ',
+                                    description: 'Tham khảo 300+ từ',
+                                    meta: '15 chủ đề',
+                                    accentColor: AppColors.success,
+                                    onTap: () => context.go('/topics'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                },
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '🔥 Chủ đề hôm nay',
-                          style: GoogleFonts.workSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withValues(alpha: 0.90),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          featuredTopic[0].toUpperCase() + featuredTopic.substring(1),
-                          style: GoogleFonts.workSans(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Học từ vựng chủ đề này ngay!',
-                          style: GoogleFonts.workSans(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.88),
-                          ),
-                        ),
-                      ],
-                    ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // ─── Topic of the Day (Stitch style) ──────────
+            _AnimatedSection(
+              delayMs: 150,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.blueBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.blue.withValues(alpha: 0.20),
                   ),
-                  Flexible(
-                    child: ElevatedButton(
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.ink.withValues(alpha: 0.06),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          '🔥',
+                          style: TextStyle(fontSize: 28),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.blue,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'CHỦ ĐỀ HÔM NAY',
+                              style: GoogleFonts.workSans(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            featuredTopic[0].toUpperCase() +
+                                featuredTopic.substring(1),
+                            style: GoogleFonts.workSans(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Học từ vựng chủ đề này ngay!',
+                            style: GoogleFonts.workSans(
+                              fontSize: 12,
+                              color: AppColors.inkSoft,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
                       onPressed: () {
                         context.read<FlashcardProvider>().setTopic(featuredTopic);
                         context.go('/flashcard');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.blueDark,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        backgroundColor: AppColors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
                         minimumSize: const Size(0, 44),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -265,33 +361,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       child: const Text('Học ngay'),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
 
-            // ─── Danh mục chủ đề ───────────────────────
-            if (data.topics.isNotEmpty) ...[
-              TopicGrid(
-                topics: data.topics,
-                onSeeAll: () => context.go('/topics'),
-                onTopicTap: (topic) async {
-                  await context.read<FlashcardProvider>().setTopic(topic);
-                  if (context.mounted) {
-                    context.go('/flashcard');
-                  }
-                },
+            // ─── Weekly Progress ─────────────────────────
+            _AnimatedSection(
+              delayMs: 200,
+              child: WeeklyChart(
+                days: [],
+                currentXp: stats.xp,
+                weeklyXpGoal: 500,
               ),
-              const SizedBox(height: 22),
+            ),
+
+            const SizedBox(height: 24),
+
+            // ─── Topic Grid ─────────────────────────────
+            if (data.topics.isNotEmpty) ...[
+              _AnimatedSection(
+                delayMs: 250,
+                child: TopicGrid(
+                  topics: data.topics,
+                  onSeeAll: () => context.go('/topics'),
+                  onTopicTap: (topic) async {
+                    await context
+                        .read<FlashcardProvider>()
+                        .setTopic(topic);
+                    if (context.mounted) {
+                      context.go('/flashcard');
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
 
-            // ─── Bảng xếp hạng ─────────────────────────
+            // ─── Leaderboard ───────────────────────────
             if (data.leaderboard.isNotEmpty) ...[
-              LeaderboardPreview(
-                entries: data.leaderboard,
-                onSeeAll: () => context.go('/profile'),
+              _AnimatedSection(
+                delayMs: 300,
+                child: LeaderboardPreview(
+                  entries: data.leaderboard,
+                  onSeeAll: () => context.go('/profile'),
+                ),
               ),
               const SizedBox(height: 24),
             ],
@@ -335,7 +451,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               levelTitle: dashboard.data?.stats.levelTitle ?? 'Mầm non',
             ),
             const SizedBox(height: 32),
-            // Welcome section
             Center(
               child: Column(
                 children: [
@@ -344,24 +459,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(
                     'Chào mừng đến với VocaEng!',
                     style: GoogleFonts.workSans(
-                      fontSize: 22, fontWeight: FontWeight.w600, color: AppColors.ink,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Học từ vựng tiếng Anh mỗi ngày!',
-                    style: GoogleFonts.workSans(fontSize: 15, color: AppColors.inkSoft),
+                    style: GoogleFonts.workSans(
+                        fontSize: 15, color: AppColors.inkSoft),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 28),
-            // Step guide for new user
             _StepGuide(
               step: '1',
               emoji: '📚',
               title: 'Khám phá kho từ vựng',
-              subtitle: 'Chọn chủ đề yêu thích từ 15+ bộ từ có sẵn',
               color: AppColors.blue,
               onTap: () => context.go('/topics'),
             ),
@@ -370,7 +486,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               step: '2',
               emoji: '🃏',
               title: 'Học với flashcard',
-              subtitle: 'Lật thẻ, ôn tập và ghi nhớ từ mới mỗi ngày',
               color: AppColors.warning,
               onTap: () => context.go('/flashcard'),
             ),
@@ -379,7 +494,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               step: '3',
               emoji: '⚡',
               title: 'Kiểm tra với quiz',
-              subtitle: 'Làm quiz 10 câu để kiểm tra kiến thức',
               color: AppColors.success,
               onTap: () => context.go('/quiz'),
             ),
@@ -391,15 +505,81 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+// ─── Animated Section (fade + slide up on appear) ────────
+class _AnimatedSection extends StatefulWidget {
+  final Widget child;
+  final int delayMs;
+
+  const _AnimatedSection({required this.child, this.delayMs = 0});
+
+  @override
+  State<_AnimatedSection> createState() => _AnimatedSectionState();
+}
+
+class _AnimatedSectionState extends State<_AnimatedSection>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnim;
+  late Animation<double> _slideAnim;
+  bool _hasAppeared = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    _slideAnim = Tween<double>(begin: 20, end: 0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_hasAppeared && mounted) {
+        Future.delayed(Duration(milliseconds: widget.delayMs), () {
+          if (mounted) _controller.forward();
+        });
+        _hasAppeared = true;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) => Opacity(
+        opacity: _fadeAnim.value,
+        child: Transform.translate(
+          offset: Offset(0, _slideAnim.value),
+          child: child,
+        ),
+      ),
+      child: widget.child,
+    );
+  }
+}
+
 // ─── Step Guide Card for new users ─────────────────────
 class _StepGuide extends StatelessWidget {
-  final String step, emoji, title, subtitle;
+  final String step, emoji, title;
   final Color color;
   final VoidCallback onTap;
 
   const _StepGuide({
-    required this.step, required this.emoji, required this.title,
-    required this.subtitle, required this.color, required this.onTap,
+    required this.step,
+    required this.emoji,
+    required this.title,
+    required this.color,
+    required this.onTap,
   });
 
   @override
@@ -414,13 +594,13 @@ class _StepGuide extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
+            border: Border.all(color: AppColors.surfaceContainerHighest),
           ),
           child: Row(
             children: [
-              // Step number circle
               Container(
-                width: 36, height: 36,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
@@ -429,7 +609,8 @@ class _StepGuide extends StatelessWidget {
                   child: Text(
                     step,
                     style: GoogleFonts.ibmPlexMono(
-                      fontSize: 14, fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                       color: color,
                     ),
                   ),
@@ -445,17 +626,14 @@ class _StepGuide extends StatelessWidget {
                         Text(emoji, style: const TextStyle(fontSize: 16)),
                         const SizedBox(width: 6),
                         Text(
-                          title, style: GoogleFonts.workSans(
-                            fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.ink,
+                          title,
+                          style: GoogleFonts.workSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ink,
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle, style: GoogleFonts.workSans(
-                        fontSize: 12, color: AppColors.inkSoft,
-                      ),
                     ),
                   ],
                 ),
@@ -469,42 +647,53 @@ class _StepGuide extends StatelessWidget {
   }
 }
 
-// ─── Sidebar (Desktop) ─────────────────────────────────────────
-
+// ─── Desktop Sidebar ─────────────────────────────────
 class _Sidebar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemSelected;
   final String avatarLetter, displayName, levelLabel;
 
   const _Sidebar({
-    required this.selectedIndex, required this.onItemSelected,
-    required this.avatarLetter, required this.displayName, required this.levelLabel,
+    required this.selectedIndex,
+    required this.onItemSelected,
+    required this.avatarLetter,
+    required this.displayName,
+    required this.levelLabel,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 230, color: AppColors.ink,
+      width: 230,
+      color: AppColors.ink,
       padding: const EdgeInsets.fromLTRB(18, 28, 18, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('VocaEng',
+          Text(
+            'VocaEng',
             style: GoogleFonts.workSans(
-              fontSize: 22, fontWeight: FontWeight.w700,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
               color: const Color(0xFFEDE6D3),
-            )),
+            ),
+          ),
           const SizedBox(height: 6),
-          Text('HỌC TỪ VỰNG',
+          Text(
+            'HỌC TỪ VỰNG',
             style: GoogleFonts.workSans(
-              fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w500,
+              fontSize: 10,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w500,
               color: const Color(0xFF9AA3B8),
-            )),
+            ),
+          ),
           const SizedBox(height: 30),
           ...List.generate(_navData.length, (i) {
             final item = _navData[i];
             return _SidebarNavItem(
-              icon: item.icon, label: item.label,
+              icon: item.icon,
+              label: item.label,
               isActive: i == selectedIndex,
               onTap: () => onItemSelected(i),
             );
@@ -513,21 +702,43 @@ class _Sidebar extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 34, height: 34,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
-                  color: AppColors.blue, borderRadius: BorderRadius.circular(17),
+                  color: AppColors.blue,
+                  borderRadius: BorderRadius.circular(17),
                 ),
-                child: Center(child: Text(avatarLetter,
-                  style: GoogleFonts.workSans(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white))),
+                child: Center(
+                  child: Text(
+                    avatarLetter,
+                    style: GoogleFonts.workSans(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(displayName,
-                    style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFFEDE6D3))),
-                  Text(levelLabel,
-                    style: GoogleFonts.workSans(fontSize: 11, fontWeight: FontWeight.w500, color: const Color(0xFF9AA3B8))),
+                  Text(
+                    displayName,
+                    style: GoogleFonts.workSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFEDE6D3),
+                    ),
+                  ),
+                  Text(
+                    levelLabel,
+                    style: GoogleFonts.workSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF9AA3B8),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -559,8 +770,10 @@ class _SidebarNavItem extends StatelessWidget {
   final VoidCallback onTap;
 
   const _SidebarNavItem({
-    required this.icon, required this.label,
-    required this.isActive, required this.onTap,
+    required this.icon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
   });
 
   @override
@@ -580,14 +793,25 @@ class _SidebarNavItem extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(icon, size: 18,
-                  color: isActive ? AppColors.ink : const Color(0xFFD6D1C0)),
+                Icon(
+                  icon,
+                  size: 18,
+                  color: isActive
+                      ? AppColors.ink
+                      : const Color(0xFFD6D1C0),
+                ),
                 const SizedBox(width: 12),
-                Text(label,
+                Text(
+                  label,
                   style: GoogleFonts.workSans(
-                    fontSize: 14, fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                    color: isActive ? AppColors.ink : const Color(0xFFD6D1C0),
-                  )),
+                    fontSize: 14,
+                    fontWeight:
+                        isActive ? FontWeight.w600 : FontWeight.w500,
+                    color: isActive
+                        ? AppColors.ink
+                        : const Color(0xFFD6D1C0),
+                  ),
+                ),
               ],
             ),
           ),
@@ -597,8 +821,7 @@ class _SidebarNavItem extends StatelessWidget {
   }
 }
 
-// ─── Wrapper: bottom nav trên mobile, sidebar layout trên desktop ──────
-// Giải quyết lỗi nested Scaffold: chỉ có 1 Scaffold, tránh gesture conflict.
+// ─── Wrapper: bottom nav mobile, sidebar desktop ──────
 class AppBottomNavWrapper extends StatelessWidget {
   final int selectedIndex;
   final bool isWide;

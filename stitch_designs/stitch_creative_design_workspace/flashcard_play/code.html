@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VocaEng - Flashcard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e1e3e4",
+                        "blue-bg": "#EFF6FF",
+                        "tertiary": "#824500",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary": "#0058be",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "on-primary-fixed": "#00174b",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-bright": "#f8f9fa",
+                        "ink-soft": "#6B7280",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#004ac6",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-high": "#e7e8e9",
+                        "secondary-container": "#2170e4",
+                        "warning-bg": "#FFFBEB",
+                        "primary-container": "#2563eb",
+                        "on-tertiary-fixed": "#2f1500",
+                        "success-bg": "#ECFDF5",
+                        "surface-dim": "#d9dadb",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#0053db",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "success": "#059669",
+                        "surface": "#FFFFFF",
+                        "tertiary-container": "#a65900",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#001a42",
+                        "ink": "#1A1D23",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-lowest": "#ffffff",
+                        "danger": "#DC2626",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#ffede1",
+                        "on-surface-variant": "#434655",
+                        "on-background": "#191c1d",
+                        "surface-subtle": "#F1F3F5",
+                        "danger-bg": "#FEF2F2",
+                        "outline": "#737686",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d8e2ff",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "surface-container": "#edeeef",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#eeefff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "sidebar-width": "230px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Work Sans"],
+                        "display-brand": ["Nunito"],
+                        "headline-md": ["Work Sans"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "body-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        .flashcard { perspective: 1000px; }
+        .flashcard-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { backface-visibility: hidden; }
+        .flashcard-back { transform: rotateY(180deg); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-background min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface w-full top-0 sticky z-40">
+<div class="flex items-center justify-between px-4 h-16 w-full">
+<button class="p-2 -ml-2 text-primary hover:bg-surface-subtle transition-transform active:scale-95 duration-200 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-display-brand text-headline-md text-primary truncate mx-4">Greetings</h1>
+<button class="p-2 -mr-2 text-primary hover:bg-surface-subtle transition-transform active:scale-95 duration-200 rounded-full">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col px-margin-mobile pt-4 pb-24 md:pb-8 md:max-w-2xl md:mx-auto w-full overflow-y-auto">
+<!-- Progress Bar -->
+<div class="flex items-center justify-between mb-8 px-2">
+<span class="font-body-md text-on-surface-variant">4 / 20</span>
+<div class="flex-1 mx-4 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-300" style="width: 20%;"></div>
+</div>
+<button class="text-on-surface-variant p-1 rounded-full hover:bg-surface-subtle transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="pause">pause</span>
+</button>
+</div>
+<!-- Flashcard -->
+<div class="flashcard w-full aspect-[4/3] max-h-[530px] relative mb-8 cursor-pointer" onclick="this.classList.toggle('flipped')">
+<div class="flashcard-inner w-full h-full relative rounded-[20px] shadow-[0_4px_24px_rgba(26,29,35,0.08)] bg-surface">
+<!-- Front -->
+<div class="flashcard-front absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-surface rounded-[20px] border border-surface-variant">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-on-surface mb-4">hello</h2>
+<button class="p-4 bg-blue-bg text-primary rounded-full hover:bg-primary hover:text-surface transition-colors duration-200 mt-4 active:scale-95" onclick="event.stopPropagation();">
+<span class="material-symbols-outlined text-3xl" data-icon="volume_up" data-weight="fill">volume_up</span>
+</button>
+</div>
+<!-- Back -->
+<div class="flashcard-back absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 bg-surface rounded-[20px] border border-surface-variant">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-on-surface mb-2">xin chào</h2>
+<p class="font-mono-data text-on-surface-variant mb-6 text-center">/həˈloʊ/</p>
+<div class="w-full h-px bg-surface-variant my-4 opacity-50"></div>
+<p class="font-body-md text-on-surface text-center px-4 italic">"Hello, how are you today?"</p>
+</div>
+</div>
+</div>
+<!-- Review Buttons -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 w-full">
+<button class="flex flex-col items-center justify-center py-3 px-2 bg-danger-bg rounded-xl hover:bg-red-100 transition-colors active:scale-95 border border-red-100">
+<span class="text-2xl mb-1">😵</span>
+<span class="font-label-sm text-danger text-center">Lại quên</span>
+</button>
+<button class="flex flex-col items-center justify-center py-3 px-2 bg-warning-bg rounded-xl hover:bg-yellow-100 transition-colors active:scale-95 border border-yellow-100">
+<span class="text-2xl mb-1">🤔</span>
+<span class="font-label-sm text-tertiary-container text-center">Hơi khó</span>
+</button>
+<button class="flex flex-col items-center justify-center py-3 px-2 bg-success-bg rounded-xl hover:bg-green-100 transition-colors active:scale-95 border border-green-100">
+<span class="text-2xl mb-1">😊</span>
+<span class="font-label-sm text-success text-center">Nhớ rồi</span>
+</button>
+<button class="flex flex-col items-center justify-center py-3 px-2 bg-blue-bg rounded-xl hover:bg-blue-100 transition-colors active:scale-95 border border-blue-100">
+<span class="text-2xl mb-1">🔥</span>
+<span class="font-label-sm text-primary text-center">Dễ ợt</span>
+</button>
+</div>
+<!-- Navigation Arrows (Optional visual indicator, though user likely swipes) -->
+<div class="flex justify-between items-center px-4 mt-auto">
+<button class="p-3 text-on-surface-variant hover:bg-surface-subtle rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<span class="font-label-sm text-on-surface-variant opacity-60">Tap to flip</span>
+<button class="p-3 text-on-surface-variant hover:bg-surface-subtle rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+<div class="flex justify-around items-center w-full px-2 py-3">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-blue-bg active:scale-90 transition-all duration-200 p-2 rounded-lg w-16">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-blue-bg active:scale-90 transition-all duration-200 p-2 rounded-lg w-16">
+<span class="material-symbols-outlined mb-1" data-icon="quiz">quiz</span>
+<span class="font-label-sm text-label-sm">Quiz</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary font-bold hover:bg-blue-bg active:scale-90 transition-all duration-200 p-2 rounded-lg w-16">
+<span class="material-symbols-outlined mb-1 fill" data-icon="style" data-weight="fill">style</span>
+<span class="font-label-sm text-label-sm">Flashcard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-blue-bg active:scale-90 transition-all duration-200 p-2 rounded-lg w-16">
+<span class="material-symbols-outlined mb-1" data-icon="assignment">assignment</span>
+<span class="font-label-sm text-label-sm">Test</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-blue-bg active:scale-90 transition-all duration-200 p-2 rounded-lg w-16">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</div>
+</nav>
+<!-- Desktop Sidebar placeholder (hidden on mobile, but structurally present per guidance) -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-sidebar-width bg-surface shadow-sm flex-col z-50">
+<div class="p-6">
+<h1 class="font-display-brand text-headline-lg text-primary">MeuBeu</h1>
+</div>
+<nav class="flex-1 px-4 py-2 flex flex-col gap-2">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant rounded-xl hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-body-md">Home</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant rounded-xl hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+<span class="font-body-md">Quiz</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 bg-blue-bg text-primary rounded-xl font-bold transition-colors" href="#">
+<span class="material-symbols-outlined fill" data-icon="style" data-weight="fill">style</span>
+<span class="font-body-md">Flashcard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant rounded-xl hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-body-md">Test</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant rounded-xl hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-md">Profile</span>
+</a>
+</nav>
+</aside>
+</body></html>

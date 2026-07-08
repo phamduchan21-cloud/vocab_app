@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Đăng nhập - MeuBeu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Nunito:wght@400;600;700;800&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "success-bg": "#ECFDF5",
+                        "on-secondary-fixed": "#001a42",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "success": "#059669",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary": "#0058be",
+                        "on-primary-container": "#eeefff",
+                        "primary": "#004ac6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-subtle": "#F1F3F5",
+                        "tertiary-container": "#a65900",
+                        "surface": "#FFFFFF",
+                        "ink": "#1A1D23",
+                        "on-tertiary": "#ffffff",
+                        "warning-bg": "#FFFBEB",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline-variant": "#c3c6d7",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "danger-bg": "#FEF2F2",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-tertiary-container": "#ffede1",
+                        "ink-soft": "#6B7280",
+                        "blue-bg": "#EFF6FF",
+                        "secondary-container": "#2170e4",
+                        "on-surface": "#191c1d",
+                        "on-primary-fixed": "#00174b",
+                        "outline": "#737686",
+                        "primary-fixed": "#dbe1ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#0053db",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-secondary-container": "#fefcff",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "on-secondary-fixed-variant": "#004395",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#2563eb",
+                        "surface-dim": "#d9dadb",
+                        "inverse-primary": "#b4c5ff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d8e2ff",
+                        "inverse-surface": "#2e3132",
+                        "tertiary-fixed": "#ffdcc3",
+                        "tertiary": "#824500",
+                        "danger": "#DC2626",
+                        "surface-container-low": "#f3f4f5",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#434655"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "2xl": "1.5rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "sidebar-width": "230px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "display-brand": ["Nunito"],
+                        "headline-sm": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "headline-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom styles for this screen */
+        body {
+            background: linear-gradient(135deg, #004ac6 0%, #00174b 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex items-center justify-center p-margin-mobile md:p-margin-desktop antialiased text-on-surface">
+<main class="w-full max-w-md">
+<!-- Header Section -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm mb-4">
+<span class="material-symbols-outlined text-white text-[32px]">menu_book</span>
+</div>
+<h1 class="font-display-brand text-[28px] leading-[36px] font-bold text-white mb-2">Chào mừng trở lại!</h1>
+<p class="font-body-md text-body-md text-primary-fixed-dim">Đăng nhập để tiếp tục học</p>
+</div>
+<!-- Main Card -->
+<div class="glass-card rounded-2xl p-6 md:p-8 shadow-2xl">
+<form class="space-y-6">
+<!-- Email Input -->
+<div>
+<label class="block font-body-md text-body-md text-on-surface mb-2" for="email">Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft">mail</span>
+<input class="w-full pl-10 pr-4 py-3 bg-background border-none rounded-[10px] focus:ring-1.5 focus:ring-primary focus:outline-none font-body-md text-body-md text-on-surface placeholder:text-ink-soft transition-shadow" id="email" name="email" placeholder="Nhập địa chỉ email của bạn" required="" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div>
+<div class="flex justify-between items-center mb-2">
+<label class="block font-body-md text-body-md text-on-surface" for="password">Mật khẩu</label>
+<a class="font-body-md text-body-md text-primary hover:text-secondary transition-colors" href="#">Quên mật khẩu?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft">lock</span>
+<input class="w-full pl-10 pr-10 py-3 bg-background border-none rounded-[10px] focus:ring-1.5 focus:ring-primary focus:outline-none font-body-md text-body-md text-on-surface placeholder:text-ink-soft transition-shadow" id="password" name="password" placeholder="Nhập mật khẩu" required="" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink focus:outline-none" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full py-3.5 px-4 bg-gradient-to-r from-primary to-secondary text-white font-headline-sm text-headline-sm rounded-[12px] hover:opacity-90 active:scale-[0.98] transition-all shadow-md" type="submit">
+                    Đăng nhập
+                </button>
+</form>
+<!-- Social Login Divider -->
+<div class="mt-6 flex items-center justify-center space-x-4">
+<div class="h-px bg-outline-variant flex-1"></div>
+<span class="font-body-md text-body-md text-ink-soft">hoặc</span>
+<div class="h-px bg-outline-variant flex-1"></div>
+</div>
+<!-- Social Login Buttons -->
+<div class="mt-6 grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center py-2.5 px-4 border border-outline-variant rounded-[10px] hover:bg-surface-subtle transition-colors">
+<img class="w-5 h-5 mr-2" data-alt="A small icon representing the Google logo. The design is clean and minimalist, suitable for a light-mode educational app UI. The icon is isolated on a transparent background, ensuring it blends seamlessly with the surrounding interface elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0HA7eTgZaqaHxm1Otrvph-gGypow_8eHDafsdOnfYF4df-GeEvZLY32BUG4AbDwlteUIVZR5nRPy8YFPDxlNXMYgvHaHP-h9FfRA6OOasUq1hJ6GqhRoqtLz-3NSHrAOSupVa2YJdiww5504vA9Pf07bWKA06fXjperH4OC9YrKGSajubkLR9xnLiKgPJvymGuWV7h5BoBuafetDON4gZj7zHklMDHhyPsncmXdxvMYVOzONxmaUV0IL3Vwz2K3V_E9UayWhIM7g"/>
+<span class="font-body-md text-body-md text-on-surface font-medium">Google</span>
+</button>
+<button class="flex items-center justify-center py-2.5 px-4 border border-outline-variant rounded-[10px] hover:bg-surface-subtle transition-colors">
+<span class="material-symbols-outlined mr-2" data-weight="fill">apps</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Apple</span>
+</button>
+</div>
+</div>
+<!-- Footer -->
+<p class="text-center mt-8 font-body-md text-body-md text-primary-fixed-dim">
+            Chưa có tài khoản? <a class="text-white font-semibold hover:underline" href="#">Đăng ký</a>
+</p>
+</main>
+<script>
+        // Simple password toggle logic
+        document.querySelector('button[type="button"]').addEventListener('click', function() {
+            const input = document.getElementById('password');
+            const icon = this.querySelector('.material-symbols-outlined');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Từ đã lưu - MeuBeu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed": "#001a42",
+                      "warning-bg": "#FFFBEB",
+                      "ink": "#1A1D23",
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#dbe1ff",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "primary-container": "#2563eb",
+                      "on-primary-container": "#eeefff",
+                      "surface-container": "#edeeef",
+                      "surface-subtle": "#F1F3F5",
+                      "on-surface-variant": "#434655",
+                      "surface-container-highest": "#e1e3e4",
+                      "secondary": "#0058be",
+                      "on-error": "#ffffff",
+                      "on-background": "#191c1d",
+                      "primary": "#004ac6",
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#c3c6d7",
+                      "surface": "#FFFFFF",
+                      "outline": "#737686",
+                      "success": "#059669",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "ink-soft": "#6B7280",
+                      "tertiary": "#824500",
+                      "surface-dim": "#d9dadb",
+                      "surface-variant": "#e1e3e4",
+                      "on-tertiary-container": "#ffede1",
+                      "surface-container-low": "#f3f4f5",
+                      "tertiary-fixed": "#ffdcc3",
+                      "error": "#ba1a1a",
+                      "surface-container-high": "#e7e8e9",
+                      "inverse-on-surface": "#f0f1f2",
+                      "tertiary-container": "#a65900",
+                      "secondary-fixed": "#d8e2ff",
+                      "on-secondary-fixed-variant": "#004395",
+                      "error-container": "#ffdad6",
+                      "surface-bright": "#f8f9fa",
+                      "on-error-container": "#93000a",
+                      "danger": "#DC2626",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-primary": "#b4c5ff",
+                      "tertiary-fixed-dim": "#ffb77d",
+                      "danger-bg": "#FEF2F2",
+                      "surface-tint": "#0053db",
+                      "secondary-container": "#2170e4",
+                      "on-surface": "#191c1d",
+                      "on-tertiary-fixed-variant": "#6e3900",
+                      "on-tertiary-fixed": "#2f1500",
+                      "on-secondary-container": "#fefcff",
+                      "background": "#f8f9fa",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "on-primary-fixed": "#00174b",
+                      "inverse-surface": "#2e3132",
+                      "blue-bg": "#EFF6FF",
+                      "success-bg": "#ECFDF5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sidebar-width": "230px",
+                      "margin-mobile": "16px",
+                      "unit": "4px",
+                      "margin-desktop": "24px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Work Sans"],
+                      "body-lg": ["Work Sans"],
+                      "headline-md": ["Work Sans"],
+                      "headline-lg-mobile": ["Work Sans"],
+                      "display-brand": ["Nunito"],
+                      "body-md": ["Work Sans"],
+                      "headline-lg": ["Work Sans"],
+                      "headline-sm": ["Work Sans"],
+                      "mono-data": ["IBM Plex Mono"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                      "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                      "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                      "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                      "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }]
+              }
+            }
+          }
+        }
+      </script>
+<style>
+          .word-stamp {
+              border: 2px dashed var(--tw-colors-outline-variant);
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+              display: none;
+          }
+          .hide-scrollbar {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+          }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row pb-[80px] md:pb-0">
+<!-- TopAppBar Mobile / Desktop Header -->
+<header class="bg-surface flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 sticky top-0 z-40 md:hidden flat no shadows">
+<button class="text-primary hover:bg-surface-subtle p-2 rounded-full scale-95 duration-200 transition-all">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary font-bold">Từ đã lưu</h1>
+<button class="text-primary font-headline-sm text-headline-sm hover:bg-surface-subtle px-4 py-2 rounded-lg scale-95 duration-200 transition-all">
+            Ôn tập
+        </button>
+</header>
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="hidden md:flex flex-col w-sidebar-width bg-ink text-surface-subtle h-screen fixed left-0 top-0 pt-8 pb-8 px-4 z-50">
+<div class="font-display-brand text-headline-md text-surface mb-12 px-4">MeuBeu</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-surface-variant/10 transition-colors text-surface-subtle" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-headline-sm text-headline-sm">Trang chủ</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-surface-variant/10 transition-colors text-surface-subtle" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-headline-sm text-headline-sm">Từ vựng</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-headline-sm text-headline-sm font-bold">Sổ tay</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-surface-variant/10 transition-colors text-surface-subtle" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-headline-sm text-headline-sm">Hồ sơ</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-sidebar-width w-full max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop py-6">
+<!-- Desktop Header (Hides on Mobile) -->
+<div class="hidden md:flex justify-between items-center mb-8">
+<h1 class="font-headline-lg text-headline-lg text-on-background font-bold">Từ đã lưu</h1>
+<button class="bg-primary text-on-primary font-headline-sm text-headline-sm px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors shadow-sm">
+                Bắt đầu ôn tập
+            </button>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full mb-6 group">
+<div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-ink-soft">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</div>
+<input class="w-full bg-surface border-none rounded-[10px] pl-12 pr-4 py-4 font-body-lg text-body-lg text-on-background placeholder:text-ink-soft shadow-sm focus:ring-1.5 focus:ring-primary focus:outline-none transition-shadow" placeholder="Tìm từ đã lưu..." type="text"/>
+</div>
+<!-- Filter Choice Chips -->
+<div class="flex overflow-x-auto hide-scrollbar gap-3 mb-8 pb-2">
+<button class="whitespace-nowrap px-5 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm shadow-sm transition-transform active:scale-95">
+                Tất cả (42)
+            </button>
+<button class="whitespace-nowrap px-5 py-2 rounded-full bg-surface text-on-surface-variant border border-outline-variant font-label-sm text-label-sm shadow-sm hover:bg-surface-subtle transition-transform active:scale-95">
+                Mới (12)
+            </button>
+<button class="whitespace-nowrap px-5 py-2 rounded-full bg-surface text-on-surface-variant border border-outline-variant font-label-sm text-label-sm shadow-sm hover:bg-surface-subtle transition-transform active:scale-95">
+                Đang học (20)
+            </button>
+<button class="whitespace-nowrap px-5 py-2 rounded-full bg-surface text-on-surface-variant border border-outline-variant font-label-sm text-label-sm shadow-sm hover:bg-surface-subtle transition-transform active:scale-95">
+                Đã thuộc (10)
+            </button>
+</div>
+<!-- Word Stamps Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+<!-- Stamp 1: Mới -->
+<div class="bg-surface rounded-xl p-5 shadow-sm word-stamp relative hover:shadow-md transition-shadow cursor-pointer group">
+<div class="absolute top-4 right-4 text-tertiary">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="inline-block bg-warning-bg text-tertiary font-label-sm text-label-sm px-2 py-1 rounded w-fit font-semibold tracking-wider">MỚI</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mt-1 group-hover:text-primary transition-colors">hello</h3>
+<p class="font-mono-data text-mono-data text-primary">/həˈloʊ/</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">xin chào</p>
+</div>
+</div>
+<!-- Stamp 2: Đang học -->
+<div class="bg-surface rounded-xl p-5 shadow-sm word-stamp relative hover:shadow-md transition-shadow cursor-pointer group">
+<div class="absolute top-4 right-4 text-tertiary">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="inline-block bg-blue-bg text-primary font-label-sm text-label-sm px-2 py-1 rounded w-fit font-semibold tracking-wider">ĐANG HỌC</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mt-1 group-hover:text-primary transition-colors">world</h3>
+<p class="font-mono-data text-mono-data text-primary">/wɜːrld/</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">thế giới</p>
+</div>
+</div>
+<!-- Stamp 3: Đã thuộc -->
+<div class="bg-surface rounded-xl p-5 shadow-sm word-stamp relative hover:shadow-md transition-shadow cursor-pointer group">
+<div class="absolute top-4 right-4 text-tertiary">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="inline-block bg-success-bg text-success font-label-sm text-label-sm px-2 py-1 rounded w-fit font-semibold tracking-wider">ĐÃ THUỘC</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mt-1 group-hover:text-primary transition-colors">cat</h3>
+<p class="font-mono-data text-mono-data text-primary">/kæt/</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">con mèo</p>
+</div>
+</div>
+<!-- Stamp 4: Đang học -->
+<div class="bg-surface rounded-xl p-5 shadow-sm word-stamp relative hover:shadow-md transition-shadow cursor-pointer group">
+<div class="absolute top-4 right-4 text-tertiary">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="inline-block bg-blue-bg text-primary font-label-sm text-label-sm px-2 py-1 rounded w-fit font-semibold tracking-wider">ĐANG HỌC</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mt-1 group-hover:text-primary transition-colors">family</h3>
+<p class="font-mono-data text-mono-data text-primary">/ˈfæməli/</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">gia đình</p>
+</div>
+</div>
+<!-- Stamp 5: Mới -->
+<div class="bg-surface rounded-xl p-5 shadow-sm word-stamp relative hover:shadow-md transition-shadow cursor-pointer group">
+<div class="absolute top-4 right-4 text-tertiary">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="inline-block bg-warning-bg text-tertiary font-label-sm text-label-sm px-2 py-1 rounded w-fit font-semibold tracking-wider">MỚI</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mt-1 group-hover:text-primary transition-colors">friend</h3>
+<p class="font-mono-data text-mono-data text-primary">/frend/</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">bạn bè</p>
+</div>
+</div>
+<!-- Stamp 6: Đã thuộc -->
+<div class="bg-surface rounded-xl p-5 shadow-sm word-stamp relative hover:shadow-md transition-shadow cursor-pointer group">
+<div class="absolute top-4 right-4 text-tertiary">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="inline-block bg-success-bg text-success font-label-sm text-label-sm px-2 py-1 rounded w-fit font-semibold tracking-wider">ĐÃ THUỘC</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mt-1 group-hover:text-primary transition-colors">book</h3>
+<p class="font-mono-data text-mono-data text-primary">/bʊk/</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">quyển sách</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Mobile -->
+<nav class="md:hidden bg-surface fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 pb-safe px-2 rounded-t-xl shadow-[0_-4px_12px_rgba(26,29,35,0.08)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant scale-95 duration-150 transition-transform hover:bg-surface-container-low p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm mt-1">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant scale-95 duration-150 transition-transform hover:bg-surface-container-low p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-sm text-label-sm mt-1">Từ vựng</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-95 duration-150 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm mt-1">Sổ tay</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant scale-95 duration-150 transition-transform hover:bg-surface-container-low p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Hồ sơ</span>
+</a>
+</nav>
+</body></html>

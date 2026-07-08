@@ -45,7 +45,17 @@
       "Bash(npm i *)",
       "Skill(run)",
       "Bash(ls venv/bin/activate)",
-      "Bash(ls venv/Scripts/activate)"
+      "Bash(ls venv/Scripts/activate)",
+      "Bash(/d/AppHocTuVung/backend/venv/Scripts/python.exe *)",
+      "Bash(ls -la /d/stich*)",
+      "Bash(ls -la /d/*.zip)",
+      "Bash(find /d -maxdepth 2 -name \"*stich*\" -o -name \"*.zip\")",
+      "Bash(unzip -l stitch_creative_design_workspace.zip)",
+      "Bash(unzip -o stitch_creative_design_workspace.zip -d stitch_designs)",
+      "Bash(pip list *)"
     ]
+  },
+  "enabledPlugins": {
+    "ponytail@ponytail": true
   }
 }

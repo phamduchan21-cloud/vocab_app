@@ -28,7 +28,7 @@ def get_vocab_service(db: AsyncSession = Depends(get_db)) -> VocabularyService:
 
 # ─── Lesson endpoints ────────────────────────────────────────────
 
-@router.get("/lessons")
+@router.get("/lessons", response_model=dict)
 async def get_lessons(
     service: VocabularyService = Depends(get_vocab_service),
 ):
@@ -36,7 +36,7 @@ async def get_lessons(
     return {"lessons": await service.get_lessons()}
 
 
-@router.get("/lessons/{lesson_id}")
+@router.get("/lessons/{lesson_id}", response_model=dict)
 async def get_lesson_vocabs(
     lesson_id: int,
     service: VocabularyService = Depends(get_vocab_service),
@@ -47,7 +47,7 @@ async def get_lesson_vocabs(
     return {"items": [{"id": str(v.id), "word": v.word, "meaning": v.meaning, "example": v.example, "topic": v.topic} for v in items], "total": total}
 
 
-@router.get("/grammar")
+@router.get("/grammar", response_model=dict)
 async def get_grammar(
     service: VocabularyService = Depends(get_vocab_service),
 ):
@@ -55,7 +55,7 @@ async def get_grammar(
     return {"parts": await service.get_grammar_parts()}
 
 
-@router.get("/advanced")
+@router.get("/advanced", response_model=dict)
 async def get_advanced(
     service: VocabularyService = Depends(get_vocab_service),
 ):
@@ -94,6 +94,11 @@ async def list_vocabularies(
             topic=v.topic,
             pronunciation=v.pronunciation,
             review_count=v.review_count or 0,
+            next_review_date=v.next_review_date,
+            ease_factor=v.ease_factor or 2.5,
+            times_correct=v.times_correct or 0,
+            times_wrong=v.times_wrong or 0,
+            lesson_id=v.lesson_id,
             created_at=v.created_at,
             updated_at=v.updated_at,
         )
@@ -127,6 +132,11 @@ async def create_vocabulary(
         topic=vocab.topic,
         pronunciation=vocab.pronunciation,
         review_count=vocab.review_count or 0,
+        next_review_date=vocab.next_review_date,
+        ease_factor=vocab.ease_factor or 2.5,
+        times_correct=vocab.times_correct or 0,
+        times_wrong=vocab.times_wrong or 0,
+        lesson_id=vocab.lesson_id,
         created_at=vocab.created_at,
         updated_at=vocab.updated_at,
     )
@@ -134,7 +144,7 @@ async def create_vocabulary(
 
 # ─── Seed Data Endpoints — MUST come BEFORE /{id} catch-all ─────────
 
-@router.get("/seed-topics")
+@router.get("/seed-topics", response_model=dict)
 async def get_seed_topics(
     service: VocabularyService = Depends(get_vocab_service),
 ):
@@ -188,6 +198,11 @@ async def get_vocabulary(
         topic=vocab.topic,
         pronunciation=vocab.pronunciation,
         review_count=vocab.review_count or 0,
+        next_review_date=vocab.next_review_date,
+        ease_factor=vocab.ease_factor or 2.5,
+        times_correct=vocab.times_correct or 0,
+        times_wrong=vocab.times_wrong or 0,
+        lesson_id=vocab.lesson_id,
         created_at=vocab.created_at,
         updated_at=vocab.updated_at,
     )
@@ -216,6 +231,11 @@ async def update_vocabulary(
         topic=vocab.topic,
         pronunciation=vocab.pronunciation,
         review_count=vocab.review_count or 0,
+        next_review_date=vocab.next_review_date,
+        ease_factor=vocab.ease_factor or 2.5,
+        times_correct=vocab.times_correct or 0,
+        times_wrong=vocab.times_wrong or 0,
+        lesson_id=vocab.lesson_id,
         created_at=vocab.created_at,
         updated_at=vocab.updated_at,
     )
@@ -244,10 +264,7 @@ async def review_vocabulary(
     service: VocabularyService = Depends(get_vocab_service),
     current_user: User = Depends(get_current_user),
 ):
-    """Gửi kết quả ôn tập từ vựng (SM-2 Spaced Repetition).
-
-    - `quality`: 0=quên hoàn toàn, 1-2=nhớ mờ nhạt, 3=nhớ với khó khăn, 4=nhớ tốt, 5=nhớ hoàn hảo
-    """
+    """Gửi kết quả ôn tập từ vựng (SM-2 Spaced Repetition)."""
     vocab = await service.review_word(
         id=id,
         user_id=current_user.id,
@@ -267,6 +284,11 @@ async def review_vocabulary(
         topic=vocab.topic,
         pronunciation=vocab.pronunciation,
         review_count=vocab.review_count or 0,
+        next_review_date=vocab.next_review_date,
+        ease_factor=vocab.ease_factor or 2.5,
+        times_correct=vocab.times_correct or 0,
+        times_wrong=vocab.times_wrong or 0,
+        lesson_id=vocab.lesson_id,
         created_at=vocab.created_at,
         updated_at=vocab.updated_at,
     )

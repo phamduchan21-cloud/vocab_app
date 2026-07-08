@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lịch sử thi - VocaEng</title>
+<!-- Google Fonts: Work Sans (Primary) & Nunito (Brand) & IBM Plex Mono (Data) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Nunito:wght@700;800&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#fefcff",
+                        "outline-variant": "#c3c6d7",
+                        "primary-container": "#2563eb",
+                        "tertiary-fixed": "#ffdcc3",
+                        "secondary-container": "#2170e4",
+                        "tertiary-container": "#a65900",
+                        "warning-bg": "#FFFBEB",
+                        "warning": "#D97706",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#2f1500",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary": "#ffffff",
+                        "ink": "#1A1D23",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "outline": "#737686",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-primary-fixed": "#00174b",
+                        "on-secondary-fixed": "#001a42",
+                        "background": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "success": "#059669",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-dim": "#d9dadb",
+                        "surface-container": "#edeeef",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-fixed-variant": "#004395",
+                        "primary": "#004ac6",
+                        "surface-subtle": "#F1F3F5",
+                        "surface-variant": "#e1e3e4",
+                        "ink-soft": "#6B7280",
+                        "danger": "#DC2626",
+                        "danger-bg": "#FEF2F2",
+                        "secondary-fixed": "#d8e2ff",
+                        "success-bg": "#ECFDF5",
+                        "on-error": "#ffffff",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#b4c5ff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-container": "#ffede1",
+                        "secondary": "#0058be",
+                        "on-surface-variant": "#434655",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary": "#824500",
+                        "on-background": "#191c1d",
+                        "blue-bg": "#EFF6FF",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-surface": "#191c1d",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "surface-tint": "#0053db"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "24px",
+                        "sidebar-width": "230px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-sm": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "display-brand": ["Nunito"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "headline-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-ink min-h-screen flex flex-col md:flex-row w-full overflow-x-hidden">
+<!-- Desktop Navigation Drawer (Sidebar) -->
+<nav class="hidden md:flex flex-col bg-surface dark:bg-inverse-surface h-screen w-[230px] rounded-r-xl shadow-lg fixed left-0 top-0 p-4 z-40 border-r border-surface-variant">
+<!-- Header -->
+<div class="flex flex-col items-start mb-8 gap-3 border-b border-surface-variant pb-6">
+<div class="font-display-brand text-headline-lg text-primary tracking-tight">VocaEng</div>
+<div class="flex items-center gap-3 w-full">
+<img class="w-10 h-10 rounded-full object-cover border-2 border-surface-variant" data-alt="A close up portrait of a smiling young person used as a user profile avatar in a digital interface, brightly lit against a neutral background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx4U38gmk6hHSPt0uMHSaAax9WqN4FZDHbbvxXR4cy028zPRFq2xz0HU9UKfjvO-Ktbcs36p4Gfb7Bbp85nv7WmQREnp0anTGTDjM5fuqX__9Acqt1wQBcNOV7O0gc23ikamxdCMz-iM_xUM6VCi7Cz8UQRrwQmAFDGfYg0AjqtbyGAvXj0ePeQZX_3e4RaA5YLn6rQq9PqzLiAd4wAJodITwz7GdjPLJRAY_vrorsGSQx8p-bmZVpIlIu7ewNrp-YYLuY-gPPmoo"/>
+<div class="flex flex-col overflow-hidden">
+<span class="font-headline-sm text-on-surface truncate">MeuBeu Learner</span>
+<span class="font-label-sm text-on-surface-variant truncate">Level B2 Upper Intermediate</span>
+<span class="font-label-sm text-success font-medium flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-[14px]">local_fire_department</span> 12 days streak</span>
+</div>
+</div>
+</div>
+<!-- Links -->
+<div class="flex flex-col gap-2 flex-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="star">star</span>
+<span class="font-body-md">Daily Goal</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-body-md">Leaderboard</span>
+</a>
+<!-- History maps conceptually to viewing progress/records, though not explicitly in sidebar JSON, we add it implicitly or rely on bottom nav for this flow. As per instructions, we follow JSON. History is missing from Sidebar JSON, so we leave Sidebar items inactive as this is a specific sub-flow. -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300 mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-body-md">Help</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-danger" data-icon="logout">logout</span>
+<span class="font-body-md text-danger">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col w-full md:pl-[230px] min-h-screen">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-4 h-16 w-full top-0 sticky bg-surface dark:bg-on-background z-30 flex-shrink-0 border-b border-surface-subtle shadow-sm md:shadow-none">
+<button class="p-2 text-ink hover:bg-surface-subtle rounded-full transition-colors md:hidden">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold absolute left-1/2 -translate-x-1/2">Lịch sử thi</h1>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant border border-surface-subtle md:hidden">
+<img class="w-full h-full object-cover" data-alt="A close up portrait of a smiling young person used as a user profile avatar in a digital interface, brightly lit against a neutral background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBldMisam8-ATdgL8xlbKebLVcixATq2xftiPlLMBpJ0f_qMj26_fZw6KaArLFdq7B0gvsnvqolz5x1wLpOoEXSB6VsLqLdqQFx3xy6FEOKljNObvwrqsLTBkvDM1K36h7r_FlAJeUzuTTd9Rur5vARRjDmsN9fSB-e4lHPwMggI5my4n4C2OmhO2kOUbZ2CGOnhFpmEBSKguDYq6UVslxtWeKgL4hGE6FsxIVI02U-gRQT6tocdmF2-hw88YArlw8BMv1PxYOO1WE"/>
+</div>
+<!-- Empty div for alignment on desktop -->
+<div class="w-10 h-10 hidden md:block"></div>
+</header>
+<!-- Scrollable Canvas -->
+<div class="flex-1 p-4 md:p-6 lg:p-8 flex flex-col gap-6 max-w-4xl mx-auto w-full pb-28 md:pb-8">
+<!-- Summary Card -->
+<section class="bg-gradient-to-br from-primary to-secondary text-on-primary rounded-[18px] p-6 shadow-sm flex flex-col sm:flex-row justify-between items-center sm:items-stretch gap-6 relative overflow-hidden">
+<!-- Decorative background elements -->
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-white opacity-5 rounded-full blur-2xl"></div>
+<div class="absolute -left-10 -bottom-10 w-32 h-32 bg-white opacity-5 rounded-full blur-2xl"></div>
+<div class="flex flex-col items-center sm:items-start z-10">
+<span class="font-label-sm uppercase tracking-wider text-primary-fixed-dim mb-1">Tổng quan</span>
+<span class="font-headline-lg text-4xl mb-1">72<span class="text-xl opacity-80">%</span></span>
+<span class="font-body-md text-primary-fixed">Điểm trung bình</span>
+</div>
+<div class="h-px w-full sm:w-px sm:h-auto bg-white/20 z-10"></div>
+<div class="flex w-full sm:w-auto justify-around sm:justify-end sm:gap-12 z-10">
+<div class="flex flex-col items-center justify-center">
+<span class="font-mono-data text-2xl font-bold mb-1">12</span>
+<span class="font-label-sm text-primary-fixed">Bài đã làm</span>
+</div>
+<div class="flex flex-col items-center justify-center">
+<span class="font-mono-data text-2xl font-bold mb-1">248<span class="text-sm font-normal opacity-70">/320</span></span>
+<span class="font-label-sm text-primary-fixed">Câu đúng</span>
+</div>
+</div>
+</section>
+<!-- Trend Chart Section -->
+<section class="bg-surface rounded-[16px] p-5 shadow-sm border border-surface-subtle">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline-sm text-ink">Xu hướng điểm số</h2>
+<span class="font-label-sm text-ink-soft bg-surface-subtle px-2 py-1 rounded-md">5 bài gần nhất</span>
+</div>
+<!-- CSS Bar Chart -->
+<div class="h-40 flex items-end justify-between gap-2 px-2 sm:px-6 mt-4 relative">
+<!-- Background Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6">
+<div class="w-full h-px bg-surface-variant/50"></div>
+<div class="w-full h-px bg-surface-variant/50"></div>
+<div class="w-full h-px bg-surface-variant/50"></div>
+<div class="w-full h-px bg-surface-variant/50"></div>
+</div>
+<!-- Bars -->
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group">
+<div class="w-full max-w-[40px] bg-primary-fixed-dim rounded-t-md relative transition-all duration-300 group-hover:bg-primary-fixed" style="height: 50%;">
+<div class="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-ink text-surface text-[10px] py-1 px-2 rounded font-mono-data">50%</div>
+</div>
+<span class="font-label-sm text-ink-soft">T2</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group">
+<div class="w-full max-w-[40px] bg-primary-fixed-dim rounded-t-md relative transition-all duration-300 group-hover:bg-primary-fixed" style="height: 65%;">
+<div class="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-ink text-surface text-[10px] py-1 px-2 rounded font-mono-data">65%</div>
+</div>
+<span class="font-label-sm text-ink-soft">T4</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group">
+<div class="w-full max-w-[40px] bg-primary-fixed-dim rounded-t-md relative transition-all duration-300 group-hover:bg-primary-fixed" style="height: 60%;">
+<div class="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-ink text-surface text-[10px] py-1 px-2 rounded font-mono-data">60%</div>
+</div>
+<span class="font-label-sm text-ink-soft">T6</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group">
+<div class="w-full max-w-[40px] bg-primary-fixed-dim rounded-t-md relative transition-all duration-300 group-hover:bg-primary-fixed" style="height: 85%;">
+<div class="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-ink text-surface text-[10px] py-1 px-2 rounded font-mono-data">85%</div>
+</div>
+<span class="font-label-sm text-ink-soft">CN</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group">
+<!-- Active Latest Bar -->
+<div class="w-full max-w-[40px] bg-primary rounded-t-md relative shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-all duration-300" style="height: 75%;">
+<div class="absolute -top-7 left-1/2 -translate-x-1/2 opacity-100 bg-primary text-surface text-[10px] py-1 px-2 rounded font-mono-data font-bold">75%</div>
+</div>
+<span class="font-label-sm font-bold text-primary">Nay</span>
+</div>
+</div>
+</section>
+<!-- History List -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline-sm text-ink">Các bài đã làm</h2>
+<button class="text-primary font-label-sm font-semibold hover:underline">Bộ lọc</button>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Item 1 (Success) -->
+<div class="bg-surface rounded-[14px] p-4 shadow-sm border border-surface-subtle flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]">
+<!-- Score Ring -->
+<div class="relative w-[52px] h-[52px] flex items-center justify-center rounded-full flex-shrink-0" style="background: conic-gradient(#059669 85%, #edeeef 0);">
+<div class="absolute inset-[3px] bg-surface rounded-full flex items-center justify-center shadow-inner">
+<span class="font-mono-data text-[13px] font-bold text-success">85%</span>
+</div>
+</div>
+<!-- Content -->
+<div class="flex-1 flex flex-col justify-center min-w-0">
+<h3 class="font-headline-sm text-ink truncate mb-1">Mini-test #42: Phrasal Verbs</h3>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="bg-warning-bg text-warning border border-warning/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">Trung cấp</span>
+<span class="font-label-sm text-ink-soft">15/03/2026 • 17/20 câu</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<!-- Item 2 (Warning) -->
+<div class="bg-surface rounded-[14px] p-4 shadow-sm border border-surface-subtle flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]">
+<div class="relative w-[52px] h-[52px] flex items-center justify-center rounded-full flex-shrink-0" style="background: conic-gradient(#D97706 60%, #edeeef 0);">
+<div class="absolute inset-[3px] bg-surface rounded-full flex items-center justify-center shadow-inner">
+<span class="font-mono-data text-[13px] font-bold text-warning">60%</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center min-w-0">
+<h3 class="font-headline-sm text-ink truncate mb-1">Test Tổng Hợp Tháng 3</h3>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="bg-danger-bg text-danger border border-danger/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">Nâng cao</span>
+<span class="font-label-sm text-ink-soft">12/03/2026 • 18/30 câu</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<!-- Item 3 (Success) -->
+<div class="bg-surface rounded-[14px] p-4 shadow-sm border border-surface-subtle flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]">
+<div class="relative w-[52px] h-[52px] flex items-center justify-center rounded-full flex-shrink-0" style="background: conic-gradient(#059669 90%, #edeeef 0);">
+<div class="absolute inset-[3px] bg-surface rounded-full flex items-center justify-center shadow-inner">
+<span class="font-mono-data text-[13px] font-bold text-success">90%</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center min-w-0">
+<h3 class="font-headline-sm text-ink truncate mb-1">Mini-test #41: Từ vựng Cơ Bản</h3>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="bg-success-bg text-success border border-success/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">Cơ bản</span>
+<span class="font-label-sm text-ink-soft">10/03/2026 • 9/10 câu</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<!-- Item 4 (Danger) -->
+<div class="bg-surface rounded-[14px] p-4 shadow-sm border border-surface-subtle flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]">
+<div class="relative w-[52px] h-[52px] flex items-center justify-center rounded-full flex-shrink-0" style="background: conic-gradient(#DC2626 45%, #edeeef 0);">
+<div class="absolute inset-[3px] bg-surface rounded-full flex items-center justify-center shadow-inner">
+<span class="font-mono-data text-[13px] font-bold text-danger">45%</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center min-w-0">
+<h3 class="font-headline-sm text-ink truncate mb-1">Kiểm tra đầu vào</h3>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="bg-surface-variant text-ink-soft border border-surface-dim text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">Tổng hợp</span>
+<span class="font-label-sm text-ink-soft">01/03/2026 • 22/50 câu</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface dark:bg-inverse-surface fixed bottom-0 w-full z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex justify-around items-center h-20 px-2 pb-safe border-t-0">
+<!-- Tab: Learn -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-secondary-container rounded-xl p-2 min-w-[64px] scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="school">school</span>
+<span class="font-label-sm text-label-sm">Learn</span>
+</a>
+<!-- Tab: Tests -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-secondary-container rounded-xl p-2 min-w-[64px] scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="font-label-sm text-label-sm">Tests</span>
+</a>
+<!-- Tab: History (Active) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold hover:bg-blue-bg dark:hover:bg-secondary-container rounded-xl p-2 min-w-[64px] scale-95 transition-transform duration-200 relative" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+<!-- Active indicator dot -->
+<div class="absolute bottom-1 w-4 h-1 bg-primary rounded-full"></div>
+</a>
+<!-- Tab: Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-secondary-container rounded-xl p-2 min-w-[64px] scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

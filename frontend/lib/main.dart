@@ -28,45 +28,62 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final apiService = ApiService();
+  State<MyApp> createState() => _MyAppState();
+}
 
+class _MyAppState extends State<MyApp> {
+  late final ApiService _apiService;
+
+  @override
+  void initState() {
+    super.initState();
+    _apiService = ApiService();
+  }
+
+  @override
+  void dispose() {
+    _apiService.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         // Expose ApiService for screens that need it directly (e.g. AI Chat)
-        Provider<ApiService>.value(value: apiService),
+        Provider<ApiService>.value(value: _apiService),
 
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProxyProvider<AuthProvider, VocabularyProvider>(
-          create: (_) => VocabularyProvider(VocabularyService(apiService)),
+          create: (_) => VocabularyProvider(VocabularyService(_apiService)),
           update: (_, auth, prev) => prev!..updateAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, QuizProvider>(
-          create: (_) => QuizProvider(QuizService(apiService)),
+          create: (_) => QuizProvider(QuizService(_apiService)),
           update: (_, auth, prev) => prev!..updateAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, DashboardProvider>(
-          create: (_) => DashboardProvider(DashboardService(apiService)),
+          create: (_) => DashboardProvider(DashboardService(_apiService)),
           update: (_, auth, prev) => prev!..updateAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, FlashcardProvider>(
-          create: (_) => FlashcardProvider(VocabularyService(apiService), TopicService(apiService)),
+          create: (_) => FlashcardProvider(VocabularyService(_apiService), TopicService(_apiService)),
           update: (_, auth, prev) => prev!..updateAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, ProfileProvider>(
-          create: (_) => ProfileProvider(ProfileService(apiService)),
+          create: (_) => ProfileProvider(ProfileService(_apiService)),
           update: (_, auth, prev) => prev!..updateAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TopicProvider>(
-          create: (_) => TopicProvider(TopicService(apiService)),
+          create: (_) => TopicProvider(TopicService(_apiService)),
           update: (_, auth, prev) => prev!..updateAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, MockTestProvider>(
-          create: (_) => MockTestProvider(MockTestService(apiService)),
+          create: (_) => MockTestProvider(MockTestService(_apiService)),
           update: (_, auth, prev) => prev!..updateAuth(auth),
         ),
       ],

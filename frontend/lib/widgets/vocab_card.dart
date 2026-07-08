@@ -14,10 +14,10 @@ class VocabCard extends StatelessWidget {
   Color get _topicColor {
     final topicColors = {
       'general': AppColors.blue,
-      'giao tiáº¿p': AppColors.warning,
-      'du lá»‹ch': AppColors.success,
-      'cÃ´ng viá»‡c': AppColors.blue,
-      'há»c táº­p': AppColors.warning,
+      'giao tiếp': AppColors.warning,
+      'du lịch': AppColors.success,
+      'công việc': AppColors.blue,
+      'học tập': AppColors.warning,
     };
     return topicColors[vocab.topic.toLowerCase()] ?? AppColors.blue;
   }

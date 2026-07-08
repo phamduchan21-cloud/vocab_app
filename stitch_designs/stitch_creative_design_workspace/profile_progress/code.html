@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile - VocaEng</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&amp;family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-highest": "#e1e3e4",
+                        "blue-bg": "#EFF6FF",
+                        "tertiary": "#824500",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary": "#0058be",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "on-primary-fixed": "#00174b",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-bright": "#f8f9fa",
+                        "ink-soft": "#6B7280",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#004ac6",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-high": "#e7e8e9",
+                        "secondary-container": "#2170e4",
+                        "warning-bg": "#FFFBEB",
+                        "primary-container": "#2563eb",
+                        "on-tertiary-fixed": "#2f1500",
+                        "success-bg": "#ECFDF5",
+                        "surface-dim": "#d9dadb",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#0053db",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "success": "#059669",
+                        "surface": "#FFFFFF",
+                        "tertiary-container": "#a65900",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#001a42",
+                        "ink": "#1A1D23",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-lowest": "#ffffff",
+                        "danger": "#DC2626",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#ffede1",
+                        "on-surface-variant": "#434655",
+                        "on-background": "#191c1d",
+                        "surface-subtle": "#F1F3F5",
+                        "danger-bg": "#FEF2F2",
+                        "outline": "#737686",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d8e2ff",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "surface-container": "#edeeef",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#eeefff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "sidebar-width": "230px"
+                    },
+                    fontFamily: {
+                        "headline-sm": ["Work Sans"],
+                        "display-brand": ["Nunito"],
+                        "headline-md": ["Work Sans"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "body-md": ["Work Sans"]
+                    },
+                    fontSize: {
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background h-full font-body-md antialiased pb-20 md:pb-0 md:pl-sidebar-width overflow-x-hidden">
+<!-- Top App Bar (Mobile) / Sidebar (Desktop) Placeholder -->
+<div class="md:hidden flex items-center justify-between px-4 h-16 w-full top-0 sticky bg-surface z-40">
+<div class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-primary cursor-pointer transition-transform active:scale-95 duration-200">arrow_back</span>
+<span class="font-headline-md text-headline-md text-primary">VocaEng (MeuBeu)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer transition-transform active:scale-95 duration-200 hover:bg-surface-subtle p-2 rounded-full">more_vert</span>
+</div>
+<!-- Desktop Sidebar (Hidden on mobile) -->
+<aside class="hidden md:flex flex-col fixed inset-y-0 left-0 w-[230px] bg-surface-container-highest border-r border-outline-variant z-50">
+<div class="p-6">
+<span class="font-display-brand text-headline-md text-primary block mb-8">VocaEng</span>
+<nav class="space-y-2">
+<!-- Links mirror Bottom Nav -->
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-subtle transition-all duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-headline-sm text-headline-sm">Home</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-subtle transition-all duration-200" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span class="font-headline-sm text-headline-sm">Quiz</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-subtle transition-all duration-200" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="font-headline-sm text-headline-sm">Flashcard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-subtle transition-all duration-200" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-headline-sm text-headline-sm">Test</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-bg text-primary font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-headline-sm text-headline-sm">Profile</span>
+</a>
+</nav>
+</div>
+</aside>
+<main class="w-full max-w-4xl mx-auto md:p-6 p-0 flex flex-col min-h-screen">
+<!-- Header Section -->
+<section class="bg-gradient-to-r from-primary to-secondary text-surface p-6 md:rounded-2xl relative overflow-hidden shadow-sm">
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+<div class="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
+<!-- Avatar -->
+<div class="relative">
+<div class="w-24 h-24 rounded-full border-4 border-surface overflow-hidden bg-surface-subtle shadow-md">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A stylized, flat vector illustration of a friendly orange tabby cat face (MeuBeu), looking bright and engaging, set against a solid soft pastel blue background. The style is clean, modern, and vector-based, fitting an educational app avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPfR9yQrnhHK4o47L1uapE_NhFqM2GKbXUoEZZTXi8K8bVF7D3FzVGECVnXttpEzRJpcFQ3eGWCCwyaoPi08h0MZYkNxcXmDBDoxut8VF8hISCKtOcy2yTe8gJULxc21kOvpWiAraN02h2bBEHzoS__aHbOOVAEIdeSWlKpcPtWMBNlmlQUmDrJcUwgr5JtJhywmWV7JxrqTIA9ItXRoImppemarCHX0RcJebDNRZYqjIopvcyGRZsWdhwxTo7RwpUjJYL6VNzKMY"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-surface text-primary p-1.5 rounded-full shadow-sm hover:bg-blue-bg transition-colors">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+<!-- Info -->
+<div class="text-center md:text-left flex-1 flex flex-col justify-center h-24">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-1">Nguyen Van A</h1>
+<p class="font-body-md text-body-md text-primary-fixed opacity-90">nguyenvana@example.com</p>
+<div class="mt-2 inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full w-fit mx-auto md:mx-0">
+<span class="material-symbols-outlined text-[14px]">stars</span>
+<span class="font-label-sm text-label-sm font-semibold tracking-wide uppercase">Advanced Learner</span>
+</div>
+</div>
+</div>
+<!-- Stats Row Overlay -->
+<div class="mt-8 bg-surface rounded-xl p-4 shadow-sm flex justify-between md:justify-around items-center text-on-surface">
+<div class="text-center">
+<span class="block font-headline-md text-headline-md text-primary">12</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Level</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="text-center">
+<span class="block font-headline-md text-headline-md text-tertiary-container">2.4k</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">XP</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="text-center">
+<span class="block font-headline-md text-headline-md text-success flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                        14
+                    </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Streak</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="text-center">
+<span class="block font-headline-md text-headline-md text-secondary-container flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">diamond</span>
+                        350
+                    </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Gems</span>
+</div>
+</div>
+</section>
+<!-- Tab Bar -->
+<div class="flex overflow-x-auto border-b border-outline-variant/30 mt-6 md:mt-8 hide-scrollbar px-4 md:px-0">
+<button class="px-6 py-3 font-headline-sm text-headline-sm text-primary border-b-2 border-primary whitespace-nowrap focus:outline-none">Tổng quan</button>
+<button class="px-6 py-3 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-colors whitespace-nowrap focus:outline-none">Tiến độ</button>
+<button class="px-6 py-3 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-colors whitespace-nowrap focus:outline-none">Huy hiệu</button>
+<button class="px-6 py-3 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-colors whitespace-nowrap focus:outline-none">Tài khoản</button>
+</div>
+<!-- Content Area -->
+<div class="p-4 md:p-0 md:pt-6 space-y-6 mb-8">
+<!-- Bento Grid Stats -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-surface p-4 rounded-xl shadow-sm border border-outline-variant/10 flex flex-col items-start gap-2 hover:bg-blue-bg/50 transition-colors">
+<div class="p-2 bg-blue-bg rounded-lg text-primary">
+<span class="material-symbols-outlined">book</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">1,240</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Từ vựng đã học</p>
+</div>
+</div>
+<div class="bg-surface p-4 rounded-xl shadow-sm border border-outline-variant/10 flex flex-col items-start gap-2 hover:bg-success-bg/50 transition-colors">
+<div class="p-2 bg-success-bg rounded-lg text-success">
+<span class="material-symbols-outlined">quiz</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">45</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Quiz hoàn thành</p>
+</div>
+</div>
+<div class="bg-surface p-4 rounded-xl shadow-sm border border-outline-variant/10 flex flex-col items-start gap-2 hover:bg-warning-bg/50 transition-colors">
+<div class="p-2 bg-warning-bg rounded-lg text-tertiary-container">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">32h</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Thời gian học</p>
+</div>
+</div>
+<div class="bg-surface p-4 rounded-xl shadow-sm border border-outline-variant/10 flex flex-col items-start gap-2 hover:bg-blue-bg/50 transition-colors">
+<div class="p-2 bg-blue-bg rounded-lg text-secondary">
+<span class="material-symbols-outlined">military_tech</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">Top 15%</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Xếp hạng tuần</p>
+</div>
+</div>
+</div>
+<!-- Recent Activity List -->
+<div class="bg-surface rounded-xl shadow-sm p-5 border border-outline-variant/10">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-md text-headline-md text-on-surface">Hoạt động gần đây</h2>
+<button class="font-body-md text-body-md text-primary hover:underline">Xem tất cả</button>
+</div>
+<ul class="space-y-0">
+<li class="flex items-center gap-4 py-3 border-b border-outline-variant/20 last:border-0 hover:bg-surface-subtle transition-colors rounded-lg px-2 -mx-2">
+<div class="w-10 h-10 rounded-full bg-blue-bg flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">quiz</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-sm text-headline-sm text-on-surface">Quiz: IELTS Vocabulary 1</p>
+<p class="font-label-sm text-label-sm text-ink-soft">Hôm nay, 10:30 AM</p>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-headline-sm text-success">90%</p>
+<p class="font-label-sm text-label-sm text-tertiary-container">+50 XP</p>
+</div>
+</li>
+<li class="flex items-center gap-4 py-3 border-b border-outline-variant/20 last:border-0 hover:bg-surface-subtle transition-colors rounded-lg px-2 -mx-2">
+<div class="w-10 h-10 rounded-full bg-blue-bg flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">style</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-sm text-headline-sm text-on-surface">Ôn tập Flashcard: Business</p>
+<p class="font-label-sm text-label-sm text-ink-soft">Hôm qua, 20:15 PM</p>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-headline-sm text-on-surface">40 từ</p>
+<p class="font-label-sm text-label-sm text-tertiary-container">+20 XP</p>
+</div>
+</li>
+<li class="flex items-center gap-4 py-3 border-b border-outline-variant/20 last:border-0 hover:bg-surface-subtle transition-colors rounded-lg px-2 -mx-2">
+<div class="w-10 h-10 rounded-full bg-success-bg flex items-center justify-center text-success shrink-0">
+<span class="material-symbols-outlined">emoji_events</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-sm text-headline-sm text-on-surface">Đạt huy hiệu: 7 Day Streak</p>
+<p class="font-label-sm text-label-sm text-ink-soft">2 ngày trước</p>
+</div>
+<div class="text-right">
+<span class="material-symbols-outlined text-tertiary-container">diamond</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Bar (Mobile Only) -->
+<nav class="md:hidden flex justify-around items-center w-full px-2 py-3 bg-surface dark:bg-surface-container-lowest shadow-[0_-2px_10px_rgba(0,0,0,0.05)] shadow-sm fixed bottom-0 z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant active:scale-90 transition-all duration-200 p-1 rounded-lg" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant active:scale-90 transition-all duration-200 p-1 rounded-lg" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span class="font-label-sm text-label-sm mt-1">Quiz</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant active:scale-90 transition-all duration-200 p-1 rounded-lg" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="font-label-sm text-label-sm mt-1">Flashcard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant active:scale-90 transition-all duration-200 p-1 rounded-lg" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-sm text-label-sm mt-1">Test</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant active:scale-90 transition-all duration-200 p-1 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<style>
+        /* Utility to hide scrollbar but allow scrolling */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

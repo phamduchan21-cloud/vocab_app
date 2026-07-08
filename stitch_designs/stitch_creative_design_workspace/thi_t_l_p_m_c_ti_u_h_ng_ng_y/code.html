@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MeuBeu - Onboarding Goal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#edeeef",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-primary": "#b4c5ff",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#eeefff",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#00174b",
+                        "error": "#ba1a1a",
+                        "tertiary": "#824500",
+                        "on-error": "#ffffff",
+                        "ink": "#1A1D23",
+                        "surface-dim": "#d9dadb",
+                        "primary-container": "#2563eb",
+                        "on-background": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "tertiary-container": "#a65900",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface": "#FFFFFF",
+                        "surface-container-low": "#f3f4f5",
+                        "on-tertiary-container": "#ffede1",
+                        "surface-container-highest": "#e1e3e4",
+                        "primary-fixed": "#dbe1ff",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#001a42",
+                        "danger-bg": "#FEF2F2",
+                        "inverse-surface": "#2e3132",
+                        "ink-soft": "#6B7280",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "outline-variant": "#c3c6d7",
+                        "primary": "#004ac6",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-secondary-container": "#fefcff",
+                        "blue-bg": "#EFF6FF",
+                        "success": "#059669",
+                        "warning-bg": "#FFFBEB",
+                        "surface-subtle": "#F1F3F5",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-fixed": "#ffdcc3",
+                        "success-bg": "#ECFDF5",
+                        "secondary-container": "#2170e4",
+                        "secondary": "#0058be",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e1e3e4",
+                        "on-surface-variant": "#434655",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#0053db",
+                        "on-surface": "#191c1d",
+                        "outline": "#737686",
+                        "secondary-fixed": "#d8e2ff",
+                        "danger": "#DC2626"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "24px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "sidebar-width": "230px"
+                    },
+                    "fontFamily": {
+                        "display-brand": ["Nunito"],
+                        "body-lg": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "headline-lg-mobile": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "headline-sm": ["Work Sans"],
+                        "headline-md": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); }
+        .option-card { transition: all 0.2s ease-in-out; }
+        .option-card:hover { transform: scale(0.98); }
+        .option-card.selected {
+            background-color: theme('colors.blue-bg');
+            border-color: theme('colors.primary');
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col items-center justify-start text-on-surface md:bg-surface-container-low">
+<!-- Top Navigation (Onboarding Focus) -->
+<header class="w-full top-0 left-0 bg-background md:bg-surface-container-low z-50">
+<div class="flex items-center justify-between px-margin-mobile md:px-margin-desktop py-4 max-w-2xl mx-auto w-full">
+<button class="text-on-surface-variant hover:opacity-80 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<!-- Progress Dots -->
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-8 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+</div>
+<!-- Placeholder to balance flex-between -->
+<div class="w-6 h-6"></div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-2xl mx-auto flex flex-col px-margin-mobile md:px-margin-desktop py-8 bg-background md:bg-surface md:rounded-2xl md:shadow-sm md:my-8">
+<!-- Header Text -->
+<div class="mb-10 text-center">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-ink mb-2">Bạn muốn dành bao nhiêu phút mỗi ngày?</h1>
+<p class="font-body-md text-body-md text-ink-soft">Chọn mục tiêu phù hợp với lịch trình của bạn. Bạn luôn có thể thay đổi sau.</p>
+</div>
+<!-- Options Grid -->
+<div class="flex flex-col gap-4 mb-auto">
+<!-- Option 1: 5 mins -->
+<label class="option-card cursor-pointer group flex items-center justify-between p-4 bg-surface rounded-xl border-2 border-transparent shadow-[0_2px_8px_rgba(26,29,35,0.08)] hover:shadow-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-[14px] bg-blue-bg flex items-center justify-center text-primary group-[.selected]:bg-primary group-[.selected]:text-surface transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="timer_5">timer_5</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-ink group-[.selected]:text-primary">5 phút / ngày</div>
+<div class="font-body-md text-body-md text-ink-soft">Nhanh chóng (Quick) - Phù hợp người bận rộn</div>
+</div>
+</div>
+<div class="relative flex items-center justify-center">
+<input class="peer sr-only" name="goal" type="radio" value="5"/>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant peer-checked:border-primary flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-primary opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+</div>
+</label>
+<!-- Option 2: 15 mins (Standard - Pre-selected) -->
+<label class="option-card selected cursor-pointer group flex items-center justify-between p-4 bg-surface rounded-xl border-2 border-transparent shadow-[0_2px_8px_rgba(26,29,35,0.08)] hover:shadow-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-[14px] bg-primary text-surface flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="timer_10">timer_10</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-primary">15 phút / ngày</div>
+<div class="font-body-md text-body-md text-ink-soft">Tiêu chuẩn (Standard) - Khuyên dùng</div>
+</div>
+</div>
+<div class="relative flex items-center justify-center">
+<input checked="" class="peer sr-only" name="goal" type="radio" value="15"/>
+<div class="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-primary opacity-100 transition-opacity"></div>
+</div>
+</div>
+</label>
+<!-- Option 3: 30 mins -->
+<label class="option-card cursor-pointer group flex items-center justify-between p-4 bg-surface rounded-xl border-2 border-transparent shadow-[0_2px_8px_rgba(26,29,35,0.08)] hover:shadow-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-[14px] bg-blue-bg flex items-center justify-center text-primary group-[.selected]:bg-primary group-[.selected]:text-surface transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="directions_run">directions_run</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-ink group-[.selected]:text-primary">30 phút / ngày</div>
+<div class="font-body-md text-body-md text-ink-soft">Tích cực (Active) - Dành cho người quyết tâm</div>
+</div>
+</div>
+<div class="relative flex items-center justify-center">
+<input class="peer sr-only" name="goal" type="radio" value="30"/>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant peer-checked:border-primary flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-primary opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+</div>
+</label>
+<!-- Option 4: 60 mins -->
+<label class="option-card cursor-pointer group flex items-center justify-between p-4 bg-surface rounded-xl border-2 border-transparent shadow-[0_2px_8px_rgba(26,29,35,0.08)] hover:shadow-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-[14px] bg-blue-bg flex items-center justify-center text-primary group-[.selected]:bg-primary group-[.selected]:text-surface transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="local_fire_department">local_fire_department</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-ink group-[.selected]:text-primary">60 phút / ngày</div>
+<div class="font-body-md text-body-md text-ink-soft">Chuyên nghiệp (Pro) - Dành cho cao thủ</div>
+</div>
+</div>
+<div class="relative flex items-center justify-center">
+<input class="peer sr-only" name="goal" type="radio" value="60"/>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant peer-checked:border-primary flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-primary opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+</div>
+</label>
+</div>
+<!-- Sticky Bottom Action -->
+<div class="mt-8 pt-4 pb-safe sticky bottom-0 bg-background md:bg-surface border-t-0 md:border-t md:border-surface-variant flex gap-4">
+<button class="w-full py-4 rounded-xl bg-primary text-surface font-headline-sm text-headline-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-sm">
+                Tiếp tục
+            </button>
+</div>
+</main>
+<script>
+        // Simple script to handle visual selection state
+        document.querySelectorAll('input[type="radio"][name="goal"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                // Remove selected class from all
+                document.querySelectorAll('.option-card').forEach(card => {
+                    card.classList.remove('selected');
+                    // Reset icon backgrounds for unselected
+                    const iconContainer = card.querySelector('.w-12.h-12');
+                    iconContainer.classList.replace('bg-primary', 'bg-blue-bg');
+                    iconContainer.classList.replace('text-surface', 'text-primary');
+                });
+                
+                // Add selected class to chosen parent
+                const selectedLabel = e.target.closest('label');
+                selectedLabel.classList.add('selected');
+                
+                // Update icon background for selected
+                const iconContainer = selectedLabel.querySelector('.w-12.h-12');
+                iconContainer.classList.replace('bg-blue-bg', 'bg-primary');
+                iconContainer.classList.replace('text-primary', 'text-surface');
+            });
+        });
+    </script>
+</body></html>

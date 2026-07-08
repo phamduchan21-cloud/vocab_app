@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VocaEng - Thành tựu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f3f4f5",
+                      "on-tertiary-fixed": "#2f1500",
+                      "success-bg": "#ECFDF5",
+                      "surface-container": "#edeeef",
+                      "surface-subtle": "#F1F3F5",
+                      "on-secondary-fixed-variant": "#004395",
+                      "on-background": "#191c1d",
+                      "primary": "#004ac6",
+                      "inverse-primary": "#b4c5ff",
+                      "on-primary": "#ffffff",
+                      "danger-bg": "#FEF2F2",
+                      "primary-container": "#2563eb",
+                      "ink": "#1A1D23",
+                      "error": "#ba1a1a",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "on-surface": "#191c1d",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb77d",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#00174b",
+                      "on-primary-container": "#eeefff",
+                      "warning-bg": "#FFFBEB",
+                      "ink-soft": "#6B7280",
+                      "tertiary": "#824500",
+                      "primary-fixed": "#dbe1ff",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "success": "#059669",
+                      "inverse-surface": "#2e3132",
+                      "surface": "#FFFFFF",
+                      "on-secondary-fixed": "#001a42",
+                      "inverse-on-surface": "#f0f1f2",
+                      "surface-container-highest": "#e1e3e4",
+                      "on-tertiary-container": "#ffede1",
+                      "on-surface-variant": "#434655",
+                      "tertiary-container": "#a65900",
+                      "surface-dim": "#d9dadb",
+                      "surface-bright": "#f8f9fa",
+                      "background": "#f8f9fa",
+                      "on-secondary-container": "#fefcff",
+                      "outline-variant": "#c3c6d7",
+                      "surface-container-high": "#e7e8e9",
+                      "secondary-fixed": "#d8e2ff",
+                      "surface-tint": "#0053db",
+                      "secondary-container": "#2170e4",
+                      "outline": "#737686",
+                      "surface-variant": "#e1e3e4",
+                      "danger": "#DC2626",
+                      "tertiary-fixed": "#ffdcc3",
+                      "error-container": "#ffdad6",
+                      "blue-bg": "#EFF6FF",
+                      "on-tertiary-fixed-variant": "#6e3900",
+                      "on-error-container": "#93000a",
+                      "secondary": "#0058be",
+                      "primary-fixed-dim": "#b4c5ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "unit": "4px",
+                      "gutter": "16px",
+                      "sidebar-width": "230px",
+                      "margin-desktop": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Work Sans"
+                      ],
+                      "body-md": [
+                              "Work Sans"
+                      ],
+                      "mono-data": [
+                              "IBM Plex Mono"
+                      ],
+                      "headline-lg": [
+                              "Work Sans"
+                      ],
+                      "label-sm": [
+                              "Work Sans"
+                      ],
+                      "headline-sm": [
+                              "Work Sans"
+                      ],
+                      "headline-md": [
+                              "Work Sans"
+                      ],
+                      "display-brand": [
+                              "Nunito"
+                      ],
+                      "body-lg": [
+                              "Work Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-data": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "22px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-brand": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f8f9fa; /* bg-background */
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(26, 29, 35, 0.08), 0 2px 4px -1px rgba(26, 29, 35, 0.04);
+        }
+        
+        .badge-unlocked {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .badge-unlocked:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(26, 29, 35, 0.08), 0 4px 6px -2px rgba(26, 29, 35, 0.04);
+        }
+        
+        .badge-locked {
+            opacity: 0.6;
+            filter: grayscale(100%);
+        }
+        
+        /* Smooth progress bar animation */
+        .progress-bar-fill {
+            transition: width 1s ease-in-out;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-background font-body-md antialiased min-h-screen flex flex-col md:flex-row">
+<!-- Navigation Drawer (Desktop) -->
+<nav class="hidden md:flex flex-col bg-surface dark:bg-on-surface h-full w-[230px] rounded-r-xl shadow-md fixed left-0 top-0 py-4 z-40">
+<div class="px-gutter mb-8 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A small, cute, circular avatar illustration of a friendly cat mascot named MeuBeu. The cat is smiling warmly, rendered in a modern vector style with bright, cheerful colors against a soft pastel blue background. The style is clean and perfect for a language learning app profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN_TWi_ZGza5-gx5HuX1mwDi5uqOSCKQHtAK3lqr1wDVblVBEp66e5jN-ba6vRH_UpjbJkWvhEuW2CUM0HzLzPcRGBWv_LPkfKYrrPG-6Q5K1hOr1KBRDIjDQlLMaAKbrTeJ22_1dr5e8C-70oKEZjNbStV9Oo4c5VhVgwO7yV6sEn7jHvb7tBHITsLa51peQzsu7PIQt01dGCL3k8ywXpHQjYlBodJLiK4-4SedBOD89i2urmRp1sBTKE-Nnvm13nz21SGaJB9e0"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">VocaEng Explorer</h2>
+<p class="font-label-sm text-label-sm text-ink-soft">Level 12 Learner</p>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<span class="font-body-md text-body-md">Daily Goals</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span class="font-body-md text-body-md">Saved Words</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-body-md text-body-md">Leaderboard</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg bg-blue-bg text-primary transition-colors duration-150 font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-md text-body-md">Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150 mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 w-full md:ml-[230px] pb-24 md:pb-8">
+<!-- TopAppBar (Mobile) -->
+<header class="md:hidden w-full top-0 sticky bg-surface dark:bg-on-surface flex items-center justify-between px-margin-mobile h-16 shadow-sm z-30">
+<button class="p-2 text-primary hover:opacity-80 transition-opacity scale-down-98 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-display-brand text-headline-lg-mobile text-primary dark:text-primary-fixed">VocaEng</h1>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A very small, circular avatar portrait of a happy, cartoonish cat face, representing the user profile. The style is flat, colorful vector illustration, matching a cheerful educational app UI. Light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8FrHj_h0c-vIONNYAvG7b4-nvlvOpxFGKd4JBQPkXdo4vDXOn-W-qR3tTtkTvyXXeVZFb_jtTcLA0jQMkAV8MvMLRis4sqoDtgofx245QR1rW7qLy-mrzxxfyCjwsdozGy0OnceQnsmhosDxWDR8KI6cQsy8Mw2tWib6bJx8xhqtZbtDRGq7kCpQGv57XfvfpYXcpre9yYwJY7rG3nk1w1DmyHQfI8W3axx4sqOuKZJOB9IrbuIUFLiWLI3PSfCZboc3KgZ2LYdw"/>
+</div>
+</header>
+<div class="p-margin-mobile md:p-margin-desktop max-w-5xl mx-auto space-y-8">
+<!-- Page Header & Overall Progress -->
+<section class="glass-card rounded-xl p-6 md:p-8 relative overflow-hidden">
+<!-- Decorative blob -->
+<div class="absolute -right-16 -top-16 w-64 h-64 bg-primary-fixed-dim rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+<div class="absolute -left-16 -bottom-16 w-64 h-64 bg-tertiary-fixed-dim rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+<div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Thành tựu của bạn</h1>
+<p class="font-body-md text-body-md text-ink-soft max-w-lg">Thu thập huy hiệu để chứng minh nỗ lực học tập mỗi ngày. Bạn đang làm rất tốt!</p>
+</div>
+<div class="w-full md:w-1/3 bg-surface p-4 rounded-lg border border-surface-container-high">
+<div class="flex justify-between items-end mb-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Tiến độ</span>
+<span class="font-label-sm text-label-sm text-primary font-bold">12 / 30 Huy hiệu</span>
+</div>
+<div class="w-full bg-surface-container-low rounded-full h-3 overflow-hidden">
+<div class="bg-primary h-3 rounded-full progress-bar-fill" id="main-progress" style="width: 0%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Unlocked Badges (Bento Grid Style) -->
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-success" data-icon="verified">verified</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Đã đạt được</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Badge 1 -->
+<div class="glass-card rounded-xl p-5 flex items-start gap-4 badge-unlocked border-l-4 border-l-success">
+<div class="w-16 h-16 rounded-2xl bg-warning-bg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary-container text-4xl" data-icon="local_fire_department" data-weight="fill">local_fire_department</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Chuỗi rực lửa</h3>
+<p class="font-label-sm text-label-sm text-ink-soft mb-2">Học liên tục trong 7 ngày không ngắt quãng.</p>
+<span class="inline-block px-2 py-1 bg-surface-container-low rounded font-mono-data text-mono-data text-ink-soft">12/10/2023</span>
+</div>
+</div>
+<!-- Badge 2 -->
+<div class="glass-card rounded-xl p-5 flex items-start gap-4 badge-unlocked border-l-4 border-l-primary">
+<div class="w-16 h-16 rounded-2xl bg-blue-bg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="school" data-weight="fill">school</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Học bá từ vựng</h3>
+<p class="font-label-sm text-label-sm text-ink-soft mb-2">Hoàn thành xuất sắc 5 bài kiểm tra liên tiếp.</p>
+<span class="inline-block px-2 py-1 bg-surface-container-low rounded font-mono-data text-mono-data text-ink-soft">05/11/2023</span>
+</div>
+</div>
+<!-- Badge 3 -->
+<div class="glass-card rounded-xl p-5 flex items-start gap-4 badge-unlocked border-l-4 border-l-secondary">
+<div class="w-16 h-16 rounded-2xl bg-secondary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-4xl" data-icon="dark_mode" data-weight="fill">dark_mode</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Cú đêm</h3>
+<p class="font-label-sm text-label-sm text-ink-soft mb-2">Học sau 11 giờ đêm trong 3 ngày liên tiếp.</p>
+<span class="inline-block px-2 py-1 bg-surface-container-low rounded font-mono-data text-mono-data text-ink-soft">Hôm qua</span>
+</div>
+</div>
+<!-- Badge 4 -->
+<div class="glass-card rounded-xl p-5 flex items-start gap-4 badge-unlocked border-l-4 border-l-success">
+<div class="w-16 h-16 rounded-2xl bg-success-bg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-success text-4xl" data-icon="emoji_events" data-weight="fill">emoji_events</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Quán quân tuần</h3>
+<p class="font-label-sm text-label-sm text-ink-soft mb-2">Đứng đầu bảng xếp hạng tuần.</p>
+<span class="inline-block px-2 py-1 bg-surface-container-low rounded font-mono-data text-mono-data text-ink-soft">Tuần trước</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Locked Badges -->
+<section class="mt-8">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-outline" data-icon="lock">lock</span>
+<h2 class="font-headline-md text-headline-md text-on-surface-variant">Chưa mở khóa</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Locked Badge 1 -->
+<div class="bg-surface rounded-xl p-4 border border-surface-variant badge-locked flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-outline text-3xl" data-icon="public">public</span>
+</div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold mb-1">Nhà ngôn ngữ học</h3>
+<p class="font-label-sm text-label-sm text-ink-soft">Học thuộc 1000 từ vựng.</p>
+<div class="w-full bg-surface-container-low rounded-full h-1.5 mt-3">
+<div class="bg-outline h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+<span class="font-mono-data text-mono-data text-ink-soft mt-1 text-xs">450/1000</span>
+</div>
+<!-- Locked Badge 2 -->
+<div class="bg-surface rounded-xl p-4 border border-surface-variant badge-locked flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-outline text-3xl" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold mb-1">Tốc độ ánh sáng</h3>
+<p class="font-label-sm text-label-sm text-ink-soft">Hoàn thành bài Quiz dưới 30 giây.</p>
+<div class="w-full bg-surface-container-low rounded-full h-1.5 mt-3">
+<div class="bg-outline h-1.5 rounded-full" style="width: 0%"></div>
+</div>
+</div>
+<!-- Locked Badge 3 -->
+<div class="bg-surface rounded-xl p-4 border border-surface-variant badge-locked flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-outline text-3xl" data-icon="forum">forum</span>
+</div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold mb-1">Người kể chuyện</h3>
+<p class="font-label-sm text-label-sm text-ink-soft">Sử dụng tính năng luyện nói 50 lần.</p>
+<div class="w-full bg-surface-container-low rounded-full h-1.5 mt-3">
+<div class="bg-outline h-1.5 rounded-full" style="width: 20%"></div>
+</div>
+<span class="font-mono-data text-mono-data text-ink-soft mt-1 text-xs">10/50</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-2 bg-surface border-t border-outline-variant/10 z-50 rounded-t-xl shadow-sm">
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all rounded-lg p-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all rounded-lg p-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="quiz">quiz</span>
+<span class="font-label-sm text-label-sm">Quiz</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all rounded-lg p-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="style">style</span>
+<span class="font-label-sm text-label-sm">Flashcards</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all rounded-lg p-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="assignment">assignment</span>
+<span class="font-label-sm text-label-sm">Test</span>
+</a>
+<!-- Active State -->
+<a class="flex flex-col items-center justify-center w-full h-full text-primary dark:text-primary-fixed font-semibold hover:bg-blue-bg dark:hover:bg-on-secondary-fixed-variant scale-down-98 active:bg-surface-variant transition-all rounded-lg p-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person" data-weight="fill">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple animation for progress bar on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('main-progress').style.width = '40%';
+            }, 300);
+        });
+    </script>
+</body></html>

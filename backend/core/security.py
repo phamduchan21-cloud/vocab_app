@@ -1,37 +1,36 @@
 import json
 import base64
+import logging
+from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from models import User
+from core.config import settings
 from services.auth_service import AuthService
 
+logger = logging.getLogger(__name__)
 security_scheme = HTTPBearer()
 
 
-def _decode_jwt_payload(token: str) -> dict:
-    """Decode JWT payload WITHOUT signature verification (dev-only).
+def _verify_jwt(token: str) -> dict:
+    """Verify JWT signature using Supabase JWT secret and return payload.
 
-    python-jose / PyJWT hay gặp lỗi với ES256 tokens của Supabase,
-    nên decode base64 thủ công — an toàn vì verify đã có Supabase Auth.
+    Supabase uses ES256 (or HS256) — python-jose handles both.
     """
-    parts = token.split(".")
-    if len(parts) != 3:
-        raise ValueError("JWT phải có 3 phần (header.payload.signature)")
-
-    payload_b64 = parts[1]
-    # Thêm padding cho base64 URL-safe
-    padding = 4 - len(payload_b64) % 4
-    if padding != 4:
-        payload_b64 += "=" * padding
-
     try:
-        decoded = base64.urlsafe_b64decode(payload_b64)
-        return json.loads(decoded)
-    except Exception as e:
-        raise ValueError(f"Không thể decode JWT payload: {e}")
+        payload = jwt.decode(
+            token,
+            settings.SUPABASE_JWT_SECRET,
+            algorithms=["HS256", "ES256"],
+            options={"verify_aud": False},
+        )
+        return payload
+    except JWTError as e:
+        logger.error(f"JWT verification failed: {e}")
+        raise ValueError(f"Token không hợp lệ: {e}")
 
 
 async def get_current_user(
@@ -40,23 +39,21 @@ async def get_current_user(
 ) -> User:
     """Verify JWT token and return the current user.
 
-    Flutter gửi Supabase JWT token → decode payload lấy user_id + email
-    → sync user vào local DB (SQLite / PostgreSQL).
+    Flutter gửi Supabase JWT token → verify signature bằng SUPABASE_JWT_SECRET
+    → lấy user_id + email → sync user vào local DB.
     """
     token = credentials.credentials
 
-    # Decode token payload without signature verification
     try:
-        payload = _decode_jwt_payload(token)
+        payload = _verify_jwt(token)
     except Exception as e:
-        print(f"[Security] Token decode failed: {e}")
+        logger.warning(f"Token verification failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token không hợp lệ hoặc đã hết hạn",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Extract user info from payload
     supabase_user_id = payload.get("sub")
     email = payload.get("email", "")
 
@@ -67,7 +64,6 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Get or create user in local DB
     user = await AuthService.get_or_create_user(db, supabase_user_id, email)
     if user is None:
         raise HTTPException(

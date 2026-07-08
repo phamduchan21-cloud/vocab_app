@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add/Edit Vocabulary - VocaEng</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;family=Nunito:wght@700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-tertiary": "#ffffff",
+                        "success-bg": "#ECFDF5",
+                        "on-secondary-container": "#fefcff",
+                        "background": "#f8f9fa",
+                        "tertiary": "#824500",
+                        "secondary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "danger-bg": "#FEF2F2",
+                        "primary-container": "#2563eb",
+                        "on-primary-container": "#eeefff",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1d",
+                        "warning-bg": "#FFFBEB",
+                        "tertiary-container": "#a65900",
+                        "surface": "#FFFFFF",
+                        "surface-subtle": "#F1F3F5",
+                        "surface-container": "#edeeef",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "surface-container-low": "#f3f4f5",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-dim": "#d9dadb",
+                        "secondary": "#0058be",
+                        "ink": "#1A1D23",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-primary": "#ffffff",
+                        "ink-soft": "#6B7280",
+                        "surface-tint": "#0053db",
+                        "surface-bright": "#f8f9fa",
+                        "on-background": "#191c1d",
+                        "outline": "#737686",
+                        "on-tertiary-fixed": "#2f1500",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-primary-fixed": "#00174b",
+                        "primary": "#004ac6",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-secondary-fixed": "#001a42",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434655",
+                        "surface-container-high": "#e7e8e9",
+                        "blue-bg": "#EFF6FF",
+                        "outline-variant": "#c3c6d7",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-container": "#ffede1",
+                        "error": "#ba1a1a",
+                        "success": "#059669",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "danger": "#DC2626",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "sidebar-width": "230px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "headline-md": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-lg": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "mono-data": ["IBM Plex Mono"],
+                        "display-brand": ["Nunito"],
+                        "headline-lg-mobile": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display-brand": ["48px", { "lineHeight": "56px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-md">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-on-background z-40">
+<div class="flex items-center justify-between px-margin-mobile h-14 w-full">
+<button aria-label="Go back" class="flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-150 rounded-full p-2 -ml-2">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-display-brand text-headline-md text-primary dark:text-primary-fixed truncate px-4">VocaEng</h1>
+<button aria-label="Account" class="flex items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-150 rounded-full p-2 -mr-2">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-md mx-auto px-margin-mobile py-6 flex flex-col gap-6 pb-24 md:pb-8">
+<div class="flex flex-col gap-2 mb-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-ink">Add New Word</h2>
+<p class="font-body-md text-body-md text-ink-soft">Expand your vocabulary journey.</p>
+</div>
+<form class="flex flex-col gap-6">
+<!-- Word Input (Required) -->
+<div class="flex flex-col gap-2">
+<label class="font-headline-sm text-headline-sm text-ink flex items-center gap-1" for="word">
+                    Word <span class="text-danger">*</span>
+</label>
+<div class="relative">
+<input class="w-full bg-surface-bright border-transparent focus:border-primary focus:ring-0 rounded-[10px] py-3 px-4 text-ink placeholder:text-ink-soft font-body-lg text-body-lg transition-colors shadow-sm outline-none border border-surface-container-high" id="word" name="word" placeholder="e.g., Ubiquitous" required="" type="text"/>
+</div>
+</div>
+<!-- Meaning Input (Required) -->
+<div class="flex flex-col gap-2">
+<label class="font-headline-sm text-headline-sm text-ink flex items-center gap-1" for="meaning">
+                    Meaning <span class="text-danger">*</span>
+</label>
+<div class="relative">
+<textarea class="w-full bg-surface-bright border-transparent focus:border-primary focus:ring-0 rounded-[10px] py-3 px-4 text-ink placeholder:text-ink-soft font-body-lg text-body-lg transition-colors shadow-sm outline-none border border-surface-container-high resize-none" id="meaning" name="meaning" placeholder="Definition in your own words..." required="" rows="3"></textarea>
+</div>
+</div>
+<!-- Example Input (Optional) -->
+<div class="flex flex-col gap-2">
+<label class="font-headline-sm text-headline-sm text-ink" for="example">
+                    Example Sentence <span class="text-ink-soft font-body-md text-body-md ml-1 font-normal">(Optional)</span>
+</label>
+<div class="relative">
+<textarea class="w-full bg-surface-bright border-transparent focus:border-primary focus:ring-0 rounded-[10px] py-3 px-4 text-ink placeholder:text-ink-soft font-body-lg text-body-lg transition-colors shadow-sm outline-none border border-surface-container-high resize-none" id="example" name="example" placeholder="How is it used in a sentence?" rows="2"></textarea>
+</div>
+</div>
+<!-- Topic Selection (Chips) -->
+<div class="flex flex-col gap-3">
+<label class="font-headline-sm text-headline-sm text-ink">
+                    Topic Tag
+                </label>
+<div class="flex flex-wrap gap-2">
+<!-- Selected State -->
+<label class="cursor-pointer relative">
+<input checked="" class="peer sr-only" name="topic" type="radio" value="academic"/>
+<div class="px-4 py-2 rounded-full border border-primary bg-blue-bg text-primary font-label-sm text-label-sm font-semibold transition-all peer-checked:bg-primary peer-checked:text-surface peer-checked:border-primary">
+                            Academic
+                        </div>
+</label>
+<!-- Unselected State -->
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="topic" type="radio" value="daily"/>
+<div class="px-4 py-2 rounded-full border border-outline-variant bg-surface text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-low transition-all peer-checked:bg-primary peer-checked:text-surface peer-checked:border-primary">
+                            Daily Life
+                        </div>
+</label>
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="topic" type="radio" value="business"/>
+<div class="px-4 py-2 rounded-full border border-outline-variant bg-surface text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-low transition-all peer-checked:bg-primary peer-checked:text-surface peer-checked:border-primary">
+                            Business
+                        </div>
+</label>
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="topic" type="radio" value="travel"/>
+<div class="px-4 py-2 rounded-full border border-outline-variant bg-surface text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-low transition-all peer-checked:bg-primary peer-checked:text-surface peer-checked:border-primary">
+                            Travel
+                        </div>
+</label>
+<button class="px-4 py-2 rounded-full border border-dashed border-outline text-ink-soft font-label-sm text-label-sm flex items-center gap-1 hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> New
+                    </button>
+</div>
+</div>
+<!-- Save Action -->
+<div class="mt-4 pb-4">
+<button class="w-full bg-primary text-surface font-headline-sm text-headline-sm py-4 rounded-[12px] shadow-sm hover:bg-on-primary-fixed-variant active:scale-98 transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined icon-fill" data-icon="save">save</span>
+                    Save Word
+                </button>
+</div>
+</form>
+</main>
+<!-- BottomNavBar (Hidden on desktop, shown on mobile. Since this is a form/transactional page, typically nav is hidden, but following the component list instructions to include it if it's part of the standard template, though instructions say "Automatic Suppression: You MUST exclude the navigation shell if the page intent is: Linear/Transactional". Since this is a new vocabulary form (transactional), I will suppress the BottomNavBar as per the "Automatic Suppression" rule in the Source of Truth Hierarchy.) -->
+</body></html>

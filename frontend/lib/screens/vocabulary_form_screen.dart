@@ -26,7 +26,7 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
   bool _showCustomTopic = false;
   final _customTopicController = TextEditingController();
 
-  final _topics = ['general', 'giao tiáº¿p', 'du lá»‹ch', 'cÃ´ng viá»‡c', 'há»c táº­p'];
+  final _topics = ['general', 'giao tiếp', 'du lịch', 'công việc', 'học tập'];
 
   @override
   void initState() {

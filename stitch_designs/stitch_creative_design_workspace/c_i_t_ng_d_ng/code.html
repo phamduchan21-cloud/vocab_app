@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cài đặt - MeuBeu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&amp;family=Work+Sans:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "warning-bg": "#FFFBEB",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "primary": "#004ac6",
+                      "surface-subtle": "#F1F3F5",
+                      "ink": "#1A1D23",
+                      "danger": "#DC2626",
+                      "on-secondary-fixed-variant": "#004395",
+                      "secondary-container": "#2170e4",
+                      "surface-container-low": "#f3f4f5",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#fefcff",
+                      "on-secondary": "#ffffff",
+                      "ink-soft": "#6B7280",
+                      "danger-bg": "#FEF2F2",
+                      "tertiary-fixed": "#ffdcc3",
+                      "on-primary-fixed": "#00174b",
+                      "blue-bg": "#EFF6FF",
+                      "outline-variant": "#c3c6d7",
+                      "tertiary": "#824500",
+                      "on-tertiary": "#ffffff",
+                      "on-background": "#191c1d",
+                      "secondary": "#0058be",
+                      "inverse-surface": "#2e3132",
+                      "on-tertiary-fixed": "#2f1500",
+                      "on-surface-variant": "#434655",
+                      "error-container": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "surface-bright": "#f8f9fa",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "inverse-primary": "#b4c5ff",
+                      "on-primary-container": "#eeefff",
+                      "secondary-fixed": "#d8e2ff",
+                      "surface-dim": "#d9dadb",
+                      "success": "#059669",
+                      "outline": "#737686",
+                      "primary-container": "#2563eb",
+                      "surface-container": "#edeeef",
+                      "primary-fixed": "#dbe1ff",
+                      "on-tertiary-fixed-variant": "#6e3900",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#0053db",
+                      "surface": "#FFFFFF",
+                      "surface-container-highest": "#e1e3e4",
+                      "on-secondary-fixed": "#001a42",
+                      "surface-variant": "#e1e3e4",
+                      "success-bg": "#ECFDF5",
+                      "tertiary-fixed-dim": "#ffb77d",
+                      "tertiary-container": "#a65900",
+                      "on-tertiary-container": "#ffede1",
+                      "surface-container-high": "#e7e8e9",
+                      "error": "#ba1a1a",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-on-surface": "#f0f1f2",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "on-surface": "#191c1d",
+                      "background": "#f8f9fa"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "sidebar-width": "230px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "24px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "display-brand": [
+                              "Nunito"
+                      ],
+                      "headline-lg": [
+                              "Work Sans"
+                      ],
+                      "label-sm": [
+                              "Work Sans"
+                      ],
+                      "headline-sm": [
+                              "Work Sans"
+                      ],
+                      "headline-md": [
+                              "Work Sans"
+                      ],
+                      "body-lg": [
+                              "Work Sans"
+                      ],
+                      "body-md": [
+                              "Work Sans"
+                      ],
+                      "mono-data": [
+                              "IBM Plex Mono"
+                      ],
+                      "headline-lg-mobile": [
+                              "Work Sans"
+                      ]
+              },
+              "fontSize": {
+                      "display-brand": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "22px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-data": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            },
+          }
+        }
+      </script>
+<style>
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #2563eb;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #2563eb;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 3rem;
+            height: 1.5rem;
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md h-screen flex flex-col md:flex-row overflow-hidden">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-background dark:bg-background flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 z-40 shrink-0 shadow-sm md:hidden">
+<button class="p-2 -ml-2 rounded-full hover:bg-surface-subtle active:scale-95 transition-transform text-primary dark:text-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-primary dark:text-primary-fixed-dim font-bold tracking-tight">Cài đặt</h1>
+<div class="w-10"></div> <!-- Placeholder for balance -->
+</header>
+<!-- Navigation Drawer (Desktop) -->
+<aside class="hidden md:flex flex-col w-sidebar-width fixed left-0 top-0 bottom-0 py-gutter bg-ink dark:bg-surface-container-lowest shadow-lg z-50">
+<!-- Profile Header -->
+<div class="flex items-center gap-4 px-4 mb-8">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-primary-container shrink-0">
+<img alt="User profile picture" class="w-full h-full object-cover" data-alt="A brightly lit, minimalist 3D avatar of a friendly cat-themed language learner mascot wearing a graduation cap, set against a solid cobalt blue background. The style is modern, soft-shaded, and welcoming." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFVqM2gf8JsgL4iTQg8qRny5hKYy-1z8ef7s60o2Z0pThaNhI8rWxJWzPCQGGoZU--tVtNV0Tm23feiNjga8UIR-FkRmXonjEGvzWwgPxyYtJ_2v0p_OGkpSZkKZkegire39TPfGE2bgObJPV9a8ymFR3VLKDQSH9mYPJuy_4YwTSwlPrdr1o5oEh2imZmJ3Q7u0exJWoxFNgiACHzH0KCWanulMehqx8ktBo3ImRubk6oai9VtWFPi04uRUJKqUIZIsZJtap6T3U"/>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-surface font-semibold line-clamp-1">Learn with MeuBeu</h2>
+<p class="font-body-md text-body-md text-outline-variant line-clamp-1">Level: Intermediate</p>
+<p class="font-label-sm text-label-sm text-surface-subtle mt-1">320 Words Mastered</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant dark:text-ink-soft mx-2 my-1 hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-headline-sm text-headline-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant dark:text-ink-soft mx-2 my-1 hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="extension">extension</span>
+<span class="font-headline-sm text-headline-sm">Quizzes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant dark:text-ink-soft mx-2 my-1 hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="style">style</span>
+<span class="font-headline-sm text-headline-sm">Flashcards</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant dark:text-ink-soft mx-2 my-1 hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-headline-sm text-headline-sm">Mock Tests</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-surface-variant dark:text-ink-soft mx-2 my-1 hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="font-headline-sm text-headline-sm">Progress</span>
+</a>
+<!-- Active Settings State in Desktop Nav -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg mx-2 my-1 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings" data-weight="fill" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-headline-sm text-headline-sm font-semibold">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 h-full overflow-y-auto bg-background md:ml-[230px] pb-24 md:pb-8 pt-4 md:pt-8 px-margin-mobile md:px-margin-desktop">
+<div class="max-w-3xl mx-auto space-y-6">
+<!-- Desktop Header -->
+<div class="hidden md:flex items-center mb-8">
+<h1 class="font-display-brand text-display-brand text-primary">Cài đặt</h1>
+</div>
+<!-- Account Section -->
+<section>
+<h2 class="font-headline-sm text-headline-sm text-primary mb-3 px-2">Tài khoản</h2>
+<div class="bg-surface rounded-xl shadow-sm border border-surface-container-low overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+<span class="font-body-lg text-body-lg text-on-surface">Thông tin cá nhân</span>
+</div>
+<span class="material-symbols-outlined text-ink-soft text-sm" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="lock">lock</span>
+<span class="font-body-lg text-body-lg text-on-surface">Đổi mật khẩu</span>
+</div>
+<span class="material-symbols-outlined text-ink-soft text-sm" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="link">link</span>
+<span class="font-body-lg text-body-lg text-on-surface">Liên kết tài khoản</span>
+</div>
+<span class="font-body-md text-body-md text-ink-soft flex items-center gap-2">Google <span class="material-symbols-outlined text-sm" data-icon="arrow_forward_ios">arrow_forward_ios</span></span>
+</button>
+</div>
+</section>
+<!-- Learning Section -->
+<section>
+<h2 class="font-headline-sm text-headline-sm text-primary mb-3 px-2">Học tập</h2>
+<div class="bg-surface rounded-xl shadow-sm border border-surface-container-low overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="target">target</span>
+<span class="font-body-lg text-body-lg text-on-surface">Mục tiêu hàng ngày</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary-container bg-blue-bg px-3 py-1 rounded-lg">20 từ/ngày</span>
+</button>
+<div class="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="notifications_active">notifications_active</span>
+<span class="font-body-lg text-body-lg text-on-surface">Nhắc nhở học tập</span>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle1" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="toggle1"></label>
+</div>
+</div>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+<span class="font-body-lg text-body-lg text-on-surface">Giờ thông báo</span>
+</div>
+<span class="font-mono-data text-mono-data text-ink-soft bg-surface-subtle px-3 py-1 rounded border border-surface-container-low">20:00</span>
+</button>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="pt-4">
+<button class="w-full bg-surface rounded-xl shadow-sm border border-danger-bg p-4 flex items-center justify-center gap-2 hover:bg-danger-bg transition-colors group">
+<span class="material-symbols-outlined text-danger group-hover:scale-110 transition-transform" data-icon="logout">logout</span>
+<span class="font-headline-sm text-headline-sm text-danger font-semibold">Đăng xuất</span>
+</button>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 right-0 flex justify-around items-center h-16 px-gutter pb-safe md:hidden bg-surface dark:bg-surface-container-lowest shadow-[0_-1px_3px_rgba(0,0,0,0.08)] z-50">
+<a class="flex flex-col items-center justify-center text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-surface-container-low active:scale-90 transition-all duration-200 w-16 h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-surface-container-low active:scale-90 transition-all duration-200 w-16 h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="extension">extension</span>
+<span class="font-label-sm text-label-sm">Quiz</span>
+</a>
+<a class="flex flex-col items-center justify-center text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-surface-container-low active:scale-90 transition-all duration-200 w-16 h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="style">style</span>
+<span class="font-label-sm text-label-sm">Flashcard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-ink-soft dark:text-outline-variant hover:bg-blue-bg dark:hover:bg-surface-container-low active:scale-90 transition-all duration-200 w-16 h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="quiz">quiz</span>
+<span class="font-label-sm text-label-sm">Test</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-secondary-container font-semibold hover:bg-blue-bg dark:hover:bg-surface-container-low active:scale-90 transition-all duration-200 w-16 h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -109,6 +109,11 @@ class VocabularyResponse(BaseModel):
     topic: str = "general"
     pronunciation: Optional[str] = None
     review_count: int = 0
+    next_review_date: Optional[date] = None
+    ease_factor: float = 2.5
+    times_correct: int = 0
+    times_wrong: int = 0
+    lesson_id: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
