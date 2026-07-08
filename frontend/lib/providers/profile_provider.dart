@@ -28,7 +28,13 @@ class ProfileProvider extends ChangeNotifier {
 
   ProfileProvider(this._service);
 
-  void updateAuth(dynamic auth) {}
+  Future<T?> _safeGet<T>(Future<T> Function() fn) async {
+    try {
+      return await fn().timeout(const Duration(seconds: 10));
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<void> loadProfile() async {
     if (_isLoading) return;
@@ -39,16 +45,16 @@ class ProfileProvider extends ChangeNotifier {
 
     try {
       final results = await Future.wait([
-        _service.getWeeklyActivity(),
-        _service.getAchievements(),
-        _service.getQuizHistory(),
-        _service.getProfile(),
+        _safeGet(() => _service.getWeeklyActivity()),
+        _safeGet(() => _service.getAchievements()),
+        _safeGet(() => _service.getQuizHistory()),
+        _safeGet(() => _service.getProfile()),
       ]);
 
-      _data = results[0] as List<WeeklyActivityDay>;
-      _achievements = results[1] as List<AchievementItem>;
-      _recentQuizzes = results[2] as List<QuizResult>;
-      _userProfile = results[3] as UserProfile;
+      _data = (results[0] as List?)?.cast<WeeklyActivityDay>() ?? [];
+      _achievements = (results[1] as List?)?.cast<AchievementItem>() ?? [];
+      _recentQuizzes = (results[2] as List?)?.cast<QuizResult>() ?? [];
+      _userProfile = results[3] as UserProfile?;
     } catch (e) {
       _errorMessage = 'Khong the tai ho so luc nay.';
       _data = [];

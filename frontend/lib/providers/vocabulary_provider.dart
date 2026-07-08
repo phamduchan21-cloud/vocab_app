@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/vocabulary.dart';
 import '../services/vocabulary_service.dart';
-import 'auth_provider.dart';
 
 class VocabularyProvider extends ChangeNotifier {
   final VocabularyService _service;
@@ -45,10 +44,6 @@ class VocabularyProvider extends ChangeNotifier {
   }
 
   VocabularyProvider(this._service);
-
-  void updateAuth(AuthProvider auth) {
-    // Auth state changed, no special handling needed
-  }
 
   Future<void> fetchAll({String? search, String? topic, int? limit}) async {
     _isLoading = true;

@@ -36,8 +36,6 @@ class TopicProvider extends ChangeNotifier {
 
   TopicProvider(this._service);
 
-  void updateAuth(dynamic auth) {}
-
   Future<void> loadTopics() async {
     if (_isLoading) return;
     _isLoading = true;

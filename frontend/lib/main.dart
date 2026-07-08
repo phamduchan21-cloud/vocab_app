@@ -58,34 +58,13 @@ class _MyAppState extends State<MyApp> {
         Provider<ApiService>.value(value: _apiService),
 
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProxyProvider<AuthProvider, VocabularyProvider>(
-          create: (_) => VocabularyProvider(VocabularyService(_apiService)),
-          update: (_, auth, prev) => prev!..updateAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, QuizProvider>(
-          create: (_) => QuizProvider(QuizService(_apiService)),
-          update: (_, auth, prev) => prev!..updateAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, DashboardProvider>(
-          create: (_) => DashboardProvider(DashboardService(_apiService)),
-          update: (_, auth, prev) => prev!..updateAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, FlashcardProvider>(
-          create: (_) => FlashcardProvider(VocabularyService(_apiService), TopicService(_apiService)),
-          update: (_, auth, prev) => prev!..updateAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, ProfileProvider>(
-          create: (_) => ProfileProvider(ProfileService(_apiService)),
-          update: (_, auth, prev) => prev!..updateAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, TopicProvider>(
-          create: (_) => TopicProvider(TopicService(_apiService)),
-          update: (_, auth, prev) => prev!..updateAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, MockTestProvider>(
-          create: (_) => MockTestProvider(MockTestService(_apiService)),
-          update: (_, auth, prev) => prev!..updateAuth(auth),
-        ),
+        ChangeNotifierProvider(create: (_) => VocabularyProvider(VocabularyService(_apiService))),
+        ChangeNotifierProvider(create: (_) => QuizProvider(QuizService(_apiService))),
+        ChangeNotifierProvider(create: (_) => DashboardProvider(DashboardService(_apiService))),
+        ChangeNotifierProvider(create: (_) => FlashcardProvider(VocabularyService(_apiService), TopicService(_apiService))),
+        ChangeNotifierProvider(create: (_) => ProfileProvider(ProfileService(_apiService))),
+        ChangeNotifierProvider(create: (_) => TopicProvider(TopicService(_apiService))),
+        ChangeNotifierProvider(create: (_) => MockTestProvider(MockTestService(_apiService))),
       ],
       child: const VocabApp(),
     );

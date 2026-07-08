@@ -174,7 +174,8 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
     );
 
     if (mounted) {
-      context.read<ProfileProvider>().recordActivity('quiz', xpEarned: _score * 10);
+      // ponytail: fire-and-forget, race safe because setState below is guarded
+      context.read<ProfileProvider>().recordActivity('quiz', xpEarned: _score * 10).ignore();
     }
 
     if (!mounted) return;
@@ -243,6 +244,14 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
 
   Widget _buildQuiz() {
     final total = _questions.length;
+    if (total == 0) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(title: const Text('Quiz')),
+        body: const Center(child: Text('Không có câu hỏi nào. Vui lòng thử lại sau.')),
+      );
+    }
+    if (_currentIndex >= total) _currentIndex = total - 1;
     final item = _questions[_currentIndex];
     final options = (item['options'] as List).cast<String>();
     final selected = _selectedAnswers[_currentIndex];

@@ -16,10 +16,6 @@ class DashboardProvider extends ChangeNotifier {
 
   DashboardProvider(this._service);
 
-  void updateAuth(dynamic auth) {
-    // Auth state changed, no special handling needed
-  }
-
   /// Safely execute an API call with timeout.
   /// Returns null on failure so one failing call doesn't crash the whole batch.
   Future<T?> _safeGet<T>(Future<T> Function() fn, {Duration timeout = const Duration(seconds: 15)}) async {

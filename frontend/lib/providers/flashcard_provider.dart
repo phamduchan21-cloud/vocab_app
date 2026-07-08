@@ -74,8 +74,6 @@ class FlashcardProvider extends ChangeNotifier {
 
   FlashcardProvider(this._vocabService, this._topicService);
 
-  void updateAuth(dynamic auth) {}
-
   void resetSession() {
     _sessionReviewed = 0;
     _sessionCorrect = 0;

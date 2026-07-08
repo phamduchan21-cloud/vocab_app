@@ -24,8 +24,6 @@ class MockTestProvider extends ChangeNotifier {
 
   MockTestProvider(this._service);
 
-  void updateAuth(dynamic auth) {}
-
   void setLevel(String level) {
     _selectedLevel = level;
     notifyListeners();

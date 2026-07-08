@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import '../models/quiz_category.dart';
 import '../models/quiz_result.dart';
 import '../services/quiz_service.dart';
-import 'auth_provider.dart';
 
 class QuizProvider extends ChangeNotifier {
   final QuizService _service;
@@ -26,8 +25,6 @@ class QuizProvider extends ChangeNotifier {
 
   QuizProvider(this._service);
 
-  void updateAuth(AuthProvider auth) {}
-
   Future<void> fetchCategories() async {
     _isLoading = true;
     _errorMessage = null;
@@ -37,6 +34,7 @@ class QuizProvider extends ChangeNotifier {
       _categories = await _service.getCategories();
     } catch (e) {
       _categories = [];
+      _errorMessage = 'Không thể tải danh mục quiz.';
     } finally {
       _isLoading = false;
       notifyListeners();
