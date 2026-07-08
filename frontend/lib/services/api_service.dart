@@ -131,7 +131,8 @@ class ApiService {
           return _request(method, endpoint, queryParams: queryParams, body: body);
         }
       } catch (_) {
-        // Refresh failed — force re-login
+        // Refresh failed — sign out to trigger redirect to login
+        await Supabase.instance.client.auth.signOut();
       }
       throw ApiAuthException('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
     }
