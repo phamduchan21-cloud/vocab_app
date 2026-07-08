@@ -106,16 +106,33 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchHistory({int page = 1, int limit = 20}) async {
+  int _historyPage = 0;
+  bool _hasMoreHistory = true;
+  bool get hasMoreHistory => _hasMoreHistory;
+
+  Future<void> fetchHistory({bool loadMore = false}) async {
+    if (loadMore) {
+      if (!_hasMoreHistory || _isLoading) return;
+      _historyPage++;
+    } else {
+      _historyPage = 1;
+      _hasMoreHistory = true;
+    }
     _isLoading = true;
-    _errorMessage = null;
+    if (!loadMore) _errorMessage = null;
     notifyListeners();
 
     try {
-      final result = await _service.getHistory(page: page, limit: limit);
-      _history = result['items'] as List<QuizResult>;
+      final result = await _service.getHistory(page: _historyPage, limit: 20);
+      final items = result['items'] as List<QuizResult>;
+      if (loadMore) {
+        _history.addAll(items);
+      } else {
+        _history = items;
+      }
+      _hasMoreHistory = items.length >= 20;
     } catch (e) {
-      _errorMessage = 'Không thể tải lịch sử quiz.';
+      if (!loadMore) _errorMessage = 'Không thể tải lịch sử quiz.';
     } finally {
       _isLoading = false;
       notifyListeners();

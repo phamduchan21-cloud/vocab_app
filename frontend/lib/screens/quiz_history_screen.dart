@@ -137,6 +137,18 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
 
           // â”€â”€ History list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           ...quiz.history.map((item) => _buildHistoryItem(item)),
+          if (quiz.hasMoreHistory)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Center(
+                child: TextButton(
+                  onPressed: quiz.isLoading ? null : () => quiz.fetchHistory(loadMore: true),
+                  child: quiz.isLoading
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      : Text('Xem thêm', style: TextStyle(color: AppColors.blue, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ),
         ],
       ),
     );

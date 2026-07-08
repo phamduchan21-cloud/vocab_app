@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -146,7 +147,24 @@ class _FlashcardScreenState extends State<FlashcardScreen>
     final flashcard = context.watch<FlashcardProvider>();
     final deck = flashcard.data;
 
-    return Scaffold(
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.arrowLeft): () {
+          if (_currentIndex > 0) _go(-1, deck.length);
+        },
+        const SingleActivator(LogicalKeyboardKey.arrowRight): () {
+          if (_currentIndex < deck.length - 1) _go(1, deck.length);
+        },
+        const SingleActivator(LogicalKeyboardKey.arrowUp): _toggleFlip,
+        const SingleActivator(LogicalKeyboardKey.arrowDown): _toggleFlip,
+        const SingleActivator(LogicalKeyboardKey.space): _toggleFlip,
+        const SingleActivator(LogicalKeyboardKey.digit1): () => _handleReview(deck[_currentIndex], 1),
+        const SingleActivator(LogicalKeyboardKey.digit2): () => _handleReview(deck[_currentIndex], 3),
+        const SingleActivator(LogicalKeyboardKey.digit3): () => _handleReview(deck[_currentIndex], 5),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
@@ -195,6 +213,8 @@ class _FlashcardScreenState extends State<FlashcardScreen>
             ),
           ],
         ),
+      ),
+    ),
       ),
     );
   }
