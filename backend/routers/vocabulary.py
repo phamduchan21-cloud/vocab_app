@@ -102,6 +102,7 @@ async def list_vocabularies(
             ease_factor=v.ease_factor or 2.5,
             times_correct=v.times_correct or 0,
             times_wrong=v.times_wrong or 0,
+            is_bookmarked=v.is_bookmarked or False,
             lesson_id=v.lesson_id,
             created_at=v.created_at,
             updated_at=v.updated_at,
@@ -220,7 +221,11 @@ async def update_vocabulary(
     current_user: User = Depends(get_current_user),
 ):
     """Cập nhật từ vựng."""
-    vocab = await service.update(id=id, user_id=current_user.id, data=data)
+    vocab = await service.update(
+        id=id, user_id=current_user.id,
+        word=data.word, meaning=data.meaning,
+        example=data.example, topic=data.topic,
+    )
     if not vocab:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -295,6 +300,86 @@ async def review_vocabulary(
         lesson_id=vocab.lesson_id,
         created_at=vocab.created_at,
         updated_at=vocab.updated_at,
+    )
+
+
+# ─── Bookmark endpoint ──────────────────────────────────────────────
+
+@router.post("/{id}/bookmark", response_model=VocabularyResponse)
+async def toggle_bookmark(
+    id: str,
+    service: VocabularyService = Depends(get_vocab_service),
+    current_user: User = Depends(get_current_user),
+):
+    """Bật/tắt đánh dấu bookmark cho một từ vựng."""
+    vocab = await service.toggle_bookmark(id=id, user_id=current_user.id)
+    if not vocab:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy từ vựng",
+        )
+    return VocabularyResponse(
+        id=str(vocab.id),
+        user_id=str(vocab.user_id),
+        word=vocab.word,
+        meaning=vocab.meaning,
+        example=vocab.example,
+        topic=vocab.topic,
+        pronunciation=vocab.pronunciation,
+        review_count=vocab.review_count or 0,
+        next_review_date=vocab.next_review_date,
+        ease_factor=vocab.ease_factor or 2.5,
+        times_correct=vocab.times_correct or 0,
+        times_wrong=vocab.times_wrong or 0,
+        is_bookmarked=vocab.is_bookmarked or False,
+        lesson_id=vocab.lesson_id,
+        created_at=vocab.created_at,
+        updated_at=vocab.updated_at,
+    )
+
+
+@router.get("/bookmarked/all", response_model=PaginatedResponse)
+async def list_bookmarked(
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=50, ge=1, le=200),
+    service: VocabularyService = Depends(get_vocab_service),
+    current_user: User = Depends(get_current_user),
+):
+    """Lấy danh sách từ vựng đã đánh dấu bookmark."""
+    items, total = await service.get_list(
+        user_id=current_user.id,
+        page=page,
+        limit=limit,
+        bookmarked_only=True,
+    )
+    pages = math.ceil(total / limit) if total > 0 else 0
+    vocab_responses = [
+        VocabularyResponse(
+            id=str(v.id),
+            user_id=str(v.user_id),
+            word=v.word,
+            meaning=v.meaning,
+            example=v.example,
+            topic=v.topic,
+            pronunciation=v.pronunciation,
+            review_count=v.review_count or 0,
+            next_review_date=v.next_review_date,
+            ease_factor=v.ease_factor or 2.5,
+            times_correct=v.times_correct or 0,
+            times_wrong=v.times_wrong or 0,
+            is_bookmarked=v.is_bookmarked or False,
+            lesson_id=v.lesson_id,
+            created_at=v.created_at,
+            updated_at=v.updated_at,
+        )
+        for v in items
+    ]
+    return PaginatedResponse(
+        items=vocab_responses,
+        total=total,
+        page=page,
+        pages=pages,
+        limit=limit,
     )
 
 

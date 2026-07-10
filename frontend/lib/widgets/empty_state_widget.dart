@@ -35,18 +35,18 @@ class EmptyStateWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSubtle,
+                  color: AppColors.luxuryBeige.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Icon(icon, size: 48, color: AppColors.primary),
+                child: Icon(icon, size: 48, color: AppColors.luxuryBrown),
               ),
             const SizedBox(height: 24),
             Text(
               title,
-              style: GoogleFonts.workSans(
-                fontSize: 18,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: AppColors.ink,
+                color: AppColors.luxuryEspresso,
               ),
               textAlign: TextAlign.center,
             ),
@@ -54,9 +54,9 @@ class EmptyStateWidget extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 subtitle!,
-                style: GoogleFonts.workSans(
+                style: GoogleFonts.nunito(
                   fontSize: 15,
-                  color: AppColors.inkSoft,
+                  color: AppColors.luxuryText,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -69,10 +69,10 @@ class EmptyStateWidget extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    gradient: AppTheme.primaryButtonGradient,
+                    gradient: AppColors.luxuryGradientLight,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
+                        color: AppColors.luxuryBrown.withValues(alpha: 0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

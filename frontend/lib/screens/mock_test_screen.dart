@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
+import '../data/mini_test_questions.dart';
 import '../models/mock_test.dart';
 import '../providers/mock_test_provider.dart';
 import '../widgets/app_bottom_nav.dart';
@@ -39,7 +40,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
       appBar: AppBar(
         title: Text(
           'Mini-test',
-          style: GoogleFonts.workSans(
+          style: GoogleFonts.nunito(
             fontWeight: FontWeight.w600,
             fontSize: 20,
             color: AppColors.ink,
@@ -56,7 +57,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
           // ── Step 1: Select Level ──────────────────────────
           Text(
             'Chọn cấp độ',
-            style: GoogleFonts.workSans(
+            style: GoogleFonts.nunito(
               fontWeight: FontWeight.w600,
               fontSize: 19,
               color: AppColors.ink,
@@ -65,7 +66,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
           const SizedBox(height: 4),
           Text(
             'Kiểm tra tổng hợp kiến thức từ vựng của bạn',
-            style: GoogleFonts.workSans(
+            style: GoogleFonts.nunito(
               fontSize: 14,
               color: AppColors.inkSoft,
             ),
@@ -111,7 +112,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
           if (prov.availableTopics.isNotEmpty) ...[
             Text(
               'Chọn chủ đề (tuỳ chọn)',
-              style: GoogleFonts.workSans(
+              style: GoogleFonts.nunito(
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
                 color: AppColors.ink,
@@ -124,11 +125,14 @@ class _MockTestScreenState extends State<MockTestScreen> {
               children: [
                 _buildTopicChip('Tất cả', prov.selectedTopic == null,
                     () => prov.setTopic(null)),
-                ...prov.availableTopics.map((topic) => _buildTopicChip(
-                      topic,
-                      prov.selectedTopic == topic,
-                      () => prov.setTopic(topic),
-                    )),
+                ...prov.availableTopics.map((topic) {
+                  final display = MiniTestBank.displayName(topic) ?? topic;
+                  return _buildTopicChip(
+                    display,
+                    prov.selectedTopic == topic,
+                    () => prov.setTopic(topic),
+                  );
+                }),
               ],
             ),
             const SizedBox(height: 18),
@@ -158,24 +162,51 @@ class _MockTestScreenState extends State<MockTestScreen> {
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'Lịch sử kiểm tra',
-                style: GoogleFonts.workSans(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  color: AppColors.ink,
+              Row(children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.rose.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.history_rounded, size: 16, color: AppColors.rose),
                 ),
-              ),
-              Text(
-                '${prov.history.length} bài',
-                style: GoogleFonts.ibmPlexMono(
-                  fontSize: 12,
-                  color: AppColors.inkSoft,
+                const SizedBox(width: 10),
+                Text(
+                  'Lịch sử kiểm tra',
+                  style: GoogleFonts.nunito(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 17,
+                    color: AppColors.ink,
+                  ),
                 ),
-              ),
+              ]),
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.ink.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${prov.history.length} bài',
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 11, fontWeight: FontWeight.w700,
+                      color: AppColors.inkSoft,
+                    ),
+                  ),
+                ),
+                if (prov.history.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () => context.go('/mock-test/history'),
+                    child: Text('Xem tất cả',
+                        style: GoogleFonts.nunito(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.rose)),
+                  ),
+                ],
+              ]),
             ],
           ),
           const SizedBox(height: 14),
@@ -211,7 +242,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: isSelected ? AppColors.blueBg : AppColors.surface,
+      color: isSelected ? AppColors.rose.withValues(alpha: 0.10) : AppColors.surface,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -221,7 +252,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? AppColors.blue : AppColors.ink.withValues(alpha: 0.14),
+              color: isSelected ? AppColors.rose : AppColors.ink.withValues(alpha: 0.14),
               width: isSelected ? 1.5 : 1,
             ),
           ),
@@ -231,7 +262,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.blue.withValues(alpha: 0.10) : AppColors.background,
+                  color: isSelected ? AppColors.rose.withValues(alpha: 0.10) : AppColors.background,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: AppColors.ink.withValues(alpha: 0.10),
@@ -248,7 +279,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
                         color: AppColors.ink,
@@ -257,7 +288,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
                     const SizedBox(height: 4),
                     Text(
                       description,
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                         fontSize: 13,
                         color: AppColors.inkSoft,
                         height: 1.3,
@@ -265,7 +296,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
                     ),
                     Text(
                       subtitle,
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                         fontSize: 12,
                         color: AppColors.textHint,
                         height: 1.3,
@@ -277,7 +308,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
               const SizedBox(width: 8),
               Icon(
                 isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                color: isSelected ? AppColors.blue : AppColors.inkSoft,
+                color: isSelected ? AppColors.rose : AppColors.inkSoft,
                 size: 22,
               ),
             ],
@@ -292,12 +323,12 @@ class _MockTestScreenState extends State<MockTestScreen> {
       label: Text(label == 'Tất cả' ? label : label),
       selected: selected,
       onSelected: (_) => onTap(),
-      selectedColor: AppColors.blue,
+      selectedColor: AppColors.rose,
       backgroundColor: AppColors.surface,
       side: BorderSide(
-        color: selected ? AppColors.blue : AppColors.ink.withValues(alpha: 0.12),
+        color: selected ? AppColors.rose : AppColors.ink.withValues(alpha: 0.12),
       ),
-      labelStyle: GoogleFonts.workSans(
+      labelStyle: GoogleFonts.nunito(
         fontWeight: FontWeight.w600,
         fontSize: 12,
         color: selected ? Colors.white : AppColors.inkSoft,
@@ -309,7 +340,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
     final gradeColor = item.grade == 'A'
         ? AppColors.success
         : item.grade == 'B'
-            ? AppColors.blue
+            ? AppColors.rose
             : item.grade == 'C'
                 ? AppColors.warning
                 : AppColors.danger;
@@ -403,7 +434,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
                 const SizedBox(height: 6),
                 Text(
                   '${item.correctAnswers}/${item.totalQuestions} câu đúng',
-                  style: GoogleFonts.workSans(
+                  style: GoogleFonts.nunito(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.ink,
@@ -411,7 +442,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
                 ),
                 Text(
                   dateStr,
-                  style: GoogleFonts.workSans(
+                  style: GoogleFonts.nunito(
                     fontSize: 11,
                     color: AppColors.inkSoft,
                   ),
@@ -428,7 +459,7 @@ class _MockTestScreenState extends State<MockTestScreen> {
                 '/mock-test/play/${item.testLevel}',
               ),
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              color: AppColors.blue,
+              color: AppColors.rose,
               tooltip: 'Làm lại',
               padding: EdgeInsets.zero,
             ),
@@ -465,7 +496,7 @@ class _MockTestProgressChart extends StatelessWidget {
         children: [
           Text(
             '📈 Xu hướng điểm số',
-            style: GoogleFonts.workSans(
+            style: GoogleFonts.nunito(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppColors.ink,
@@ -479,7 +510,7 @@ class _MockTestProgressChart extends StatelessWidget {
               painter: _ScoreChartPainter(
                 scores: display.map((e) => e.scorePercent).toList(),
                 maxY: chartMax,
-                color: AppColors.blue,
+                color: AppColors.rose,
               ),
             ),
           ),

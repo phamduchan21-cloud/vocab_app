@@ -7,32 +7,196 @@ import '../models/vocabulary.dart';
 import '../providers/vocabulary_provider.dart';
 import '../widgets/app_bottom_nav.dart';
 import '../widgets/error_state_widget.dart';
-import '../widgets/empty_state_widget.dart';
 import '../widgets/loading_widget.dart';
+
+// ════════════════════════════════════════════════════════
+// BOOKMARK SCREEN — Editorial Luxury
+// ════════════════════════════════════════════════════════
+
+// ─── Entry animation (spring cubic) ────────────────────
+class _EntryAnimation extends StatefulWidget {
+  final Widget child;
+  const _EntryAnimation({required this.child});
+
+  @override
+  State<_EntryAnimation> createState() => _EntryAnimationState();
+}
+
+class _EntryAnimationState extends State<_EntryAnimation>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fade = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(position: _slide, child: widget.child),
+    );
+  }
+}
+
+// ─── Double-bezel card wrapper ─────────────────────────
+class _DoubleBezel extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final double borderRadius;
+
+  const _DoubleBezel({
+    required this.child,
+    this.padding,
+    this.borderRadius = 14,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final innerPad = padding ?? const EdgeInsets.all(14);
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: AppColors.luxuryBorder, width: 1.2),
+      ),
+      padding: const EdgeInsets.all(2),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius - 2),
+          border: Border.all(
+            color: AppColors.luxuryBorder.withValues(alpha: 0.45),
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius - 3),
+          child: Padding(padding: innerPad, child: child),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Luxury pill button with trailing icon island ──────
+class _LuxuryPill extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData icon;
+  final Color color;
+
+  const _LuxuryPill({
+    required this.label,
+    this.onPressed,
+    this.icon = Icons.arrow_forward_rounded,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 10, 10, 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 16, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 enum _WordTag { new_, learning, mastered }
 
 class _BookmarkWord {
   final String id, word, ipa, meaning, tagLabel;
   final _WordTag tag;
+  final bool isBookmarked;
   const _BookmarkWord({
-    required this.id, required this.word, required this.ipa,
-    required this.meaning, required this.tagLabel, required this.tag,
+    required this.id,
+    required this.word,
+    required this.ipa,
+    required this.meaning,
+    required this.tagLabel,
+    required this.tag,
+    required this.isBookmarked,
   });
 
   factory _BookmarkWord.fromVocabulary(Vocabulary v) {
     _WordTag tag;
     String tagLabel;
     if (v.reviewCount == 0) {
-      tag = _WordTag.new_; tagLabel = 'Mới';
+      tag = _WordTag.new_;
+      tagLabel = 'Moi';
     } else if (v.reviewCount < 5) {
-      tag = _WordTag.learning; tagLabel = 'Đang học';
+      tag = _WordTag.learning;
+      tagLabel = 'Dang hoc';
     } else {
-      tag = _WordTag.mastered; tagLabel = 'Đã thuộc';
+      tag = _WordTag.mastered;
+      tagLabel = 'Da thuoc';
     }
     return _BookmarkWord(
-      id: v.id, word: v.word, ipa: v.pronunciation ?? '',
-      meaning: v.meaning, tagLabel: tagLabel, tag: tag,
+      id: v.id,
+      word: v.word,
+      ipa: v.pronunciation ?? '',
+      meaning: v.meaning,
+      tagLabel: tagLabel,
+      tag: tag,
+      isBookmarked: v.isBookmarked,
     );
   }
 }
@@ -45,12 +209,11 @@ class BookmarkScreen extends StatefulWidget {
 }
 
 class _BookmarkScreenState extends State<BookmarkScreen> {
-  final Set<String> _bookmarkedIds = {};
   int _selectedTabIndex = 0;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  static const List<String> _tabLabels = ['Tất cả', 'Mới', 'Đang học', 'Đã thuộc'];
+  static const List<String> _tabLabels = ['Tat ca', 'Moi', 'Dang hoc', 'Da thuoc'];
 
   @override
   void initState() {
@@ -69,22 +232,29 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
   _WordTag? get _selectedTag {
     switch (_selectedTabIndex) {
-      case 1: return _WordTag.new_;
-      case 2: return _WordTag.learning;
-      case 3: return _WordTag.mastered;
-      default: return null;
+      case 1:
+        return _WordTag.new_;
+      case 2:
+        return _WordTag.learning;
+      case 3:
+        return _WordTag.mastered;
+      default:
+        return null;
     }
   }
 
   List<_BookmarkWord> get _filteredWords {
     final provider = context.read<VocabularyProvider>();
-    return provider.items
+    return provider.bookmarked
         .map((v) => _BookmarkWord.fromVocabulary(v))
         .where((w) {
           if (_selectedTag != null && w.tag != _selectedTag) return false;
           if (_searchQuery.isNotEmpty) {
             final q = _searchQuery.toLowerCase();
-            if (!w.word.toLowerCase().contains(q) && !w.meaning.toLowerCase().contains(q)) return false;
+            if (!w.word.toLowerCase().contains(q) &&
+                !w.meaning.toLowerCase().contains(q)) {
+              return false;
+            }
           }
           return true;
         })
@@ -93,7 +263,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
   int _countForTag(_WordTag? tag) {
     final provider = context.read<VocabularyProvider>();
-    return provider.items.where((v) {
+    return provider.bookmarked.where((v) {
       final count = v.reviewCount;
       if (tag == null) return true;
       if (tag == _WordTag.new_) return count == 0;
@@ -103,160 +273,315 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     }).length;
   }
 
-  void _toggleBookmark(String id) {
-    setState(() {
-      if (_bookmarkedIds.contains(id)) { _bookmarkedIds.remove(id); } else { _bookmarkedIds.add(id); }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<VocabularyProvider>();
     final isLoading = provider.isLoading && provider.items.isEmpty;
-    final hasError = provider.errorMessage != null && provider.items.isEmpty;
-    final isEmptyState = !provider.isLoading && provider.errorMessage == null && provider.items.isEmpty;
+    final hasError =
+        provider.errorMessage != null && provider.items.isEmpty;
+    final isEmptyState = !provider.isLoading &&
+        provider.errorMessage == null &&
+        provider.items.isEmpty;
+    // ponytail: bookmarkedCount unused, removed
+    final screenW = MediaQuery.of(context).size.width;
+    final isNarrow = screenW < 400;
+    final hPad = isNarrow ? 20.0 : 44.0;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.luxuryBg,
       bottomNavigationBar: const AppBottomNav(selectedIndex: 4),
       body: SafeArea(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // Top bar
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              MediaQuery.of(context).size.width < 400 ? 20 : 44,
-              36,
-              MediaQuery.of(context).size.width < 400 ? 20 : 44,
-              0,
-            ),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Từ đã lưu', style: GoogleFonts.workSans(fontWeight: FontWeight.w600, fontSize: 27, color: AppColors.ink)),
-                  const SizedBox(height: 6),
-                  Text('${provider.items.length} từ bạn đã đánh dấu để ôn lại sau',
-                      style: GoogleFonts.workSans(fontSize: 15, color: AppColors.inkSoft)),
-                ]),
-              ),
-              const SizedBox(width: 20),
-              SizedBox(
-                height: 44,
-                child: ElevatedButton.icon(
-                  onPressed: () => context.go('/flashcard'),
-                  icon: const Icon(Icons.play_arrow_rounded, size: 18),
-                  label: Text('Ôn tập ngay →', style: GoogleFonts.workSans(fontSize: 14, fontWeight: FontWeight.w600)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.blue, foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(horizontal: 20), elevation: 0,
-                  ),
-                ),
-              ),
-            ]),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Search + tabs
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 400 ? 20 : 44),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              SizedBox(
-                width: 280,
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (v) => setState(() => _searchQuery = v),
-                  style: GoogleFonts.workSans(fontSize: 14, color: AppColors.ink),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    prefixIcon: Icon(Icons.search, size: 18, color: AppColors.inkSoft),
-                    hintText: 'Tìm từ đã lưu...',
-                    hintStyle: GoogleFonts.workSans(fontSize: 14, color: AppColors.textHint),
-                    filled: true, fillColor: AppColors.surface,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AppColors.outlineVariant)),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AppColors.outlineVariant)),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.blue, width: 1.5)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+        child: _EntryAnimation(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ─── Header ───────────────────────────────
+              Padding(
+                padding: EdgeInsets.fromLTRB(hPad, 32, hPad, 0),
                 child: Row(
-                  children: List.generate(_tabLabels.length, (i) {
-                    final isActive = i == _selectedTabIndex;
-                    final tag = switch (i) { 1 => _WordTag.new_, 2 => _WordTag.learning, 3 => _WordTag.mastered, _ => null };
-                    final count = _countForTag(tag);
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedTabIndex = i),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isActive ? AppColors.ink : AppColors.surface,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.outlineVariant),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(children: [
+                            Text(
+                              'Tu da luu',
+                              style: GoogleFonts.playfairDisplay(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 26,
+                                color: AppColors.luxuryEspresso,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.luxuryBrown
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${provider.bookmarked.length}',
+                                style: GoogleFonts.nunito(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.luxuryBrown,
+                                ),
+                              ),
+                            ),
+                          ]),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Từ bạn đã đánh dấu để ôn lại sau',
+                            style: GoogleFonts.nunito(
+                              fontSize: 14,
+                              color: AppColors.luxuryText,
+                            ),
                           ),
-                          child: Text('${_tabLabels[i]} · $count',
-                              style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600,
-                                  color: isActive ? const Color(0xFFEDE6D3) : AppColors.inkSoft)),
-                        ),
+                        ],
                       ),
-                    );
-                  }),
+                    ),
+                    const SizedBox(width: 16),
+                    _LuxuryPill(
+                      label: 'On tap',
+                      color: AppColors.luxuryBrown,
+                      icon: Icons.play_arrow_rounded,
+                      onPressed: () => context.go('/flashcard'),
+                    ),
+                  ],
                 ),
               ),
-            ]),
+
+              const SizedBox(height: 22),
+
+              // ─── Search ───────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: hPad),
+                child: SizedBox(
+                  width: 280,
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (v) => setState(() => _searchQuery = v),
+                    style: GoogleFonts.nunito(
+                      fontSize: 14,
+                      color: AppColors.luxuryEspresso,
+                    ),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      prefixIcon: Icon(Icons.search,
+                          size: 18, color: AppColors.luxuryTextHint),
+                      hintText: 'Tim tu da luu...',
+                      hintStyle: GoogleFonts.nunito(
+                        fontSize: 14,
+                        color: AppColors.luxuryTextHint,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.luxurySurface,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            BorderSide(color: AppColors.luxuryBorder),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            BorderSide(color: AppColors.luxuryBorder),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: AppColors.luxuryBrown, width: 1.5),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ─── Tabs ─────────────────────────────────
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: hPad),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(_tabLabels.length, (i) {
+                      final isActive = i == _selectedTabIndex;
+                      final tag = switch (i) {
+                        1 => _WordTag.new_,
+                        2 => _WordTag.learning,
+                        3 => _WordTag.mastered,
+                        _ => null
+                      };
+                      final count = _countForTag(tag);
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: GestureDetector(
+                          onTap: () =>
+                              setState(() => _selectedTabIndex = i),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? AppColors.luxuryEspresso
+                                  : AppColors.luxurySurface,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isActive
+                                    ? Colors.transparent
+                                    : AppColors.luxuryBorder,
+                              ),
+                            ),
+                            child: Text(
+                              '${_tabLabels[i]} . $count',
+                              style: GoogleFonts.nunito(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: isActive
+                                    ? AppColors.luxurySurface
+                                    : AppColors.luxuryText,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // ─── Body ─────────────────────────────────
+              Expanded(
+                child: _buildBody(
+                    isLoading, hasError, isEmptyState, provider, hPad),
+              ),
+            ],
           ),
-
-          const SizedBox(height: 22),
-
-          // Body
-          Expanded(child: _buildBody(isLoading, hasError, isEmptyState, provider)),
-        ]),
+        ),
       ),
     );
   }
 
-  Widget _buildBody(bool isLoading, bool hasError, bool isEmptyState, VocabularyProvider provider) {
-    if (isLoading) return const SkeletonLoading(type: SkeletonType.grid, count: 8);
-    if (hasError) return ErrorStateWidget(message: provider.errorMessage!, onRetry: () => provider.fetchAll(limit: 200));
-    if (isEmptyState) {
-      return EmptyStateWidget(
-        icon: Icons.bookmark_border, title: 'Chưa có từ vựng nào',
-        subtitle: 'Thêm từ mới để bắt đầu học và ôn tập.',
-        action: 'Thêm từ mới', onAction: () => context.push('/vocabulary/new'), showCat: false,
+  Widget _buildBody(bool isLoading, bool hasError, bool isEmptyState,
+      VocabularyProvider provider, double hPad) {
+    if (isLoading) {
+      return const SkeletonLoading(type: SkeletonType.grid, count: 8);
+    }
+    if (hasError) {
+      return ErrorStateWidget(
+        message: provider.errorMessage!,
+        onRetry: () => provider.fetchAll(limit: 200),
       );
     }
+    if (isEmptyState) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.luxuryBrown.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Icon(Icons.bookmark_border,
+                  size: 36, color: AppColors.luxuryBrown),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Chua co tu vung nao',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppColors.luxuryEspresso,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Them tu moi de bat dau hoc tap nhe!',
+              style: GoogleFonts.nunito(
+                fontSize: 13,
+                color: AppColors.luxuryText,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _LuxuryPill(
+              label: 'Them tu moi',
+              color: AppColors.luxuryBrown,
+              icon: Icons.add_rounded,
+              onPressed: () => context.push('/vocabulary/new'),
+            ),
+          ],
+        ),
+      );
+    }
+
     final filtered = _filteredWords;
     if (filtered.isEmpty) {
       return Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(_searchQuery.isNotEmpty ? Icons.search_off_rounded : Icons.bookmark_border,
-              size: 56, color: AppColors.inkSoft.withValues(alpha: 0.5)),
-          const SizedBox(height: 16),
-          Text(_searchQuery.isNotEmpty ? 'Không tìm thấy từ nào' : 'Chưa có từ nào',
-              style: GoogleFonts.workSans(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.inkSoft)),
-          if (_searchQuery.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            TextButton(onPressed: () { _searchController.clear(); setState(() => _searchQuery = ''); },
-                child: Text('Xoá bộ lọc', style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.blue))),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _searchQuery.isNotEmpty
+                  ? Icons.search_off_rounded
+                  : Icons.bookmark_border,
+              size: 56,
+              color: AppColors.luxuryTextHint.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _searchQuery.isNotEmpty
+                  ? 'Khong tim thay tu nao'
+                  : 'Chua co tu nao trong muc nay',
+              style: GoogleFonts.nunito(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.luxuryTextHint,
+              ),
+            ),
+            if (_searchQuery.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() => _searchQuery = '');
+                },
+                child: Text(
+                  'Xoa bo loc',
+                  style: GoogleFonts.nunito(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.luxuryBrown,
+                  ),
+                ),
+              ),
+            ],
           ],
-        ]),
+        ),
       );
     }
+
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width < 400 ? 20 : 44, 0,
-          MediaQuery.of(context).size.width < 400 ? 20 : 44, 60),
-      child: LayoutBuilder(builder: (context, constraints) {
-        return _buildStampGrid(filtered, constraints.maxWidth);
-      }),
+      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 60),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return _buildStampGrid(filtered, constraints.maxWidth, provider);
+        },
+      ),
     );
   }
 
-  Widget _buildStampGrid(List<_BookmarkWord> words, double maxWidth) {
+  Widget _buildStampGrid(
+      List<_BookmarkWord> words, double maxWidth, VocabularyProvider provider) {
     const spacing = 14.0;
     final crossAxisCount = maxWidth < 500 ? 3 : 4;
     final itemWidth = (maxWidth - spacing * (crossAxisCount - 1)) / crossAxisCount;
@@ -265,12 +590,32 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       final rowEnd = (i + crossAxisCount).clamp(0, words.length);
       final rowItems = <Widget>[];
       for (var j = i; j < rowEnd; j++) {
-        rowItems.add(SizedBox(width: itemWidth, child: _WordStamp(word: words[j], isStarred: _bookmarkedIds.contains(words[j].id), onStarToggle: () => _toggleBookmark(words[j].id))));
+        final word = words[j];
+        rowItems.add(SizedBox(
+          width: itemWidth,
+          child: _WordStamp(
+            word: word,
+            onStarToggle: () {
+              final vocab = provider.items.firstWhere(
+                (v) => v.id == word.id,
+                orElse: () => provider.items.first,
+              );
+              provider.toggleBookmark(vocab);
+            },
+          ),
+        ));
       }
       rows.add(Padding(
         padding: EdgeInsets.only(bottom: spacing),
-        child: Row(children: List.generate(rowItems.length, (k) {
-          return Padding(padding: EdgeInsets.only(left: k == 0 ? 0 : spacing / 2, right: k == rowItems.length - 1 ? 0 : spacing / 2), child: rowItems[k]);
+        child: Row(
+            children: List.generate(rowItems.length, (k) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: k == 0 ? 0 : spacing / 2,
+              right: k == rowItems.length - 1 ? 0 : spacing / 2,
+            ),
+            child: rowItems[k],
+          );
         })),
       ));
     }
@@ -278,81 +623,120 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   }
 }
 
-// SkeletonLoading moved to widgets/loading_widget.dart — use from there
+// ════════════════════════════════════════════════════════
+// WORD STAMP — luxury style
+// ════════════════════════════════════════════════════════
 
 class _WordStamp extends StatelessWidget {
   final _BookmarkWord word;
-  final bool isStarred;
   final VoidCallback onStarToggle;
-  const _WordStamp({required this.word, required this.isStarred, required this.onStarToggle});
+
+  const _WordStamp({required this.word, required this.onStarToggle});
 
   @override
   Widget build(BuildContext context) {
-    Color tagBg, tagFg;
+    Color tagBg, tagFg, tagBorder;
     switch (word.tag) {
-      case _WordTag.new_: tagBg = AppColors.warningBg; tagFg = AppColors.warning; break;
-      case _WordTag.learning: tagBg = AppColors.blueBg; tagFg = AppColors.blue; break;
-      case _WordTag.mastered: tagBg = AppColors.successBg; tagFg = AppColors.success; break;
+      case _WordTag.new_:
+        tagBg = AppColors.luxuryGold.withValues(alpha: 0.08);
+        tagFg = AppColors.luxuryGold;
+        tagBorder = AppColors.luxuryGold.withValues(alpha: 0.20);
+      case _WordTag.learning:
+        tagBg = AppColors.luxuryBrown.withValues(alpha: 0.08);
+        tagFg = AppColors.luxuryBrown;
+        tagBorder = AppColors.luxuryBrown.withValues(alpha: 0.20);
+      case _WordTag.mastered:
+        tagBg = AppColors.luxuryGreen.withValues(alpha: 0.08);
+        tagFg = AppColors.luxuryGreen;
+        tagBorder = AppColors.luxuryGreen.withValues(alpha: 0.20);
     }
 
-    return Container(
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(10)),
+    final accentColor = word.isBookmarked
+        ? AppColors.luxuryBrown
+        : AppColors.luxuryEspresso;
+
+    return _DoubleBezel(
+      borderRadius: 16,
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-      child: Stack(clipBehavior: Clip.none, children: [
-        Positioned.fill(
-          child: IgnorePointer(
-            child: CustomPaint(
-              painter: _DashedBorderPainter(
-                color: AppColors.ink.withValues(alpha: 0.22), strokeWidth: 1.5,
-                dashLength: 6, gapLength: 4, borderRadius: 10,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                word.word,
+                style: GoogleFonts.nunito(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: accentColor,
+                ),
+              ),
+              const SizedBox(height: 3),
+              if (word.ipa.isNotEmpty)
+                Text(
+                  word.ipa,
+                  style: GoogleFonts.nunito(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.luxuryBrown.withValues(alpha: 0.7),
+                  ),
+                ),
+              const SizedBox(height: 8),
+              Text(
+                word.meaning,
+                style: GoogleFonts.nunito(
+                  fontSize: 13,
+                  color: AppColors.luxuryText,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: tagBg,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: tagBorder),
+                ),
+                child: Text(
+                  word.tagLabel.toUpperCase(),
+                  style: GoogleFonts.nunito(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: tagFg,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: -2,
+            right: -2,
+            child: GestureDetector(
+              onTap: onStarToggle,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: word.isBookmarked
+                      ? AppColors.luxuryGold.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  word.isBookmarked ? Icons.star : Icons.star_border,
+                  size: 18,
+                  color: word.isBookmarked
+                      ? AppColors.luxuryGold
+                      : AppColors.luxuryTextHint,
+                ),
               ),
             ),
           ),
-        ),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(word.word, style: GoogleFonts.workSans(fontWeight: FontWeight.w600, fontSize: 16, color: AppColors.ink)),
-          const SizedBox(height: 3),
-          Text(word.ipa, style: GoogleFonts.ibmPlexMono(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.blue)),
-          const SizedBox(height: 8),
-          Text(word.meaning, style: GoogleFonts.workSans(fontSize: 13, color: AppColors.inkSoft)),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-            decoration: BoxDecoration(color: tagBg, borderRadius: BorderRadius.circular(20)),
-            child: Text(word.tagLabel.toUpperCase(), style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 0.6, color: tagFg)),
-          ),
-        ]),
-        Positioned(top: -2, right: -2, child: GestureDetector(
-          onTap: onStarToggle,
-          child: Icon(isStarred ? Icons.star : Icons.star_border, size: 20,
-              color: isStarred ? AppColors.warning : AppColors.ink.withValues(alpha: 0.22)),
-        )),
-      ]),
+        ],
+      ),
     );
   }
-}
-
-class _DashedBorderPainter extends CustomPainter {
-  final Color color; final double strokeWidth, dashLength, gapLength, borderRadius;
-  _DashedBorderPainter({required this.color, this.strokeWidth = 1.5, this.dashLength = 6, this.gapLength = 4, this.borderRadius = 0});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = strokeWidth..strokeCap = StrokeCap.butt;
-    final rect = Rect.fromLTWH(strokeWidth / 2, strokeWidth / 2, size.width - strokeWidth, size.height - strokeWidth);
-    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
-    final path = Path()..addRRect(rrect);
-    final metrics = path.computeMetrics();
-    for (final metric in metrics) {
-      double distance = 0.0;
-      while (distance < metric.length) {
-        final end = (distance + dashLength).clamp(0.0, metric.length);
-        canvas.drawPath(metric.extractPath(distance, end), paint);
-        distance += dashLength + gapLength;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedBorderPainter oldDelegate) => oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth || oldDelegate.dashLength != dashLength || oldDelegate.gapLength != gapLength;
 }

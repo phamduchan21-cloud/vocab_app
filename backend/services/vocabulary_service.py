@@ -63,12 +63,15 @@ class VocabularyService:
         self, user_id: str, page: int = 1, limit: int = 20,
         search: Optional[str] = None, topic: Optional[str] = None,
         sort_by: str = "created_at", sort_dir: str = "desc",
+        bookmarked_only: bool = False,
     ) -> tuple:
         base_query = select(Vocabulary).where(Vocabulary.user_id == user_id)
         if search:
             base_query = base_query.where(Vocabulary.word.ilike(f"%{search}%"))
         if topic and topic != "all":
             base_query = base_query.where(Vocabulary.topic == topic)
+        if bookmarked_only:
+            base_query = base_query.where(Vocabulary.is_bookmarked == True)
         count_query = select(func.count()).select_from(base_query.subquery())
         total = await self.db.scalar(count_query) or 0
         sort_col = getattr(Vocabulary, sort_by, Vocabulary.created_at)
@@ -110,6 +113,15 @@ class VocabularyService:
             vocab.pronunciation = pronunciation
         if topic is not None:
             vocab.topic = topic
+        await self.db.commit()
+        await self.db.refresh(vocab)
+        return vocab
+
+    async def toggle_bookmark(self, id: str, user_id: str) -> Optional[Vocabulary]:
+        vocab = await self.get_by_id(id, user_id)
+        if not vocab:
+            return None
+        vocab.is_bookmarked = not vocab.is_bookmarked
         await self.db.commit()
         await self.db.refresh(vocab)
         return vocab

@@ -69,6 +69,9 @@ class Vocabulary(Base):
     times_correct = Column(Integer, default=0)                      # Số lần trả lời đúng
     times_wrong = Column(Integer, default=0)                        # Số lần trả lời sai
 
+    # ─── Bookmark ─────────────────────────────────────────────────
+    is_bookmarked = Column(Boolean, default=False)                   # Đã đánh dấu / lưu
+
     user = relationship("User", back_populates="vocabularies")
 
     def __repr__(self):

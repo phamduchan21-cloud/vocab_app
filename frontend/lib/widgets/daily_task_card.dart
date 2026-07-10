@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app.dart';
 
-/// Stitch-style Bento task card for the dashboard.
-/// Compact grid item with icon, title, subtitle, and optional progress.
+/// Editorial-luxury Bento task card for the dashboard.
+/// Double-bezel framing with gold/green accent and playfair headings.
 class DailyTaskCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -21,102 +21,117 @@ class DailyTaskCard extends StatelessWidget {
     required this.description,
     this.meta,
     this.isDone = false,
-    this.accentColor = AppColors.blue,
+    this.accentColor = AppColors.luxuryGold,
     this.progress = 0.0,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveAccent = isDone ? AppColors.luxuryGreen : accentColor;
+
     return Material(
-      color: AppColors.surface,
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: isDone ? null : onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
+            color: AppColors.luxurySurface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDone
-                  ? AppColors.success.withValues(alpha: 0.25)
-                  : AppColors.surfaceContainerHighest,
-              width: 1,
+                  ? AppColors.luxuryGreen.withValues(alpha: 0.35)
+                  : AppColors.luxuryBorder,
+              width: 1.5,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Icon in colored bg
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isDone
-                      ? AppColors.success.withValues(alpha: 0.12)
-                      : _iconBg(accentColor),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  isDone ? Icons.check_circle : icon,
-                  size: 20,
-                  color: isDone ? AppColors.success : accentColor,
-                ),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDone
+                    ? AppColors.luxuryGreen.withValues(alpha: 0.15)
+                    : AppColors.luxuryBorder.withValues(alpha: 0.4),
+                width: 0.5,
               ),
-              const SizedBox(height: 12),
-              // Title
-              Text(
-                title,
-                style: GoogleFonts.workSans(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: isDone ? AppColors.success : AppColors.ink,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              // Description
-              Text(
-                isDone ? 'Đã hoàn thành ✓' : description,
-                style: GoogleFonts.workSans(
-                  fontSize: 12,
-                  color: isDone
-                      ? AppColors.success
-                      : AppColors.inkSoft,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (!isDone && progress > 0) ...[
-                const SizedBox(height: 12),
-                // Progress bar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LinearProgressIndicator(
-                    value: progress.clamp(0.0, 1.0),
-                    minHeight: 6,
-                    backgroundColor: AppColors.surfaceContainerHighest,
-                    valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icon in colored bg
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isDone
+                        ? AppColors.luxuryGreen.withValues(alpha: 0.12)
+                        : _iconBg(effectiveAccent),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    isDone ? Icons.check_circle : icon,
+                    size: 20,
+                    color: isDone ? AppColors.luxuryGreen : effectiveAccent,
                   ),
                 ),
-              ],
-              if (meta != null && !isDone) ...[
-                const Spacer(),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Text(
-                    meta!,
-                    style: GoogleFonts.workSans(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: accentColor,
+                const SizedBox(height: 12),
+                // Title
+                Text(
+                  title,
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isDone ? AppColors.luxuryGreen : AppColors.luxuryEspresso,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                // Description
+                Text(
+                  isDone ? 'Da hoan thanh ✓' : description,
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    color: isDone
+                        ? AppColors.luxuryGreen
+                        : AppColors.luxuryText,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (!isDone && progress > 0) ...[
+                  const SizedBox(height: 12),
+                  // Progress bar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: progress.clamp(0.0, 1.0),
+                      minHeight: 6,
+                      backgroundColor: AppColors.luxuryBorder,
+                      valueColor: AlwaysStoppedAnimation<Color>(effectiveAccent),
                     ),
                   ),
-                ),
+                ],
+                if (meta != null && !isDone) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      meta!,
+                      style: GoogleFonts.nunito(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: effectiveAccent,
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -124,9 +139,9 @@ class DailyTaskCard extends StatelessWidget {
   }
 
   Color _iconBg(Color color) {
-    if (color == AppColors.danger) return AppColors.dangerBg;
-    if (color == AppColors.warning) return AppColors.warningBg;
-    if (color == AppColors.success) return AppColors.successBg;
-    return AppColors.blueBg;
+    if (color == AppColors.luxuryDanger) return color.withValues(alpha: 0.10);
+    if (color == AppColors.luxuryGold) return color.withValues(alpha: 0.10);
+    if (color == AppColors.luxuryGreen) return color.withValues(alpha: 0.10);
+    return AppColors.luxuryGold.withValues(alpha: 0.10);
   }
 }

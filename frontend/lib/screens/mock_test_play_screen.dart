@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../app.dart';
 import '../models/mock_test.dart';
+import '../providers/mock_test_provider.dart';
 import '../providers/profile_provider.dart';
 import '../services/mock_test_service.dart';
 import '../widgets/loading_widget.dart';
@@ -69,6 +71,46 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
       _startTimer();
       if (mounted) setState(() {});
     } catch (e) {
+      // Fallback: dùng local question bank
+      _loadLocalQuestions();
+    }
+  }
+
+  void _loadLocalQuestions() {
+    try {
+      const levelConfig = {
+        'beginner': {'total': 10, 'duration': 15, 'localLevel': 'basic'},
+        'intermediate': {'total': 20, 'duration': 30, 'localLevel': 'intermediate'},
+        'advanced': {'total': 30, 'duration': 45, 'localLevel': 'advanced'},
+      };
+      final cfg = levelConfig[widget.level] ?? levelConfig['beginner']!;
+      final total = cfg['total'] as int;
+      final duration = cfg['duration'] as int;
+      final localLevel = cfg['localLevel'] as String;
+
+      final prov = context.read<MockTestProvider>();
+      var pool = prov.getLocalQuestions(widget.topic, localLevel);
+
+      if (pool.length < total) {
+        pool = prov.getLocalQuestions(widget.topic, null);
+      }
+      if (pool.isEmpty) {
+        pool = prov.getLocalQuestions(null, null);
+      }
+
+      pool = List.from(pool);
+      pool.shuffle(math.Random());
+      pool = pool.take(total).toList();
+
+      _questions = pool;
+      _testId = null;
+      _secondsRemaining = duration * 60;
+      _initialDurationSeconds = _secondsRemaining;
+      _answers.addAll(List.filled(_questions.length, null));
+      _isLoading = false;
+      _startTimer();
+      if (mounted) setState(() {});
+    } catch (e2) {
       _errorMessage = 'Không thể tạo đề kiểm tra. Vui lòng thử lại.';
       _isLoading = false;
       if (mounted) setState(() {});
@@ -241,7 +283,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('Danh sách câu hỏi',
-              style: GoogleFonts.workSans(
+              style: GoogleFonts.nunito(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.inkSoft)),
@@ -271,8 +313,8 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
     Color textColor;
     double borderWidth;
     if (isCurrent) {
-      bg = AppColors.blue;
-      border = AppColors.blue;
+      bg = AppColors.rose;
+      border = AppColors.rose;
       borderWidth = 2;
       textColor = Colors.white;
     } else if (isAnswered) {
@@ -331,7 +373,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     color: AppColors.warning)),
             const SizedBox(height: 14),
             Text(_questions[_currentIndex].question,
-                style: GoogleFonts.workSans(
+                style: GoogleFonts.nunito(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.ink,
@@ -350,12 +392,12 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                       horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.blue.withValues(alpha: 0.06)
+                        ? AppColors.rose.withValues(alpha: 0.06)
                         : AppColors.background,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: isSelected
-                          ? AppColors.blue
+                          ? AppColors.rose
                           : AppColors.ink.withValues(alpha: 0.14),
                       width: isSelected ? 1.5 : 1,
                     ),
@@ -368,11 +410,11 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: isSelected
-                              ? AppColors.blue
+                              ? AppColors.rose
                               : Colors.transparent,
                           border: Border.all(
                             color: isSelected
-                                ? AppColors.blue
+                                ? AppColors.rose
                                 : AppColors.ink
                                     .withValues(alpha: 0.14),
                           ),
@@ -393,7 +435,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(option,
-                            style: GoogleFonts.workSans(
+                            style: GoogleFonts.nunito(
                                 fontSize: 14,
                                 color: AppColors.ink)),
                       ),
@@ -431,7 +473,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                       size: 14, color: AppColors.inkSoft),
                   const SizedBox(width: 4),
                   Text('Trang chủ',
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                           fontSize: 13, fontWeight: FontWeight.w600,
                           color: AppColors.inkSoft)),
                 ],
@@ -447,11 +489,11 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Mini-test',
-                        style: GoogleFonts.workSans(
+                        style: GoogleFonts.nunito(
                             fontSize: 22, fontWeight: FontWeight.w600,
                             color: AppColors.ink)),
                     Text('Bài kiểm tra tổng hợp ${_questions.length} câu',
-                        style: GoogleFonts.workSans(
+                        style: GoogleFonts.nunito(
                             fontSize: 13, color: AppColors.inkSoft)),
                   ],
                 ),
@@ -501,7 +543,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('Danh sách câu hỏi',
-                  style: GoogleFonts.workSans(fontSize: 15,
+                  style: GoogleFonts.nunito(fontSize: 15,
                       fontWeight: FontWeight.w600, color: AppColors.ink)),
               const SizedBox(height: 12),
               GridView.builder(
@@ -549,7 +591,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                                   letterSpacing: 1.2, color: AppColors.warning)),
                           const SizedBox(height: 14),
                           Text(_questions[_currentIndex].question,
-                              style: GoogleFonts.workSans(fontSize: 20,
+                              style: GoogleFonts.nunito(fontSize: 20,
                                   fontWeight: FontWeight.w600, color: AppColors.ink,
                                   height: 1.4)),
                           const SizedBox(height: 26),
@@ -567,12 +609,12 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                                     horizontal: 16, vertical: 14),
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? AppColors.blue.withValues(alpha: 0.06)
+                                      ? AppColors.rose.withValues(alpha: 0.06)
                                       : AppColors.background,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     color: isSelected
-                                        ? AppColors.blue
+                                        ? AppColors.rose
                                         : AppColors.ink.withValues(alpha: 0.14),
                                     width: isSelected ? 1.5 : 1,
                                   ),
@@ -584,10 +626,10 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: isSelected
-                                            ? AppColors.blue : Colors.transparent,
+                                            ? AppColors.rose : Colors.transparent,
                                         border: Border.all(
                                           color: isSelected
-                                              ? AppColors.blue
+                                              ? AppColors.rose
                                               : AppColors.ink.withValues(alpha: 0.14),
                                         ),
                                       ),
@@ -604,7 +646,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(option,
-                                          style: GoogleFonts.workSans(
+                                          style: GoogleFonts.nunito(
                                               fontSize: 15, color: AppColors.ink)),
                                     ),
                                   ],
@@ -635,7 +677,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
     Color border;
     double borderWidth;
     if (isCurrent) {
-      bg = AppColors.surface; border = AppColors.blue; borderWidth = 2;
+      bg = AppColors.surface; border = AppColors.rose; borderWidth = 2;
     } else if (isAnswered) {
       bg = AppColors.success.withValues(alpha: 0.12);
       border = AppColors.success; borderWidth = 1;
@@ -652,7 +694,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: border, width: borderWidth),
           boxShadow: isCurrent
-              ? [BoxShadow(color: AppColors.blue.withValues(alpha: 0.18), blurRadius: 4)]
+              ? [BoxShadow(color: AppColors.rose.withValues(alpha: 0.18), blurRadius: 4)]
               : null,
         ),
         child: Center(
@@ -674,7 +716,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
         const SizedBox(height: 6),
         _legendRow(AppColors.success.withValues(alpha: 0.5), AppColors.success, 'Đã trả lời'),
         const SizedBox(height: 6),
-        _legendRow(AppColors.surface, AppColors.blue, 'Đang xem'),
+        _legendRow(AppColors.surface, AppColors.rose, 'Đang xem'),
       ],
     );
   }
@@ -688,7 +730,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
               border: Border.all(color: dotBorder, width: 1.2))),
         const SizedBox(width: 7),
         Text(label,
-            style: GoogleFonts.workSans(fontSize: 12, color: AppColors.inkSoft)),
+            style: GoogleFonts.nunito(fontSize: 12, color: AppColors.inkSoft)),
       ],
     );
   }
@@ -728,7 +770,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     color: isFirst ? AppColors.ink.withValues(alpha: 0.2) : AppColors.inkSoft),
                 const SizedBox(width: 4),
                 Text('Câu trước',
-                    style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600,
+                    style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600,
                         color: isFirst ? AppColors.ink.withValues(alpha: 0.2) : AppColors.inkSoft)),
               ],
             ),
@@ -751,7 +793,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text('Câu sau',
-                        style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600,
+                        style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600,
                             color: isLast ? AppColors.ink.withValues(alpha: 0.2) : AppColors.inkSoft)),
                     const SizedBox(width: 4),
                     Icon(Icons.chevron_right, size: 18,
@@ -767,10 +809,10 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: AppColors.blue,
+                  color: AppColors.rose,
                 ),
                 child: Text('Nộp bài',
-                    style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                    style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
               ),
             ),
           ],
@@ -806,7 +848,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                   Flexible(
                     child: Text('Câu trước',
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600,
+                        style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600,
                             color: isFirst ? AppColors.ink.withValues(alpha: 0.2) : AppColors.inkSoft)),
                   ),
                 ],
@@ -834,7 +876,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                   Flexible(
                     child: Text('Câu sau',
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600,
+                        style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600,
                             color: isLast ? AppColors.ink.withValues(alpha: 0.2) : AppColors.inkSoft)),
                   ),
                   const SizedBox(width: 4),
@@ -853,11 +895,11 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: AppColors.blue,
+                color: AppColors.rose,
               ),
               child: Center(
                 child: Text('Nộp bài',
-                    style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                    style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
               ),
             ),
           ),
@@ -894,7 +936,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                   Icon(Icons.arrow_back_ios, size: 14, color: AppColors.inkSoft),
                   const SizedBox(width: 4),
                   Text('Chọn cấp độ',
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                           fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.inkSoft)),
                 ],
               ),
@@ -917,7 +959,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                       children: [
                         Expanded(child: _statCard('%', '$_scorePercent%', 'Điểm số', AppColors.warning, 0.14)),
                         const SizedBox(width: 12),
-                        Expanded(child: _statCard('⏱', _formatTime(_usedSeconds), 'Thời gian', AppColors.blue, 0.10)),
+                        Expanded(child: _statCard('⏱', _formatTime(_usedSeconds), 'Thời gian', AppColors.rose, 0.10)),
                       ],
                     ),
                   ],
@@ -930,7 +972,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     const SizedBox(width: 12),
                     Expanded(child: _statCard('%', '$_scorePercent%', 'Điểm số', AppColors.warning, 0.14)),
                     const SizedBox(width: 12),
-                    Expanded(child: _statCard('⏱', _formatTime(_usedSeconds), 'Thời gian', AppColors.blue, 0.10)),
+                    Expanded(child: _statCard('⏱', _formatTime(_usedSeconds), 'Thời gian', AppColors.rose, 0.10)),
                   ],
                 ),
           const SizedBox(height: 16),
@@ -959,7 +1001,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     ),
                   ),
                   child: Center(child: Text(grade,
-                      style: GoogleFonts.workSans(fontSize: 22, fontWeight: FontWeight.w700,
+                      style: GoogleFonts.nunito(fontSize: 22, fontWeight: FontWeight.w700,
                           color: _scorePercent >= 75 ? AppColors.success : AppColors.warning))),
                 ),
                 const SizedBox(width: 16),
@@ -968,10 +1010,10 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Trình độ $level',
-                          style: GoogleFonts.workSans(
+                          style: GoogleFonts.nunito(
                               fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.ink)),
                       Text(_levelDescription(level),
-                          style: GoogleFonts.workSans(fontSize: 13, color: AppColors.inkSoft)),
+                          style: GoogleFonts.nunito(fontSize: 13, color: AppColors.inkSoft)),
                     ],
                   ),
                 ),
@@ -993,7 +1035,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Chi tiết đáp án',
-                    style: GoogleFonts.workSans(
+                    style: GoogleFonts.nunito(
                         fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.ink)),
                 const SizedBox(height: 16),
                 ...List.generate(_questions.length, (i) {
@@ -1009,33 +1051,46 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                         bottom: BorderSide(color: AppColors.ink.withValues(alpha: 0.08)),
                       ),
                     ),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              style: GoogleFonts.workSans(fontSize: 14, color: AppColors.ink),
-                              children: [
-                                TextSpan(text: 'Câu ${i + 1}: ',
-                                    style: GoogleFonts.workSans(fontWeight: FontWeight.w600)),
-                                TextSpan(text: _questions[i].question),
-                              ],
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RichText(
+                                text: TextSpan(
+                                  style: GoogleFonts.nunito(fontSize: 14, color: AppColors.ink),
+                                  children: [
+                                    TextSpan(text: 'Câu ${i + 1}: ',
+                                        style: GoogleFonts.nunito(fontWeight: FontWeight.w600)),
+                                    TextSpan(text: _questions[i].question),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isCorrect
+                                    ? AppColors.success.withValues(alpha: 0.10)
+                                    : AppColors.danger.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(chosenText,
+                                  style: GoogleFonts.nunito(fontSize: 13, fontWeight: FontWeight.w600,
+                                      color: isCorrect ? AppColors.success : AppColors.danger)),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: isCorrect
-                                ? AppColors.success.withValues(alpha: 0.10)
-                                : AppColors.danger.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(chosenText,
-                              style: GoogleFonts.workSans(fontSize: 13, fontWeight: FontWeight.w600,
-                                  color: isCorrect ? AppColors.success : AppColors.danger)),
-                        ),
+                        if (_questions[i].explanation != null) ...[
+                          const SizedBox(height: 6),
+                          Text('Giải thích: ${_questions[i].explanation}',
+                              style: GoogleFonts.nunito(
+                                  fontSize: 12,
+                                  color: AppColors.inkSoft,
+                                  fontStyle: FontStyle.italic)),
+                        ],
                       ],
                     ),
                   );
@@ -1056,7 +1111,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: AppColors.blue,
+                      color: AppColors.rose,
                     ),
                     child: Center(
                       child: _isSubmitting
@@ -1064,7 +1119,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                               width: 18, height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                           : Text('Lưu kết quả',
-                              style: GoogleFonts.workSans(
+                              style: GoogleFonts.nunito(
                                   fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
                     ),
                   ),
@@ -1081,7 +1136,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     ),
                     child: Center(
                       child: Text('Về trang chọn đề',
-                          style: GoogleFonts.workSans(
+                          style: GoogleFonts.nunito(
                               fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.inkSoft)),
                     ),
                   ),
@@ -1097,14 +1152,14 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: AppColors.blue,
+                      color: AppColors.rose,
                     ),
                     child: _isSubmitting
                         ? const SizedBox(
                             width: 18, height: 18,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                         : Text('Lưu kết quả',
-                            style: GoogleFonts.workSans(
+                            style: GoogleFonts.nunito(
                                 fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
                   ),
                 ),
@@ -1119,7 +1174,7 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
                       color: AppColors.surface,
                     ),
                     child: Text('Về trang chọn đề',
-                        style: GoogleFonts.workSans(
+                        style: GoogleFonts.nunito(
                             fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.inkSoft)),
                   ),
                 ),
@@ -1145,13 +1200,13 @@ class _MockTestPlayScreenState extends State<MockTestPlayScreen> {
               decoration: BoxDecoration(
                   color: color.withValues(alpha: alpha), borderRadius: BorderRadius.circular(8)),
               child: Center(child: Text(icon,
-                  style: GoogleFonts.workSans(
+                  style: GoogleFonts.nunito(
                       fontSize: 14, fontWeight: FontWeight.w600, color: color)))),
           const SizedBox(height: 10),
           Text(value, style: GoogleFonts.ibmPlexMono(
               fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.ink)),
           const SizedBox(height: 2),
-          Text(label, style: GoogleFonts.workSans(fontSize: 12, color: AppColors.inkSoft)),
+          Text(label, style: GoogleFonts.nunito(fontSize: 12, color: AppColors.inkSoft)),
         ],
       ),
     );

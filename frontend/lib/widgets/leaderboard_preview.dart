@@ -31,8 +31,8 @@ class LeaderboardPreview extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Shimmer.fromColors(
-        baseColor: AppColors.surfaceSubtle,
-        highlightColor: AppColors.surface,
+        baseColor: AppColors.luxuryBorder,
+        highlightColor: AppColors.luxurySurface,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -61,22 +61,22 @@ class LeaderboardPreview extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              '🏆  Bảng xếp hạng',
-              style: GoogleFonts.workSans(
-                fontSize: 16,
+              'Bang xep hang',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: AppColors.ink,
+                color: AppColors.luxuryEspresso,
               ),
             ),
             if (onSeeAll != null)
               GestureDetector(
                 onTap: onSeeAll,
                 child: Text(
-                  'Xem tất cả →',
-                  style: GoogleFonts.workSans(
+                  'Xem tat ca →',
+                  style: GoogleFonts.nunito(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.blue,
+                    color: AppColors.luxuryGold,
                   ),
                 ),
               ),
@@ -84,17 +84,24 @@ class LeaderboardPreview extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Container(
+          padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.ink.withValues(alpha: 0.10)),
+            color: AppColors.luxurySurface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
           ),
-          child: Column(
-            children: List.generate(displayEntries.length, (index) {
-              final entry = displayEntries[index];
-              final isMe = index == 0;
-              return _buildEntryRow(entry, index + 1, isMe);
-            }),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: AppColors.luxuryBorder.withValues(alpha: 0.4), width: 0.5),
+            ),
+            child: Column(
+              children: List.generate(displayEntries.length, (index) {
+                final entry = displayEntries[index];
+                final isMe = index == 0;
+                return _buildEntryRow(entry, index + 1, isMe);
+              }),
+            ),
           ),
         ),
       ],
@@ -113,30 +120,30 @@ class LeaderboardPreview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isMe ? AppColors.surfaceSubtle : Colors.transparent,
+        color: isMe ? AppColors.luxuryBeige.withValues(alpha: 0.2) : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         border: Border(
-          bottom: BorderSide(color: AppColors.ink.withValues(alpha: 0.06)),
+          bottom: BorderSide(color: AppColors.luxuryBorder.withValues(alpha: 0.5)),
         ),
       ),
       child: Row(
         children: [
           Text(
             rankStr,
-            style: GoogleFonts.ibmPlexMono(
+            style: GoogleFonts.nunito(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.ink,
+              color: AppColors.luxuryEspresso,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              isMe ? 'Bạn' : entry.username,
-              style: GoogleFonts.workSans(
+              isMe ? 'Ban' : entry.username,
+              style: GoogleFonts.nunito(
                 fontSize: 14,
                 fontWeight: isMe ? FontWeight.w600 : FontWeight.w500,
-                color: AppColors.ink,
+                color: AppColors.luxuryEspresso,
               ),
             ),
           ),
@@ -145,10 +152,10 @@ class LeaderboardPreview extends StatelessWidget {
             children: [
               Text(
                 '${entry.xp} XP',
-                style: GoogleFonts.ibmPlexMono(
+                style: GoogleFonts.nunito(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.inkSoft,
+                  color: AppColors.luxuryText,
                 ),
               ),
             ],

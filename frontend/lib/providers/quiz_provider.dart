@@ -14,6 +14,7 @@ class QuizProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String _selectedTopic = 'all';
+  String? _selectedSkillType;
 
   List<QuizCategory> get categories => _categories;
   List<Map<String, dynamic>> get currentQuestions => _currentQuestions;
@@ -22,6 +23,7 @@ class QuizProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String get selectedTopic => _selectedTopic;
+  String? get selectedSkillType => _selectedSkillType;
 
   QuizProvider(this._service);
 
@@ -55,6 +57,7 @@ class QuizProvider extends ChangeNotifier {
     if (topic != null) {
       _selectedTopic = topic;
     }
+    _selectedSkillType = skillType;
     notifyListeners();
 
     try {
@@ -75,6 +78,7 @@ class QuizProvider extends ChangeNotifier {
     required String quizType,
     required List<Map<String, dynamic>> answers,
     String? topic,
+    String? skillType,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -85,6 +89,7 @@ class QuizProvider extends ChangeNotifier {
         quizType: quizType,
         answers: answers,
         topic: topic ?? _selectedTopic,
+        skillType: skillType,
       );
     } catch (e) {
       final correct = answers.where((a) => a['is_correct'] == true).length;

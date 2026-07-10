@@ -41,7 +41,7 @@ class _TopicBrowserScreenState extends State<TopicBrowserScreen> {
       appBar: AppBar(
         title: Text(
           'Khó từ vựng',
-          style: GoogleFonts.workSans(
+          style: GoogleFonts.nunito(
             fontWeight: FontWeight.w600,
             fontSize: 18,
             color: AppColors.ink,
@@ -68,8 +68,8 @@ class _TopicBrowserScreenState extends State<TopicBrowserScreen> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Tim chủ de từ vựng...',
-                  hintStyle: GoogleFonts.workSans(color: AppColors.textHint),
+                  hintText: 'Tìm chủ đề từ vựng...',
+                  hintStyle: GoogleFonts.nunito(color: AppColors.textHint),
                   prefixIcon:
                       const Icon(Icons.search, color: AppColors.textHint),
                   border: InputBorder.none,
@@ -126,7 +126,7 @@ class _TopicBrowserScreenState extends State<TopicBrowserScreen> {
             const SizedBox(height: 16),
             Text(
               'Không tìm thấy chủ đề phù hợp',
-              style: GoogleFonts.workSans(
+              style: GoogleFonts.nunito(
                 fontSize: 16,
                 color: AppColors.inkSoft,
               ),
@@ -192,7 +192,7 @@ class _TopicCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.blueBg,
+                  color: AppColors.rose.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
@@ -204,7 +204,7 @@ class _TopicCard extends StatelessWidget {
                 title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.workSans(
+                style: GoogleFonts.nunito(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.ink,
@@ -213,7 +213,7 @@ class _TopicCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '$count từ',
-                style: GoogleFonts.workSans(
+                style: GoogleFonts.nunito(
                   fontSize: 12,
                   color: AppColors.inkSoft,
                 ),

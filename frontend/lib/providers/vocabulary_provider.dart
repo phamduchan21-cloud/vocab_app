@@ -143,4 +143,20 @@ class VocabularyProvider extends ChangeNotifier {
     _selectedTopic = topic;
     fetchAll(topic: topic);
   }
+
+  Future<void> toggleBookmark(Vocabulary v) async {
+    try {
+      final updated = await _service.toggleBookmark(v.id);
+      final idx = _items.indexWhere((i) => i.id == v.id);
+      if (idx >= 0) {
+        _items[idx] = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('toggleBookmark error: $e');
+    }
+  }
+
+  List<Vocabulary> get bookmarked =>
+      _items.where((v) => v.isBookmarked).toList();
 }

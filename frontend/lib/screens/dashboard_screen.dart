@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app.dart';
+import '../data/mini_test_questions.dart';
 import '../providers/dashboard_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/flashcard_provider.dart';
@@ -18,6 +19,160 @@ import '../widgets/daily_task_card.dart';
 import '../widgets/weekly_chart.dart';
 import '../widgets/app_bottom_nav.dart';
 
+// ─── Entry animation (spring cubic) ────────────────────
+class _EntryAnimation extends StatefulWidget {
+  final Widget child;
+  final int delayMs;
+  const _EntryAnimation({required this.child, this.delayMs = 0});
+
+  @override
+  State<_EntryAnimation> createState() => _EntryAnimationState();
+}
+
+class _EntryAnimationState extends State<_EntryAnimation>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fade = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(milliseconds: widget.delayMs), () {
+        if (mounted) _controller.forward();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(position: _slide, child: widget.child),
+    );
+  }
+}
+
+// ─── Double-bezel card wrapper ─────────────────────────
+class _DoubleBezel extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final double borderRadius;
+
+  const _DoubleBezel({
+    required this.child,
+    this.padding,
+    this.borderRadius = 16,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final innerPad = padding ?? const EdgeInsets.all(16);
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: AppColors.luxuryBorder, width: 1.2),
+      ),
+      padding: const EdgeInsets.all(2),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius - 2),
+          border: Border.all(
+            color: AppColors.luxuryBorder.withValues(alpha: 0.45),
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius - 3),
+          child: Padding(padding: innerPad, child: child),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Luxury pill button with trailing icon island ──────
+class _LuxuryPill extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData icon;
+  final Color color;
+
+  const _LuxuryPill({
+    required this.label,
+    this.onPressed,
+    this.icon = Icons.arrow_forward_rounded,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 10, 10, 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 16, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// DashboardScreen
+// ════════════════════════════════════════════════════════
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -31,7 +186,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (location == '/') return 0;
     if (location.startsWith('/quiz')) return 1;
     if (location.startsWith('/flashcard')) return 2;
-    if (location.startsWith('/test') || location.startsWith('/mock-test')) return 3;
+    if (location.startsWith('/test') ||
+        location.startsWith('/mock-test')) {
+      return 3;
+    }
     if (location.startsWith('/profile') ||
         location.startsWith('/progress') ||
         location.startsWith('/bookmark')) {
@@ -54,7 +212,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final dashboard = context.watch<DashboardProvider>();
     final auth = context.watch<AuthProvider>();
     final user = auth.user;
-    final username = user?.userMetadata?['username'] as String? ?? 'Bạn';
+    final username = user?.userMetadata?['username'] as String? ?? 'Ban';
     final profile = context.watch<ProfileProvider>();
 
     return LayoutBuilder(
@@ -68,12 +226,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ? _Sidebar(
                   selectedIndex: _selectedNavIndex,
                   onItemSelected: (index) {
-                    final routes = ['/', '/quiz', '/flashcard', '/test', '/profile'];
+                    final routes = [
+                      '/',
+                      '/quiz',
+                      '/flashcard',
+                      '/test',
+                      '/profile'
+                    ];
                     context.go(routes[index]);
                   },
-                  avatarLetter: username.isNotEmpty ? username[0].toUpperCase() : 'V',
+                  avatarLetter: username.isNotEmpty
+                      ? username[0].toUpperCase()
+                      : 'V',
                   displayName: username,
-                  levelLabel: 'CẤP ${dashboard.data?.stats.level ?? '-'}',
+                  levelLabel: 'CAP ${dashboard.data?.stats.level ?? '-'}',
                 )
               : null,
           body: _buildMainContent(context, dashboard, username, profile),
@@ -105,19 +271,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final data = dashboard.data!;
     final stats = data.stats;
     final review = data.review;
-    final dailyProgress = stats.vocabCount > 20 ? 8 : stats.vocabCount;
     final dailyGoal = profile.userProfile?.dailyWordGoal ?? 10;
     final hasDoneQuizToday = stats.quizCount > 0;
-
-    // Featured topic
-    final topicNames = [
-      'greetings', 'family', 'numbers', 'daily', 'food', 'travel',
-      'shopping', 'weather', 'health', 'work', 'education',
-      'entertainment', 'technology', 'emotions', 'society',
-    ];
-    final featuredTopic = topicNames[DateTime.now().day % topicNames.length];
+    final dailyProgress = review.total > 0
+        ? review.completed
+        : stats.vocabCount.clamp(0, dailyGoal);
+    final featuredTopic =
+        MiniTestBank.topicKeys[DateTime.now().day % MiniTestBank.topicKeys.length];
+    final featuredLabel =
+        MiniTestBank.displayName(featuredTopic) ?? featuredTopic;
 
     return RefreshIndicator(
+      color: AppColors.luxuryBrown,
       onRefresh: () => dashboard.refresh(),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -125,7 +290,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ─── Hero Stats Bar ──────────────────────────
             HeroStatsBar(
               displayName: username,
               streak: stats.streak,
@@ -138,279 +302,329 @@ class _DashboardScreenState extends State<DashboardScreen> {
               englishLevel: profile.userProfile?.englishLevel,
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
-            // ─── Daily Tasks (Bento Grid - Stitch style) ─
-            Text(
-              '📅 Học tập hôm nay',
-              style: GoogleFonts.workSans(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: AppColors.ink,
-              ),
-            ),
-            const SizedBox(height: 14),
-            // Bento 2x2 grid
-            _AnimatedSection(
+            // ─── Daily Tasks ─────────────────────────────
+            _EntryAnimation(
               delayMs: 50,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final isNarrow = constraints.maxWidth < 380;
-                  return isNarrow
-                      ? Column(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hoc tap hom nay',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.luxuryEspresso,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 380;
+                      if (isNarrow) {
+                        return Column(
                           children: [
                             DailyTaskCard(
                               icon: Icons.style,
-                              title: 'Ôn tập flashcard',
+                              title: 'On tap flashcard',
                               description: review.remaining > 0
-                                  ? '$review.remaining từ cần ôn'
-                                  : 'Học từ mới',
-                              meta: review.remaining > 0 ? '${review.remaining} từ' : null,
-                              progress: review.total > 0 ? review.completed / review.total : 0,
+                                  ? '$review.remaining tu can on'
+                                  : 'Hoc tu moi',
+                              meta: review.remaining > 0
+                                  ? '${review.remaining} tu'
+                                  : null,
+                              progress: review.total > 0
+                                  ? review.completed / review.total
+                                  : 0,
                               isDone: review.total > 0 && review.remaining == 0,
-                              accentColor: AppColors.blue,
+                              accentColor: AppColors.luxuryBrown,
                               onTap: () => context.go('/flashcard'),
                             ),
                             const SizedBox(height: 10),
                             DailyTaskCard(
                               icon: Icons.quiz,
-                              title: 'Luyện tập quiz',
+                              title: 'Luyen tap quiz',
                               description: hasDoneQuizToday
-                                  ? 'Đã làm quiz hôm nay!'
-                                  : 'Trắc nghiệm 4 đáp án',
+                                  ? 'Da lam quiz hom nay!'
+                                  : 'Trac nghiem 4 dap an',
                               isDone: hasDoneQuizToday,
-                              accentColor: AppColors.warning,
+                              accentColor: AppColors.luxuryGold,
                               onTap: () => context.go('/quiz'),
                             ),
                             const SizedBox(height: 10),
                             DailyTaskCard(
                               icon: Icons.assignment,
-                              title: 'Kiểm tra trình độ',
-                              description: 'Mini-test tổng hợp',
-                              accentColor: AppColors.danger,
+                              title: 'Kiem tra trinh do',
+                              description: 'Mini-test tong hop',
+                              accentColor: AppColors.luxuryDanger,
                               onTap: () => context.go('/test'),
                             ),
                             const SizedBox(height: 10),
                             DailyTaskCard(
                               icon: Icons.explore,
-                              title: 'Khám phá kho từ',
-                              description: 'Tham khảo 300+ từ',
-                              meta: '15 chủ đề',
-                              accentColor: AppColors.success,
+                              title: 'Kham pha kho tu',
+                              description: 'Tham khao 300+ tu',
+                              meta: '15 chu de',
+                              accentColor: AppColors.luxuryGreen,
                               onTap: () => context.go('/topics'),
                             ),
                           ],
-                        )
-                      : Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: DailyTaskCard(
-                                    icon: Icons.style,
-                                    title: 'Ôn tập flashcard',
-                                    description: review.remaining > 0
-                                        ? '$review.remaining từ cần ôn'
-                                        : 'Học từ mới',
-                                    meta: review.remaining > 0 ? '${review.remaining} từ' : null,
-                                    progress: review.total > 0 ? review.completed / review.total : 0,
-                                    isDone: review.total > 0 && review.remaining == 0,
-                                    accentColor: AppColors.blue,
-                                    onTap: () => context.go('/flashcard'),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: DailyTaskCard(
-                                    icon: Icons.quiz,
-                                    title: 'Luyện tập quiz',
-                                    description: hasDoneQuizToday
-                                        ? 'Đã làm quiz hôm nay!'
-                                        : 'Trắc nghiệm 4 đáp án',
-                                    isDone: hasDoneQuizToday,
-                                    accentColor: AppColors.warning,
-                                    onTap: () => context.go('/quiz'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: DailyTaskCard(
-                                    icon: Icons.assignment,
-                                    title: 'Kiểm tra trình độ',
-                                    description: 'Mini-test tổng hợp',
-                                    accentColor: AppColors.danger,
-                                    onTap: () => context.go('/test'),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: DailyTaskCard(
-                                    icon: Icons.explore,
-                                    title: 'Khám phá kho từ',
-                                    description: 'Tham khảo 300+ từ',
-                                    meta: '15 chủ đề',
-                                    accentColor: AppColors.success,
-                                    onTap: () => context.go('/topics'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
                         );
-                },
+                      }
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DailyTaskCard(
+                                  icon: Icons.style,
+                                  title: 'On tap flashcard',
+                                  description: review.remaining > 0
+                                      ? '$review.remaining tu can on'
+                                      : 'Hoc tu moi',
+                                  meta: review.remaining > 0
+                                      ? '${review.remaining} tu'
+                                      : null,
+                                  progress: review.total > 0
+                                      ? review.completed / review.total
+                                      : 0,
+                                  isDone: review.total > 0 &&
+                                      review.remaining == 0,
+                                  accentColor: AppColors.luxuryBrown,
+                                  onTap: () => context.go('/flashcard'),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: DailyTaskCard(
+                                  icon: Icons.quiz,
+                                  title: 'Luyen tap quiz',
+                                  description: hasDoneQuizToday
+                                      ? 'Da lam quiz hom nay!'
+                                      : 'Trac nghiem 4 dap an',
+                                  isDone: hasDoneQuizToday,
+                                  accentColor: AppColors.luxuryGold,
+                                  onTap: () => context.go('/quiz'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DailyTaskCard(
+                                  icon: Icons.assignment,
+                                  title: 'Kiem tra trinh do',
+                                  description: 'Mini-test tong hop',
+                                  accentColor: AppColors.luxuryDanger,
+                                  onTap: () => context.go('/test'),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: DailyTaskCard(
+                                  icon: Icons.explore,
+                                  title: 'Kham pha kho tu',
+                                  description: 'Tham khao 300+ tu',
+                                  meta: '15 chu de',
+                                  accentColor: AppColors.luxuryGreen,
+                                  onTap: () => context.go('/topics'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
-            // ─── Topic of the Day (Stitch style) ──────────
-            _AnimatedSection(
-              delayMs: 150,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.blueBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.blue.withValues(alpha: 0.20),
+            // ─── Streak reward hint ─────────────────────
+            if (stats.streak >= 3 && !hasDoneQuizToday)
+              _EntryAnimation(
+                delayMs: 100,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.luxuryGold.withValues(alpha: 0.04),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: _DoubleBezel(
+                      borderRadius: 14,
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        children: [
+                          const Text('\u{1F525}',
+                              style: TextStyle(fontSize: 24)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Streak ${stats.streak} ngay!',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.luxuryEspresso,
+                                  ),
+                                ),
+                                Text(
+                                  'Lam quiz hom nay de duy tri chuoi',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 12,
+                                    color: AppColors.luxuryText,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _LuxuryPill(
+                            label: 'Luyen ngay',
+                            color: AppColors.luxuryGold,
+                            icon: Icons.bolt_rounded,
+                            onPressed: () => context.go('/quiz'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.ink.withValues(alpha: 0.06),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          '🔥',
-                          style: TextStyle(fontSize: 28),
+              ),
+
+            // ─── Topic of the Day ───────────────────────
+            _EntryAnimation(
+              delayMs: 150,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: _DoubleBezel(
+                  padding: const EdgeInsets.all(16),
+                  borderRadius: 16,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          color: AppColors.luxuryBg,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppColors.luxuryBorder),
+                        ),
+                        child: Center(
+                          child: Text('\u{1F525}',
+                              style: const TextStyle(fontSize: 28)),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: AppColors.blue,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'CHỦ ĐỀ HÔM NAY',
-                              style: GoogleFonts.workSans(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                letterSpacing: 0.8,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.luxuryBrown,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'CHU DE HOM NAY',
+                                style: GoogleFonts.nunito(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 0.8,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            featuredTopic[0].toUpperCase() +
-                                featuredTopic.substring(1),
-                            style: GoogleFonts.workSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.ink,
+                            const SizedBox(height: 6),
+                            Text(
+                              featuredLabel,
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.luxuryEspresso,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Học từ vựng chủ đề này ngay!',
-                            style: GoogleFonts.workSans(
-                              fontSize: 12,
-                              color: AppColors.inkSoft,
+                            const SizedBox(height: 2),
+                            Text(
+                              'Hoc tu vung chu de nay ngay!',
+                              style: GoogleFonts.nunito(
+                                fontSize: 12,
+                                color: AppColors.luxuryText,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<FlashcardProvider>().setTopic(featuredTopic);
-                        context.go('/flashcard');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
-                        minimumSize: const Size(0, 44),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          ],
                         ),
                       ),
-                      child: const Text('Học ngay'),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      _LuxuryPill(
+                        label: 'Hoc ngay',
+                        color: AppColors.luxuryBrown,
+                        onPressed: () {
+                          context
+                              .read<FlashcardProvider>()
+                              .setTopic(featuredTopic);
+                          context.go('/flashcard');
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
-
             // ─── Weekly Progress ─────────────────────────
-            _AnimatedSection(
+            _EntryAnimation(
               delayMs: 200,
-              child: WeeklyChart(
-                days: [],
-                currentXp: stats.xp,
-                weeklyXpGoal: 500,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: WeeklyChart(
+                  days: profile.data,
+                  currentXp: stats.xp,
+                  weeklyXpGoal: 500,
+                ),
               ),
             ),
-
-            const SizedBox(height: 24),
 
             // ─── Topic Grid ─────────────────────────────
             if (data.topics.isNotEmpty) ...[
-              _AnimatedSection(
+              _EntryAnimation(
                 delayMs: 250,
-                child: TopicGrid(
-                  topics: data.topics,
-                  onSeeAll: () => context.go('/topics'),
-                  onTopicTap: (topic) async {
-                    await context
-                        .read<FlashcardProvider>()
-                        .setTopic(topic);
-                    if (context.mounted) {
-                      context.go('/flashcard');
-                    }
-                  },
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: TopicGrid(
+                    topics: data.topics,
+                    onSeeAll: () => context.go('/topics'),
+                    onTopicTap: (topic) async {
+                      await context
+                          .read<FlashcardProvider>()
+                          .setTopic(topic);
+                      if (context.mounted) {
+                        context.go('/flashcard');
+                      }
+                    },
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
             ],
 
             // ─── Leaderboard ───────────────────────────
             if (data.leaderboard.isNotEmpty) ...[
-              _AnimatedSection(
+              _EntryAnimation(
                 delayMs: 300,
                 child: LeaderboardPreview(
                   entries: data.leaderboard,
                   onSeeAll: () => context.go('/profile'),
                 ),
               ),
-              const SizedBox(height: 24),
             ],
           ],
         ),
@@ -450,6 +664,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildEmpty(DashboardProvider dashboard, String username) {
     return RefreshIndicator(
+      color: AppColors.luxuryBrown,
       onRefresh: () => dashboard.refresh(),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -463,27 +678,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
               xp: dashboard.data?.stats.xp ?? 0,
               gems: dashboard.data?.stats.gems ?? 0,
               level: dashboard.data?.stats.level ?? 0,
-              levelTitle: dashboard.data?.stats.levelTitle ?? 'Mầm non',
+              levelTitle: dashboard.data?.stats.levelTitle ?? 'Mam non',
             ),
             const SizedBox(height: 32),
             Center(
               child: Column(
                 children: [
-                  const Text('🐱', style: TextStyle(fontSize: 72)),
+                  const Text('\u{1F431}', style: TextStyle(fontSize: 72)),
                   const SizedBox(height: 12),
                   Text(
-                    'Chào mừng đến với VocaEng!',
-                    style: GoogleFonts.workSans(
-                      fontSize: 22,
+                    'Chao mung den voi VocaEng!',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 26,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.ink,
+                      color: AppColors.luxuryEspresso,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Học từ vựng tiếng Anh mỗi ngày!',
-                    style: GoogleFonts.workSans(
-                        fontSize: 15, color: AppColors.inkSoft),
+                    'Hoc tu vung tieng Anh moi ngay!',
+                    style: GoogleFonts.nunito(
+                        fontSize: 15, color: AppColors.luxuryText),
                   ),
                 ],
               ),
@@ -491,25 +706,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 28),
             _StepGuide(
               step: '1',
-              emoji: '📚',
-              title: 'Khám phá kho từ vựng',
-              color: AppColors.blue,
+              emoji: '\u{1F4DA}',
+              title: 'Kham pha kho tu vung',
+              color: AppColors.luxuryBrown,
               onTap: () => context.go('/topics'),
             ),
             const SizedBox(height: 10),
             _StepGuide(
               step: '2',
-              emoji: '🃏',
-              title: 'Học với flashcard',
-              color: AppColors.warning,
+              emoji: '\u{1F0CF}',
+              title: 'Hoc voi flashcard',
+              color: AppColors.luxuryGold,
               onTap: () => context.go('/flashcard'),
             ),
             const SizedBox(height: 10),
             _StepGuide(
               step: '3',
-              emoji: '⚡',
-              title: 'Kiểm tra với quiz',
-              color: AppColors.success,
+              emoji: '\u{26A1}',
+              title: 'Kiem tra voi quiz',
+              color: AppColors.luxuryGreen,
               onTap: () => context.go('/quiz'),
             ),
             const SizedBox(height: 22),
@@ -520,70 +735,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-// ─── Animated Section (fade + slide up on appear) ────────
-class _AnimatedSection extends StatefulWidget {
-  final Widget child;
-  final int delayMs;
-
-  const _AnimatedSection({required this.child, this.delayMs = 0});
-
-  @override
-  State<_AnimatedSection> createState() => _AnimatedSectionState();
-}
-
-class _AnimatedSectionState extends State<_AnimatedSection>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnim;
-  late Animation<double> _slideAnim;
-  bool _hasAppeared = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-    _slideAnim = Tween<double>(begin: 20, end: 0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_hasAppeared && mounted) {
-        Future.delayed(Duration(milliseconds: widget.delayMs), () {
-          if (mounted) _controller.forward();
-        });
-        _hasAppeared = true;
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) => Opacity(
-        opacity: _fadeAnim.value,
-        child: Transform.translate(
-          offset: Offset(0, _slideAnim.value),
-          child: child,
-        ),
-      ),
-      child: widget.child,
-    );
-  }
-}
-
-// ─── Step Guide Card for new users ─────────────────────
+// ─── Step Guide Card ──────────────────────────────────
 class _StepGuide extends StatelessWidget {
   final String step, emoji, title;
   final Color color;
@@ -600,61 +752,76 @@ class _StepGuide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surface,
+      color: AppColors.luxurySurface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.surfaceContainerHighest),
+            border: Border.all(color: AppColors.luxuryBorder),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    step,
-                    style: GoogleFonts.ibmPlexMono(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.all(2),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                  color: AppColors.luxuryBorder.withValues(alpha: 0.45)),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Text(emoji, style: const TextStyle(fontSize: 16)),
-                        const SizedBox(width: 6),
-                        Text(
-                          title,
-                          style: GoogleFonts.workSans(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.ink,
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          step,
+                          style: GoogleFonts.nunito(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: color,
                           ),
                         ),
-                      ],
+                      ),
                     ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(emoji,
+                                  style: const TextStyle(fontSize: 16)),
+                              const SizedBox(width: 6),
+                              Text(
+                                title,
+                                style: GoogleFonts.nunito(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.luxuryEspresso,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right,
+                        color: AppColors.luxuryText, size: 20),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: AppColors.inkSoft, size: 20),
-            ],
+            ),
           ),
         ),
       ),
@@ -680,27 +847,27 @@ class _Sidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 230,
-      color: AppColors.ink,
+      color: AppColors.luxuryEspresso,
       padding: const EdgeInsets.fromLTRB(18, 28, 18, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'VocaEng',
-            style: GoogleFonts.workSans(
+            style: GoogleFonts.playfairDisplay(
               fontSize: 22,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFFEDE6D3),
+              color: AppColors.luxuryBeige,
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            'HỌC TỪ VỰNG',
-            style: GoogleFonts.workSans(
+            'HOC TU VUNG',
+            style: GoogleFonts.nunito(
               fontSize: 10,
               letterSpacing: 1.2,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF9AA3B8),
+              color: AppColors.luxuryTextHint,
             ),
           ),
           const SizedBox(height: 30),
@@ -720,13 +887,13 @@ class _Sidebar extends StatelessWidget {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: AppColors.blue,
+                  gradient: AppColors.luxuryGradient,
                   borderRadius: BorderRadius.circular(17),
                 ),
                 child: Center(
                   child: Text(
                     avatarLetter,
-                    style: GoogleFonts.workSans(
+                    style: GoogleFonts.nunito(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                       color: Colors.white,
@@ -740,18 +907,18 @@ class _Sidebar extends StatelessWidget {
                 children: [
                   Text(
                     displayName,
-                    style: GoogleFonts.workSans(
+                    style: GoogleFonts.nunito(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFFEDE6D3),
+                      color: AppColors.luxuryBeige,
                     ),
                   ),
                   Text(
                     levelLabel,
-                    style: GoogleFonts.workSans(
+                    style: GoogleFonts.nunito(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9AA3B8),
+                      color: AppColors.luxuryTextHint,
                     ),
                   ),
                 ],
@@ -764,11 +931,11 @@ class _Sidebar extends StatelessWidget {
   }
 
   static const _navData = [
-    _SidebarNavData(Icons.home_outlined, 'Trang chủ'),
+    _SidebarNavData(Icons.home_outlined, 'Trang chu'),
     _SidebarNavData(Icons.quiz_outlined, 'Quiz'),
     _SidebarNavData(Icons.style_outlined, 'Flashcard'),
     _SidebarNavData(Icons.assignment_outlined, 'Mini-test'),
-    _SidebarNavData(Icons.person_outlined, 'Hồ sơ'),
+    _SidebarNavData(Icons.person_outlined, 'Ho so'),
   ];
 }
 
@@ -801,9 +968,12 @@ class _SidebarNavItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(10),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
             decoration: BoxDecoration(
-              color: isActive ? const Color(0xFFEDE6D3) : Colors.transparent,
+              color: isActive
+                  ? AppColors.luxuryBeige
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -812,19 +982,19 @@ class _SidebarNavItem extends StatelessWidget {
                   icon,
                   size: 18,
                   color: isActive
-                      ? AppColors.ink
-                      : const Color(0xFFD6D1C0),
+                      ? AppColors.luxuryEspresso
+                      : AppColors.luxuryBrownPale,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   label,
-                  style: GoogleFonts.workSans(
+                  style: GoogleFonts.nunito(
                     fontSize: 14,
                     fontWeight:
                         isActive ? FontWeight.w600 : FontWeight.w500,
                     color: isActive
-                        ? AppColors.ink
-                        : const Color(0xFFD6D1C0),
+                        ? AppColors.luxuryEspresso
+                        : AppColors.luxuryBrownPale,
                   ),
                 ),
               ],
@@ -836,7 +1006,7 @@ class _SidebarNavItem extends StatelessWidget {
   }
 }
 
-// ─── Wrapper: bottom nav mobile, sidebar desktop ──────
+// ─── Wrapper: bottom nav mobile, sidebar desktop ─────
 class AppBottomNavWrapper extends StatelessWidget {
   final int selectedIndex;
   final bool isWide;
@@ -854,7 +1024,7 @@ class AppBottomNavWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.luxuryBg,
       body: isWide && sidebar != null
           ? Row(
               children: [
@@ -863,7 +1033,8 @@ class AppBottomNavWrapper extends StatelessWidget {
               ],
             )
           : body,
-      bottomNavigationBar: isWide ? null : AppBottomNav(selectedIndex: selectedIndex),
+      bottomNavigationBar:
+          isWide ? null : AppBottomNav(selectedIndex: selectedIndex),
     );
   }
 }

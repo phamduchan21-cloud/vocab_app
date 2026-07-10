@@ -73,7 +73,7 @@ class _SpeakerButtonState extends State<SpeakerButton>
   Widget build(BuildContext context) {
     if (!TtsService.isSupported) return const SizedBox.shrink();
 
-    final color = widget.color ?? AppColors.blue;
+    final color = widget.color ?? AppColors.rose;
 
     return AnimatedBuilder(
       animation: _pulseAnim ?? kAlwaysCompleteAnimation,

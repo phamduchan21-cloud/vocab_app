@@ -14,8 +14,21 @@ from schemas import (
     QuizQuestion,
 )
 from seed_data import SEED_VOCABULARIES
+from question_bank import get_questions, AVAILABLE_TOPICS
 
 logger = logging.getLogger(__name__)
+
+
+def _bank_question_to_quiz(bq: dict) -> QuizQuestion:
+    """Convert question bank dict to QuizQuestion schema."""
+    return QuizQuestion(
+        question=bq["question"],
+        options=bq["options"],
+        correctAnswer=bq["correctAnswer"],
+        vocabId=bq.get("id", ""),
+        explanation=bq.get("explanation", ""),
+        transcript=bq.get("transcript"),
+    )
 
 
 class QuizService:
@@ -68,20 +81,44 @@ class QuizService:
         skill_type: Optional[str] = None,
         topic: Optional[str] = None,
     ) -> Tuple[List[QuizQuestion], int]:
+        # Ưu tiên question bank nếu có topic cụ thể + skill_type
+        if topic and topic != "all" and skill_type:
+            from question_bank import get_questions
+            bank_qs = get_questions(topic, skill_type, count)
+            if bank_qs:
+                return [_bank_question_to_quiz(q) for q in bank_qs], len(bank_qs)
+
+        # Nếu topic = "all" + skill_type cụ thể, gộp từ tất cả topics trong bank
+        if (not topic or topic == "all") and skill_type:
+            from question_bank import QUESTION_BANK
+            all_bank_qs = []
+            for t_key in QUESTION_BANK:
+                from question_bank import get_questions
+                bank_qs = get_questions(t_key, skill_type, count)
+                all_bank_qs.extend(bank_qs)
+            import random as _rnd
+            _rnd.shuffle(all_bank_qs)
+            if all_bank_qs:
+                return [_bank_question_to_quiz(q) for q in all_bank_qs[:count]], min(count, len(all_bank_qs))
+
+        # Nếu topic = "all" + skill_type = "all", mix từ bank
+        if (not topic or topic == "all") and (not skill_type or skill_type == "all"):
+            from question_bank import QUESTION_BANK, get_questions
+            all_bank_qs = []
+            for t_key in QUESTION_BANK:
+                for s_key in ("vocabulary", "grammar", "reading", "listening"):
+                    bank_qs = get_questions(t_key, s_key, count)
+                    all_bank_qs.extend(bank_qs)
+            import random as _rnd
+            _rnd.shuffle(all_bank_qs)
+            if all_bank_qs:
+                return [_bank_question_to_quiz(q) for q in all_bank_qs[:count]], min(count, len(all_bank_qs))
+
+        # Fallback: lấy từ từ vựng người dùng
         query = select(Vocabulary).where(Vocabulary.user_id == user_id)
 
         if topic and topic != "all":
             query = query.where(Vocabulary.topic == topic)
-
-        # Nếu là kỹ năng từ vựng, ưu tiên lấy từ cần ôn tập
-        if skill_type == "vocabulary":
-            from sqlalchemy import or_
-            query = query.where(
-                or_(
-                    Vocabulary.next_review_date.is_(None),
-                    Vocabulary.next_review_date <= func.current_date(),
-                )
-            )
 
         result = await self.db.execute(query)
         all_vocabs = list(result.scalars().all())
@@ -93,7 +130,6 @@ class QuizService:
                 seed_vocabs = [v for v in seed_vocabs if v.get("topic") == topic]
 
             if seed_vocabs:
-                # Trộn user vocab + seed vocab
                 combined = list(all_vocabs) + seed_vocabs
                 return await self._build_questions_from_vocab_list(combined, count)
 

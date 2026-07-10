@@ -62,8 +62,8 @@ class TopicGrid extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Shimmer.fromColors(
-        baseColor: AppColors.surfaceSubtle,
-        highlightColor: AppColors.surface,
+        baseColor: AppColors.luxuryBorder,
+        highlightColor: AppColors.luxurySurface,
         child: Row(
           children: List.generate(4, (_) => Expanded(
             child: Container(
@@ -89,22 +89,22 @@ class TopicGrid extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              '📂  Danh mục chủ đề',
-              style: GoogleFonts.workSans(
-                fontSize: 16,
+              'Danh muc chu de',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: AppColors.ink,
+                color: AppColors.luxuryEspresso,
               ),
             ),
             if (onSeeAll != null)
               GestureDetector(
                 onTap: onSeeAll,
                 child: Text(
-                  'Xem tất cả →',
-                  style: GoogleFonts.workSans(
+                  'Xem tat ca →',
+                  style: GoogleFonts.nunito(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.blue,
+                    color: AppColors.luxuryGold,
                   ),
                 ),
               ),
@@ -137,41 +137,48 @@ class _TopicChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.ink.withValues(alpha: 0.10)),
+          color: AppColors.luxurySurface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 6),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  topic.topic.length > 10
-                      ? '${topic.topic.substring(0, 10)}..'
-                      : topic.topic,
-                  style: GoogleFonts.workSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(color: AppColors.luxuryBorder.withValues(alpha: 0.4), width: 0.5),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    topic.topic.length > 10
+                        ? '${topic.topic.substring(0, 10)}..'
+                        : topic.topic,
+                    style: GoogleFonts.nunito(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.luxuryEspresso,
+                    ),
                   ),
-                ),
-                Text(
-                  '${topic.total} từ · ${topic.masteryPercent.round()}%',
-                  style: GoogleFonts.ibmPlexMono(
-                    fontSize: 10,
-                    color: AppColors.inkSoft,
+                  Text(
+                    '${topic.total} tu · ${topic.masteryPercent.round()}%',
+                    style: GoogleFonts.nunito(
+                      fontSize: 10,
+                      color: AppColors.luxuryText,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

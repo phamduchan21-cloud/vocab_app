@@ -17,6 +17,105 @@ import '../widgets/loading_widget.dart';
 import '../widgets/flashcard_topic_sheet.dart';
 import '../widgets/speaker_button.dart';
 
+// ─── Entry animation (spring cubic) ────────────────────
+class _EntryAnimation extends StatefulWidget {
+  final Widget child;
+  const _EntryAnimation({required this.child});
+
+  @override
+  State<_EntryAnimation> createState() => _EntryAnimationState();
+}
+
+class _EntryAnimationState extends State<_EntryAnimation>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fade = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(position: _slide, child: widget.child),
+    );
+  }
+}
+
+// ─── Double-bezel card wrapper ─────────────────────────
+class _DoubleBezel extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final double borderRadius;
+
+  const _DoubleBezel({
+    required this.child,
+    this.padding,
+    this.borderRadius = 20,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final innerPad = padding ?? const EdgeInsets.all(24);
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: AppColors.luxuryBorder, width: 1.2),
+      ),
+      padding: const EdgeInsets.all(2),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius - 2),
+          border: Border.all(
+            color: AppColors.luxuryBorder.withValues(alpha: 0.45),
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius - 3),
+          child: Padding(padding: innerPad, child: child),
+        ),
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// FlashcardScreen
+// ════════════════════════════════════════════════════════
+
 class FlashcardScreen extends StatefulWidget {
   const FlashcardScreen({super.key});
 
@@ -44,7 +143,7 @@ class _FlashcardScreenState extends State<FlashcardScreen>
     );
     _flipAnimation = CurvedAnimation(
       parent: _flipController,
-      curve: Curves.easeInOutCubic,
+      curve: const Cubic(0.42, 0.0, 0.58, 1.0),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FlashcardProvider>().loadDeck();
@@ -112,7 +211,10 @@ class _FlashcardScreenState extends State<FlashcardScreen>
   void _startAutoPlay(int deckLength) {
     _autoPlayTimer?.cancel();
     _autoPlayTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (!mounted) { timer.cancel(); return; }
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       if (!_isFlipped) {
         _toggleFlip();
         Future.delayed(const Duration(milliseconds: 2500), () {
@@ -158,73 +260,80 @@ class _FlashcardScreenState extends State<FlashcardScreen>
         const SingleActivator(LogicalKeyboardKey.arrowUp): _toggleFlip,
         const SingleActivator(LogicalKeyboardKey.arrowDown): _toggleFlip,
         const SingleActivator(LogicalKeyboardKey.space): _toggleFlip,
-        const SingleActivator(LogicalKeyboardKey.digit1): () => _handleReview(deck[_currentIndex], 1),
-        const SingleActivator(LogicalKeyboardKey.digit2): () => _handleReview(deck[_currentIndex], 3),
-        const SingleActivator(LogicalKeyboardKey.digit3): () => _handleReview(deck[_currentIndex], 5),
+        const SingleActivator(LogicalKeyboardKey.digit1):
+            () => _handleReview(deck[_currentIndex], 1),
+        const SingleActivator(LogicalKeyboardKey.digit2):
+            () => _handleReview(deck[_currentIndex], 3),
+        const SingleActivator(LogicalKeyboardKey.digit3):
+            () => _handleReview(deck[_currentIndex], 5),
       },
       child: Focus(
         autofocus: true,
         child: Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          flashcard.selectedTopic == 'all'
-              ? 'Tất cả chủ đề'
-              : flashcard.selectedTopic,
-          style: GoogleFonts.workSans(
-            fontWeight: FontWeight.w600,
-            fontSize: 17,
-            color: AppColors.ink,
+          backgroundColor: AppColors.luxuryBg,
+          appBar: AppBar(
+            title: Text(
+              flashcard.selectedTopic == 'all'
+                  ? 'Tất cả chủ đề'
+                  : flashcard.selectedTopic,
+              style: GoogleFonts.nunito(
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
+                color: AppColors.luxuryEspresso,
+              ),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back,
+                  color: AppColors.luxuryEspresso),
+              onPressed: () => context.go('/'),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.shuffle),
+                color: flashcard.shuffleEnabled
+                    ? AppColors.luxuryGold
+                    : AppColors.luxuryTextHint,
+                onPressed: () => flashcard.toggleShuffle(),
+                tooltip: 'Xao tron',
+              ),
+              IconButton(
+                icon: Icon(_isAutoPlaying
+                    ? Icons.pause_circle_outline
+                    : Icons.play_circle_outline),
+                color: _isAutoPlaying
+                    ? AppColors.luxuryGold
+                    : AppColors.luxuryTextHint,
+                onPressed: () => _toggleAutoPlay(deck.length),
+                tooltip: _isAutoPlaying ? 'Dung tu dong' : 'Tu dong lat',
+              ),
+            ],
+          ),
+          bottomNavigationBar: const AppBottomNav(selectedIndex: 2),
+          body: SafeArea(
+            child: _EntryAnimation(
+              child: Column(
+                children: [
+                  _buildTopicBar(flashcard, deck.length),
+                  _buildSessionStats(flashcard),
+                  Expanded(child: _buildBody(flashcard, deck)),
+                ],
+              ),
+            ),
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.ink),
-          onPressed: () => context.go('/'),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.shuffle,
-              color: flashcard.shuffleEnabled ? AppColors.blue : AppColors.inkSoft,
-            ),
-            onPressed: () => flashcard.toggleShuffle(),
-            tooltip: 'Xáo trộn',
-          ),
-          IconButton(
-            icon: Icon(
-              _isAutoPlaying ? Icons.pause_circle_outline : Icons.play_circle_outline,
-              color: _isAutoPlaying ? AppColors.blue : AppColors.inkSoft,
-            ),
-            onPressed: () => _toggleAutoPlay(deck.length),
-            tooltip: _isAutoPlaying ? 'Dừng tự động' : 'Tự động lật',
-          ),
-        ],
-      ),
-      bottomNavigationBar: const AppBottomNav(selectedIndex: 2),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Topic bar + session stats
-            _buildTopicBar(flashcard, deck.length),
-            _buildSessionStats(flashcard),
-            // Flashcard body
-            Expanded(
-              child: _buildBody(flashcard, deck),
-            ),
-          ],
-        ),
-      ),
-    ),
       ),
     );
   }
 
   Widget _buildTopicBar(FlashcardProvider flashcard, int deckLength) {
     final topic = flashcard.selectedTopic;
-    final label = topic == 'all' ? 'Tất cả chủ đề' : topic;
-    final totalItems = flashcard.topicItemCount.values.fold<int>(0, (a, b) => a + b);
+    final label = topic == 'all' ? 'Tat ca chu de' : topic;
+    final totalItems =
+        flashcard.topicItemCount.values.fold<int>(0, (a, b) => a + b);
     final isAll = topic == 'all';
-    final displayCount = isAll ? totalItems : (flashcard.topicItemCount[topic] ?? deckLength);
+    final displayCount = isAll
+        ? totalItems
+        : (flashcard.topicItemCount[topic] ?? deckLength);
     final mastery = flashcard.getTopicMastery(topic);
 
     return GestureDetector(
@@ -233,17 +342,19 @@ class _FlashcardScreenState extends State<FlashcardScreen>
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
         child: Row(
           children: [
-            // Mastery ring
             SizedBox(
-              width: 24, height: 24,
+              width: 24,
+              height: 24,
               child: CircularProgressIndicator(
                 value: mastery,
                 strokeWidth: 2.5,
-                backgroundColor: AppColors.surfaceContainerHighest,
+                backgroundColor: AppColors.luxuryBorder,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  mastery < 0.33 ? AppColors.danger
-                      : mastery < 0.66 ? AppColors.warning
-                      : AppColors.success,
+                  mastery < 0.33
+                      ? AppColors.luxuryDanger
+                      : mastery < 0.66
+                          ? AppColors.luxuryGold
+                          : AppColors.luxuryGreen,
                 ),
               ),
             ),
@@ -251,18 +362,22 @@ class _FlashcardScreenState extends State<FlashcardScreen>
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.workSans(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.ink,
+                style: GoogleFonts.nunito(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.luxuryEspresso,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.keyboard_arrow_down, color: AppColors.inkSoft, size: 20),
+            Icon(Icons.keyboard_arrow_down,
+                color: AppColors.luxuryText, size: 20),
             const SizedBox(width: 8),
             Text(
-              '$displayCount thẻ',
-              style: GoogleFonts.ibmPlexMono(
-                fontSize: 11, color: AppColors.ink.withValues(alpha: 0.45),
+              '$displayCount the',
+              style: GoogleFonts.nunito(
+                fontSize: 11,
+                color: AppColors.luxuryTextHint,
               ),
             ),
           ],
@@ -277,26 +392,35 @@ class _FlashcardScreenState extends State<FlashcardScreen>
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.blueBg,
+        color: AppColors.luxuryBrown.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          const Text('📊', style: TextStyle(fontSize: 14)),
+          Text('\u{1F4CA}',
+              style: GoogleFonts.nunito(fontSize: 14)),
           const SizedBox(width: 8),
           Text(
-            'Hôm nay: ${flashcard.sessionReviewed} thẻ',
-            style: GoogleFonts.ibmPlexMono(
-              fontSize: 11, color: AppColors.blue, fontWeight: FontWeight.w600,
+            'Hom nay: ${flashcard.sessionReviewed} the',
+            style: GoogleFonts.nunito(
+              fontSize: 11,
+              color: AppColors.luxuryBrown,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(width: 12),
-          Container(width: 1, height: 14, color: AppColors.blue.withValues(alpha: 0.2)),
+          Container(
+            width: 1,
+            height: 14,
+            color: AppColors.luxuryBrown.withValues(alpha: 0.2),
+          ),
           const SizedBox(width: 12),
           Text(
-            'Chính xác: ${flashcard.sessionAccuracy}%',
-            style: GoogleFonts.ibmPlexMono(
-              fontSize: 11, color: AppColors.blue, fontWeight: FontWeight.w600,
+            'Chinh xac: ${flashcard.sessionAccuracy}%',
+            style: GoogleFonts.nunito(
+              fontSize: 11,
+              color: AppColors.luxuryBrown,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -316,9 +440,9 @@ class _FlashcardScreenState extends State<FlashcardScreen>
     }
     if (deck.isEmpty) {
       return const EmptyStateWidget(
-        title: 'Chưa có từ vựng cho flashcard',
-        subtitle: 'Thêm từ mới hoặc chọn chủ đề khác.',
-        action: 'Mở danh sách từ',
+        title: 'Chua co tu vung cho flashcard',
+        subtitle: 'Them tu moi hoac chon chu de khac.',
+        action: 'Mo danh sach tu',
         showCat: true,
       );
     }
@@ -333,19 +457,21 @@ class _FlashcardScreenState extends State<FlashcardScreen>
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       child: Column(
         children: [
-          // Progress bar
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.blueBg,
+                  color: AppColors.luxuryBrown.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${_currentIndex + 1} / ${deck.length}',
-                  style: GoogleFonts.ibmPlexMono(
-                    fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.blue,
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.luxuryBrown,
                   ),
                 ),
               ),
@@ -356,8 +482,9 @@ class _FlashcardScreenState extends State<FlashcardScreen>
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: AppColors.surfaceContainerHighest,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.blue),
+                    backgroundColor: AppColors.luxuryBorder,
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(AppColors.luxuryBrown),
                   ),
                 ),
               ),
@@ -365,7 +492,8 @@ class _FlashcardScreenState extends State<FlashcardScreen>
               IconButton(
                 icon: Icon(
                   _isAutoPlaying ? Icons.pause : Icons.play_arrow,
-                  color: AppColors.inkSoft, size: 20,
+                  color: AppColors.luxuryText,
+                  size: 20,
                 ),
                 onPressed: () => _toggleAutoPlay(deck.length),
                 padding: EdgeInsets.zero,
@@ -375,7 +503,6 @@ class _FlashcardScreenState extends State<FlashcardScreen>
           ),
           const SizedBox(height: 20),
 
-          // Flashcard — Stitch 4:3 aspect ratio with 3D flip
           Expanded(
             child: GestureDetector(
               onHorizontalDragEnd: (details) {
@@ -387,7 +514,8 @@ class _FlashcardScreenState extends State<FlashcardScreen>
                 }
               },
               onVerticalDragEnd: (details) {
-                if (details.primaryVelocity != null && details.primaryVelocity! > 500) {
+                if (details.primaryVelocity != null &&
+                    details.primaryVelocity! > 500) {
                   context.go('/');
                 }
               },
@@ -409,7 +537,8 @@ class _FlashcardScreenState extends State<FlashcardScreen>
                           child: isBack
                               ? Transform(
                                   alignment: Alignment.center,
-                                  transform: Matrix4.identity()..rotateY(math.pi),
+                                  transform:
+                                      Matrix4.identity()..rotateY(math.pi),
                                   child: _FlashcardBack(cardItem: cardItem),
                                 )
                               : _FlashcardFront(cardItem: cardItem),
@@ -424,35 +553,39 @@ class _FlashcardScreenState extends State<FlashcardScreen>
 
           const SizedBox(height: 16),
 
-          // Review buttons — Stitch grid style
           if (!_isAutoPlaying) ...[
             _isFlipped
                 ? _buildReviewButtons(cardItem)
                 : Text(
-                    'Chạm để lật thẻ',
-                    style: GoogleFonts.workSans(
-                      fontSize: 12, color: AppColors.textHint,
+                    'Cham de lat the',
+                    style: GoogleFonts.nunito(
+                      fontSize: 12,
+                      color: AppColors.luxuryTextHint,
                     ),
                   ),
             const SizedBox(height: 12),
-
-            // Navigation arrows
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  onPressed: _currentIndex > 0 ? () => _go(-1, deck.length) : null,
-                  icon: Icon(Icons.chevron_left, color: AppColors.inkSoft),
+                  onPressed:
+                      _currentIndex > 0 ? () => _go(-1, deck.length) : null,
+                  icon: Icon(Icons.chevron_left,
+                      color: AppColors.luxuryTextHint),
                 ),
                 Text(
-                  'Chạm để lật',
-                  style: GoogleFonts.workSans(
-                    fontSize: 12, color: AppColors.inkSoft.withValues(alpha: 0.6),
+                  'Cham de lat',
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    color: AppColors.luxuryTextHint.withValues(alpha: 0.6),
                   ),
                 ),
                 IconButton(
-                  onPressed: _currentIndex < deck.length - 1 ? () => _go(1, deck.length) : null,
-                  icon: Icon(Icons.chevron_right, color: AppColors.inkSoft),
+                  onPressed: _currentIndex < deck.length - 1
+                      ? () => _go(1, deck.length)
+                      : null,
+                  icon: Icon(Icons.chevron_right,
+                      color: AppColors.luxuryTextHint),
                 ),
               ],
             ),
@@ -464,19 +597,25 @@ class _FlashcardScreenState extends State<FlashcardScreen>
 
   Widget _buildReviewButtons(dynamic cardItem) {
     final buttons = [
-      _ReviewButtonData('😵', 'Lại quên', 0, AppColors.danger, AppColors.dangerBg),
-      _ReviewButtonData('🤔', 'Hơi khó', 2, AppColors.warning, AppColors.warningBg),
-      _ReviewButtonData('😊', 'Nhớ rồi', 4, AppColors.success, AppColors.successBg),
-      _ReviewButtonData('🔥', 'Dễ ợt', 5, AppColors.blue, AppColors.blueBg),
+      _ReviewButtonData(
+          '1F635', 'Lai quen', 0, AppColors.luxuryDanger, AppColors.luxuryDanger.withValues(alpha: 0.08)),
+      _ReviewButtonData(
+          '1F914', 'Hoi kho', 2, AppColors.luxuryGold, AppColors.luxuryGold.withValues(alpha: 0.08)),
+      _ReviewButtonData(
+          '1F60A', 'Nho roi', 4, AppColors.luxuryGreen, AppColors.luxuryGreen.withValues(alpha: 0.08)),
+      _ReviewButtonData(
+          '1F525', 'De ot', 5, AppColors.luxuryBrown, AppColors.luxuryBrown.withValues(alpha: 0.08)),
     ];
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
+      switchInCurve: const Cubic(0.34, 1.56, 0.64, 1),
       child: _isReviewing
           ? const Center(
               key: ValueKey('loading'),
               child: SizedBox(
-                width: 20, height: 20,
+                width: 20,
+                height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             )
@@ -488,7 +627,8 @@ class _FlashcardScreenState extends State<FlashcardScreen>
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
               childAspectRatio: 1.2,
-              children: buttons.map((b) => _buildReviewButton(cardItem, b)).toList(),
+              children:
+                  buttons.map((b) => _buildReviewButton(cardItem, b)).toList(),
             ),
     );
   }
@@ -512,8 +652,10 @@ class _FlashcardScreenState extends State<FlashcardScreen>
               const SizedBox(height: 2),
               Text(
                 data.label,
-                style: GoogleFonts.workSans(
-                  fontSize: 11, fontWeight: FontWeight.w600, color: data.color,
+                style: GoogleFonts.nunito(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: data.color,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -531,7 +673,8 @@ class _ReviewButtonData {
   final int quality;
   final Color color;
   final Color bgColor;
-  const _ReviewButtonData(this.emoji, this.label, this.quality, this.color, this.bgColor);
+  const _ReviewButtonData(
+      this.emoji, this.label, this.quality, this.color, this.bgColor);
 }
 
 class _FlashcardItem {
@@ -541,18 +684,28 @@ class _FlashcardItem {
   final String? example;
   final String topic;
 
-  _FlashcardItem({this.id, required this.word, required this.meaning, this.example, this.topic = 'general'});
+  _FlashcardItem(
+      {this.id,
+      required this.word,
+      required this.meaning,
+      this.example,
+      this.topic = 'general'});
 
   factory _FlashcardItem.fromDynamic(dynamic item) {
     if (item is Vocabulary) {
       return _FlashcardItem(
-        id: item.id, word: item.word, meaning: item.meaning,
-        example: item.example, topic: item.topic,
+        id: item.id,
+        word: item.word,
+        meaning: item.meaning,
+        example: item.example,
+        topic: item.topic,
       );
     }
     return _FlashcardItem(
-      word: item.word as String, meaning: item.meaning as String,
-      example: item.example as String?, topic: item.topic as String? ?? 'general',
+      word: item.word as String,
+      meaning: item.meaning as String,
+      example: item.example as String?,
+      topic: item.topic as String? ?? 'general',
     );
   }
 }
@@ -564,33 +717,24 @@ class _FlashcardFront extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
+    return _DoubleBezel(
+      borderRadius: 20,
+      padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Topic badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.blueBg,
+              color: AppColors.luxuryBrown.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               cardItem.topic,
-              style: GoogleFonts.ibmPlexMono(
-                fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.blue,
+              style: GoogleFonts.nunito(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.luxuryBrown,
               ),
             ),
           ),
@@ -598,24 +742,28 @@ class _FlashcardFront extends StatelessWidget {
           Text(
             cardItem.word,
             textAlign: TextAlign.center,
-            style: GoogleFonts.workSans(
-              fontSize: 30, fontWeight: FontWeight.w700, color: AppColors.ink,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryEspresso,
             ),
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.blueBg,
+              color: AppColors.luxuryBrown.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(32),
             ),
-            child: SpeakerButton(text: cardItem.word, size: 24, color: AppColors.blue),
+            child: SpeakerButton(
+                text: cardItem.word, size: 24, color: AppColors.luxuryBrown),
           ),
           const SizedBox(height: 20),
           Text(
-            'Chạm để lật thẻ',
-            style: GoogleFonts.workSans(
-              fontSize: 12, color: AppColors.textHint,
+            'Cham de lat the',
+            style: GoogleFonts.nunito(
+              fontSize: 12,
+              color: AppColors.luxuryTextHint,
             ),
           ),
         ],
@@ -631,56 +779,49 @@ class _FlashcardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
+    return _DoubleBezel(
+      borderRadius: 20,
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            cardItem.meaning,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryEspresso,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '/${cardItem.word.toLowerCase()}/',
+            style: GoogleFonts.nunito(
+              fontSize: 13,
+              color: AppColors.luxuryText,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+            child: Divider(
+              height: 1,
+              color: AppColors.luxuryBorder,
+            ),
+          ),
+          Text(
+            cardItem.example?.isNotEmpty == true
+                ? '"${cardItem.example!}"'
+                : 'Chua co cau vi du.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(
+              fontSize: 14,
+              fontStyle: FontStyle.italic,
+              color: AppColors.luxuryText,
+              height: 1.5,
+            ),
           ),
         ],
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                cardItem.meaning,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.workSans(
-                  fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.ink,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '/${cardItem.word.toLowerCase()}/',
-                style: GoogleFonts.ibmPlexMono(
-                  fontSize: 13, color: AppColors.onSurfaceVariant,
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                child: Divider(height: 1),
-              ),
-              Text(
-                cardItem.example?.isNotEmpty == true
-                    ? '"${cardItem.example!}"'
-                    : 'Chưa có câu ví dụ.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.workSans(
-                  fontSize: 14, fontStyle: FontStyle.italic,
-                  color: AppColors.inkSoft, height: 1.5,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

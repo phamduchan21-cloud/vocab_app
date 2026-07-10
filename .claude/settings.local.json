@@ -53,7 +53,14 @@
       "Bash(unzip -l stitch_creative_design_workspace.zip)",
       "Bash(unzip -o stitch_creative_design_workspace.zip -d stitch_designs)",
       "Bash(pip list *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(unzip -l \"Vocabulary iOS Onboarding.zip\")",
+      "Bash(powershell -Command \"Expand-Archive -Path 'Vocabulary iOS Onboarding.zip' -DestinationPath 'Vocabulary_iOS_Onboarding_tmp' -Force; Get-ChildItem -Recurse 'Vocabulary_iOS_Onboarding_tmp'\")",
+      "PowerShell(Stop-Process *)",
+      "Bash(netstat -ano)",
+      "Bash(flutter clean *)",
+      "Bash(flutter run *)",
+      "Bash(flutter pub *)"
     ]
   },
   "enabledPlugins": {

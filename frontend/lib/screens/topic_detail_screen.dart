@@ -58,7 +58,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
       appBar: AppBar(
         title: Text(
           _topicName ?? 'Từ vựng chủ đề',
-          style: GoogleFonts.workSans(
+          style: GoogleFonts.nunito(
             fontWeight: FontWeight.w600,
             fontSize: 18,
             color: AppColors.ink,
@@ -82,7 +82,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                     icon: const Icon(Icons.play_arrow_rounded, size: 18),
                     label: Text(
                       'Làm quiz',
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -119,7 +119,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
       return Center(
         child: Text(
           'Chưa có từ vựng cho chủ đề này.',
-          style: GoogleFonts.workSans(fontSize: 16, color: AppColors.inkSoft),
+          style: GoogleFonts.nunito(fontSize: 16, color: AppColors.inkSoft),
         ),
       );
     }
@@ -197,7 +197,7 @@ class _VocabCardTile extends StatelessWidget {
                         Flexible(
                           child: Text(
                             item.word,
-                            style: GoogleFonts.workSans(
+                            style: GoogleFonts.nunito(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
                               color: AppColors.ink,
@@ -219,9 +219,9 @@ class _VocabCardTile extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       item.meaning,
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                         fontSize: 15,
-                        color: AppColors.blue,
+                        color: AppColors.rose,
                       ),
                     ),
                   ],
@@ -230,7 +230,7 @@ class _VocabCardTile extends StatelessWidget {
               IconButton(
                 onPressed: onAdd,
                 icon: const Icon(Icons.add_circle_outline),
-                color: AppColors.blue,
+                color: AppColors.rose,
                 tooltip: 'Thêm vào từ của tôi',
               ),
             ],
@@ -245,7 +245,7 @@ class _VocabCardTile extends StatelessWidget {
               ),
               child: Text(
                 item.example!,
-                style: GoogleFonts.workSans(
+                style: GoogleFonts.nunito(
                   fontSize: 13,
                   fontStyle: FontStyle.italic,
                   color: AppColors.inkSoft,

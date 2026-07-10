@@ -2,17 +2,20 @@ class MockTestQuestion {
   final String question;
   final List<String> options;
   final String correctAnswer;
+  final String? explanation;
 
   MockTestQuestion({
     required this.question,
     required this.options,
     required this.correctAnswer,
+    this.explanation,
   });
 
   factory MockTestQuestion.fromJson(Map<String, dynamic> json) => MockTestQuestion(
         question: json['question'] ?? '',
         options: (json['options'] as List?)?.map((o) => o.toString()).toList() ?? [],
         correctAnswer: json['correctAnswer'] ?? '',
+        explanation: json['explanation'],
       );
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app.dart';
 
 class CatWidget extends StatelessWidget {
   final double size;
@@ -38,11 +39,11 @@ class _CatPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final scale = size.width / 120;
-    final purple = const Color(0xFF7C3AED);
-    final pink = const Color(0xFFEC4899);
+    final purple = AppColors.lavender;
+    final pink = AppColors.lavender;
     final darkPurple = const Color(0xFF5B21B6);
     final white = Colors.white;
-    final lightPurple = const Color(0xFFEDE9FE);
+    final lightPurple = AppColors.rose.withValues(alpha: 0.10);
 
     // === Body ===
     final bodyPaint = Paint()..color = purple;

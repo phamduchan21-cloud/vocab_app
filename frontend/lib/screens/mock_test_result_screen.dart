@@ -22,7 +22,7 @@ class MockTestResultScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Kết quả thi thử',
-          style: GoogleFonts.workSans(
+          style: GoogleFonts.nunito(
             fontWeight: FontWeight.w600,
             fontSize: 18,
             color: AppColors.ink,
@@ -52,7 +52,7 @@ class MockTestResultScreen extends StatelessWidget {
             // ── Title ─────────────────────────────────────
             Text(
               'Hoàn thành bài kiểm tra!',
-              style: GoogleFonts.workSans(
+              style: GoogleFonts.nunito(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
                 color: AppColors.ink,
@@ -61,7 +61,7 @@ class MockTestResultScreen extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               'Bạn đạt trình độ $level',
-              style: GoogleFonts.workSans(
+              style: GoogleFonts.nunito(
                 fontSize: 15,
                 color: AppColors.inkSoft,
               ),
@@ -126,7 +126,7 @@ class MockTestResultScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         grade,
-                        style: GoogleFonts.workSans(
+                        style: GoogleFonts.nunito(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: levelColor,
@@ -141,7 +141,7 @@ class MockTestResultScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Trình độ $level · Xếp loại $grade',
-                          style: GoogleFonts.workSans(
+                          style: GoogleFonts.nunito(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.ink,
@@ -150,7 +150,7 @@ class MockTestResultScreen extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           _levelDescription(level),
-                          style: GoogleFonts.workSans(
+                          style: GoogleFonts.nunito(
                             fontSize: 13,
                             color: AppColors.inkSoft,
                           ),
@@ -172,7 +172,7 @@ class MockTestResultScreen extends StatelessWidget {
                     icon: const Icon(Icons.home_rounded, size: 20),
                     label: Text(
                       'Về trang chủ',
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -196,13 +196,13 @@ class MockTestResultScreen extends StatelessWidget {
                     icon: const Icon(Icons.refresh_rounded, size: 20),
                     label: Text(
                       'Làm lại',
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.nunito(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.blue,
+                      backgroundColor: AppColors.rose,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -236,7 +236,7 @@ class MockTestResultScreen extends StatelessWidget {
           ),
           Text(
             label,
-            style: GoogleFonts.workSans(
+            style: GoogleFonts.nunito(
               fontSize: 12,
               color: AppColors.inkSoft,
             ),
@@ -266,7 +266,7 @@ class MockTestResultScreen extends StatelessWidget {
       case 'C1':
         return AppColors.success;
       case 'B2':
-        return AppColors.blue;
+        return AppColors.rose;
       case 'B1':
         return AppColors.warning;
       case 'A2':

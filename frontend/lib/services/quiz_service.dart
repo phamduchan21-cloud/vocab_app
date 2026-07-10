@@ -39,6 +39,7 @@ class QuizService {
     required String quizType,
     required List<Map<String, dynamic>> answers,
     String? topic,
+    String? skillType,
   }) async {
     final body = <String, dynamic>{
       'quiz_type': quizType,
@@ -46,6 +47,9 @@ class QuizService {
     };
     if (topic != null && topic.isNotEmpty && topic != 'all') {
       body['topic'] = topic;
+    }
+    if (skillType != null && skillType.isNotEmpty) {
+      body['skill_type'] = skillType;
     }
 
     final response = await _api.post('/api/quiz/submit', body: body);

@@ -114,6 +114,7 @@ class VocabularyResponse(BaseModel):
     times_correct: int = 0
     times_wrong: int = 0
     lesson_id: Optional[int] = None
+    is_bookmarked: bool = False
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

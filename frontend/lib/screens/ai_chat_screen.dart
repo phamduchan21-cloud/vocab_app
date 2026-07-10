@@ -99,7 +99,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
               Container(
                 width: 32, height: 32,
                 decoration: BoxDecoration(
-                  color: AppColors.blueBg,
+                  color: AppColors.rose.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Center(child: Text('🤖', style: TextStyle(fontSize: 18))),
@@ -119,12 +119,12 @@ class _AIChatScreenState extends State<AIChatScreen> {
           ),
           const SizedBox(width: 10),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Meu - Trợ lý AI', style: GoogleFonts.workSans(fontWeight: FontWeight.w600, fontSize: 17, color: AppColors.ink)),
+            Text('Meu - Trợ lý AI', style: GoogleFonts.nunito(fontWeight: FontWeight.w600, fontSize: 17, color: AppColors.ink)),
             Row(children: [
               Container(width: 6, height: 6, decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.success)),
               const SizedBox(width: 4),
               Text(_isLoading ? 'Đang suy nghĩ...' : 'Online',
-                  style: GoogleFonts.workSans(fontSize: 11, color: _isLoading ? AppColors.warning : AppColors.success)),
+                  style: GoogleFonts.nunito(fontSize: 11, color: _isLoading ? AppColors.warning : AppColors.success)),
             ]),
           ]),
         ]),
@@ -156,7 +156,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
               const SizedBox(width: 8),
-              Text('Meu đang trả lời...', style: GoogleFonts.workSans(fontSize: 12, color: AppColors.inkSoft)),
+              Text('Meu đang trả lời...', style: GoogleFonts.nunito(fontSize: 12, color: AppColors.inkSoft)),
             ]),
           ),
         // Input — Stitch glassmorphism
@@ -205,13 +205,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
                       controller: _messageController,
                       decoration: InputDecoration(
                         hintText: 'Hỏi Meu về từ vựng...',
-                        hintStyle: GoogleFonts.workSans(color: AppColors.textHint, fontSize: 14),
+                        hintStyle: GoogleFonts.nunito(color: AppColors.textHint, fontSize: 14),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      style: GoogleFonts.workSans(fontSize: 14, color: AppColors.ink),
+                      style: GoogleFonts.nunito(fontSize: 14, color: AppColors.ink),
                       maxLines: 3, minLines: 1,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (v) => _sendMessage(v),
@@ -228,7 +228,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
             ),
             const SizedBox(width: 8),
             Material(
-              color: AppColors.blue,
+              color: AppColors.rose,
               borderRadius: BorderRadius.circular(24),
               child: InkWell(
                 onTap: () => _sendMessage(_messageController.text),
@@ -254,7 +254,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.outlineVariant),
         ),
-        child: Text(label, style: GoogleFonts.workSans(fontSize: 13, color: AppColors.onSurfaceVariant)),
+        child: Text(label, style: GoogleFonts.nunito(fontSize: 13, color: AppColors.onSurfaceVariant)),
       ),
     );
   }
@@ -286,7 +286,7 @@ class _MessageBubble extends StatelessWidget {
             if (!message.isUser) ...[
               Container(
                 width: 28, height: 28,
-                decoration: BoxDecoration(color: AppColors.blueBg, borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: AppColors.rose.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(8)),
                 child: const Center(child: Text('🤖', style: TextStyle(fontSize: 16))),
               ),
               const SizedBox(width: 8),
@@ -296,7 +296,7 @@ class _MessageBubble extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: message.isUser ? AppColors.blue : AppColors.surface,
+                    color: message.isUser ? AppColors.rose : AppColors.surface,
                     borderRadius: BorderRadius.circular(18).copyWith(
                       bottomRight: message.isUser ? const Radius.circular(4) : null,
                       bottomLeft: !message.isUser ? const Radius.circular(4) : null,
@@ -304,14 +304,14 @@ class _MessageBubble extends StatelessWidget {
                     border: message.isUser ? null : Border.all(color: AppColors.surfaceContainerHighest),
                     boxShadow: message.isUser ? null : [BoxShadow(color: AppColors.ink.withValues(alpha: 0.04), blurRadius: 8)],
                   ),
-                  child: Text(message.text, style: GoogleFonts.workSans(
+                  child: Text(message.text, style: GoogleFonts.nunito(
                     fontSize: 14, height: 1.5,
                     color: message.isUser ? Colors.white : AppColors.ink,
                   )),
                 ),
                 const SizedBox(height: 4),
                 // Timestamp
-                Text('12:00', style: GoogleFonts.workSans(fontSize: 11, color: AppColors.inkSoft)),
+                Text('12:00', style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft)),
               ]),
             ),
             if (message.isUser) const SizedBox(width: 8),
@@ -328,10 +328,10 @@ class _MessageBubble extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.blueBg,
+                  color: AppColors.rose.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(s, style: GoogleFonts.workSans(fontSize: 12, color: AppColors.blue, fontWeight: FontWeight.w500)),
+                child: Text(s, style: GoogleFonts.nunito(fontSize: 12, color: AppColors.rose, fontWeight: FontWeight.w500)),
               ),
             )).toList()),
           ),

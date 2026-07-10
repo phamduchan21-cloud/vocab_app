@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app.dart';
 
-/// A reusable bottom sheet for selecting a study topic.
-///
-/// Shows a searchable grid of topics with word counts.
-/// Can be invoked from flashcard, quiz, or any topic-picker context.
+/// Editorial-luxury bottom sheet for selecting a study topic.
+/// Double-bezel tiles with gold accent and playfair headings.
 class FlashcardTopicSheet extends StatefulWidget {
   final List<String> topics;
   final Map<String, int> topicItemCount;
@@ -70,9 +68,9 @@ class _FlashcardTopicSheetState extends State<FlashcardTopicSheet> {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.65,
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
@@ -82,7 +80,7 @@ class _FlashcardTopicSheetState extends State<FlashcardTopicSheet> {
             child: Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: AppColors.ink.withValues(alpha: 0.18),
+                color: AppColors.luxuryBorder,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -93,19 +91,19 @@ class _FlashcardTopicSheetState extends State<FlashcardTopicSheet> {
             child: Row(
               children: [
                 Text(
-                  'Chọn chủ đề',
-                  style: GoogleFonts.workSans(
-                    fontSize: 18,
+                  'Chon chu de',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.ink,
+                    color: AppColors.luxuryEspresso,
                   ),
                 ),
                 const Spacer(),
                 Text(
-                  '$totalItems thẻ',
-                  style: GoogleFonts.ibmPlexMono(
+                  '$totalItems the',
+                  style: GoogleFonts.nunito(
                     fontSize: 12,
-                    color: AppColors.inkSoft,
+                    color: AppColors.luxuryText,
                   ),
                 ),
               ],
@@ -116,22 +114,22 @@ class _FlashcardTopicSheetState extends State<FlashcardTopicSheet> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: AppColors.luxuryBg,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Tìm chủ đề...',
-                  hintStyle: GoogleFonts.workSans(color: AppColors.textHint, fontSize: 14),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.textHint, size: 20),
+                  hintText: 'Tim chu de...',
+                  hintStyle: GoogleFonts.nunito(color: AppColors.luxuryTextHint, fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: AppColors.luxuryTextHint, size: 20),
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear, color: AppColors.textHint, size: 18),
+                          icon: Icon(Icons.clear, color: AppColors.luxuryTextHint, size: 18),
                           onPressed: () {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
@@ -148,10 +146,10 @@ class _FlashcardTopicSheetState extends State<FlashcardTopicSheet> {
             child: filtered.isEmpty
                 ? Center(
                     child: Text(
-                      'Không tìm thấy chủ đề phù hợp',
-                      style: GoogleFonts.workSans(
+                      'Khong tim thay chu de phu hop',
+                      style: GoogleFonts.nunito(
                         fontSize: 14,
-                        color: AppColors.textHint,
+                        color: AppColors.luxuryTextHint,
                       ),
                     ),
                   )
@@ -170,7 +168,7 @@ class _FlashcardTopicSheetState extends State<FlashcardTopicSheet> {
                       final count = topic == 'all'
                           ? totalItems
                           : (widget.topicItemCount[topic] ?? 0);
-                      final label = topic == 'all' ? 'Tất cả' : topic;
+                      final label = topic == 'all' ? 'Tat ca' : _topicLabel(topic);
                       // Emoji mapping for common topics
                       final emoji = _topicEmoji(topic);
 
@@ -217,6 +215,16 @@ class _FlashcardTopicSheetState extends State<FlashcardTopicSheet> {
     }
     return '📖';
   }
+
+  String _topicLabel(String topic) {
+    const labels = {
+      'family': 'Gia đình & Bạn bè',
+      'travel': 'Du lịch',
+      'work': 'Công việc & Nghề nghiệp',
+      'food': 'Ẩm thực',
+    };
+    return labels[topic] ?? topic;
+  }
 }
 
 class _TopicTile extends StatelessWidget {
@@ -236,51 +244,70 @@ class _TopicTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final activeColor = isSelected ? AppColors.luxuryGold : AppColors.luxuryBrown;
+
     return Material(
-      color: isSelected ? AppColors.blueBg : AppColors.surface,
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
+            color: AppColors.luxurySurface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isSelected
-                  ? AppColors.blue.withValues(alpha: 0.4)
-                  : AppColors.ink.withValues(alpha: 0.08),
+                  ? AppColors.luxuryGold.withValues(alpha: 0.5)
+                  : AppColors.luxuryBorder,
+              width: 1.5,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 28)),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.workSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? AppColors.blue : AppColors.ink,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '$count thẻ',
-                    style: GoogleFonts.ibmPlexMono(
-                      fontSize: 11,
-                      color: AppColors.inkSoft,
-                    ),
-                  ),
-                ],
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.luxuryGold.withValues(alpha: 0.2)
+                    : AppColors.luxuryBorder.withValues(alpha: 0.4),
+                width: 0.5,
               ),
-            ],
+              color: isSelected
+                  ? AppColors.luxuryGold.withValues(alpha: 0.05)
+                  : Colors.transparent,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 28)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: activeColor,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$count the',
+                      style: GoogleFonts.nunito(
+                        fontSize: 11,
+                        color: AppColors.luxuryText,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

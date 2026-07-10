@@ -18,8 +18,8 @@ class SkeletonLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: const Color(0xFFE5E7EB),
-      highlightColor: const Color(0xFFF3F4F6),
+      baseColor: AppColors.luxuryBorder,
+      highlightColor: AppColors.luxurySurface,
       child: _buildByType(),
     );
   }
@@ -137,19 +137,19 @@ class LoadingWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 48,
             height: 48,
             child: CircularProgressIndicator(
               strokeWidth: 4,
-              color: AppColors.primary,
+              color: AppColors.luxuryBrown,
             ),
           ),
           if (message != null) ...[
             const SizedBox(height: 20),
             Text(
               message!,
-              style: GoogleFonts.workSans(fontSize: 16, color: AppColors.inkSoft),
+              style: GoogleFonts.nunito(fontSize: 16, color: AppColors.luxuryText),
             ),
           ],
         ],

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/cat_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -12,30 +13,61 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _usernameController = TextEditingController();
+class _RegisterScreenState extends State<RegisterScreen>
+    with SingleTickerProviderStateMixin {
+  final _usernameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _obscurePassword = true;
+  bool _obscurePass = true;
   bool _obscureConfirm = true;
+
+  late final AnimationController _animCtrl;
+  late final Animation<double> _fadeIn;
+  late final Animation<Offset> _slideUp;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeIn = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animCtrl,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    _slideUp = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animCtrl,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    _animCtrl.forward();
+  }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _usernameController.dispose();
+    _usernameCtrl.dispose();
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
+    _confirmCtrl.dispose();
+    _animCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
     await context.read<AuthProvider>().register(
-      _emailController.text.trim(),
-      _passwordController.text,
-      _usernameController.text.trim(),
+      _emailCtrl.text.trim(),
+      _passCtrl.text,
+      _usernameCtrl.text.trim(),
     );
   }
 
@@ -44,202 +76,243 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: AppTheme.secondaryGradient,
-        ),
-        child: Stack(
-          children: [
-            // Decorative blur elements
-            Positioned(
-              top: -80,
-              left: -40,
-              child: Container(
-                width: 280,
-                height: 280,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
+      backgroundColor: AppColors.luxuryBg,
+      body: Stack(
+        children: [
+          Positioned(
+            top: -80, left: -40,
+            child: Container(
+              width: 280, height: 280,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.luxuryBrown.withValues(alpha: 0.04),
               ),
             ),
-            Positioned(
-              bottom: -60,
-              right: -60,
-              child: Container(
-                width: 260,
-                height: 260,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.10),
-                ),
+          ),
+          Positioned(
+            bottom: -80, right: -60,
+            child: Container(
+              width: 300, height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.luxuryBrown.withValues(alpha: 0.03),
               ),
             ),
-            SafeArea(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: FadeTransition(
+                opacity: _fadeIn,
+                child: SlideTransition(
+                  position: _slideUp,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Back button
+                      const SizedBox(height: 16),
+
+                      // Back — Double-Bezel
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back_rounded,
-                              color: Colors.white),
-                          onPressed: () => context.go('/login'),
+                        child: GestureDetector(
+                          onTap: () => context.go('/login'),
+                          child: Container(
+                            padding: const EdgeInsets.all(1.5),
+                            decoration: BoxDecoration(
+                              color: AppColors.luxuryBrown.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(
+                                color: AppColors.luxuryBorder,
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: AppColors.luxurySurface,
+                                borderRadius: BorderRadius.circular(26.5),
+                              ),
+                              child: const Icon(
+                                Icons.arrow_back_rounded,
+                                color: AppColors.luxuryEspresso,
+                                size: 20,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 8),
 
-                      // Icon
+                      const SizedBox(height: 24),
+
+                      // Cat — Double-Bezel
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(1.5),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(24),
+                          color: AppColors.luxuryBrown.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: AppColors.luxuryBorder,
+                            width: 0.5,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.auto_stories_rounded,
-                          size: 48,
-                          color: Colors.white,
+                        child: Container(
+                          width: 88,
+                          height: 88,
+                          decoration: BoxDecoration(
+                            color: AppColors.luxurySurface,
+                            borderRadius: BorderRadius.circular(26.5),
+                          ),
+                          child: const CatWidget(
+                            size: 80,
+                            expression: CatExpression.happy,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+
+                      const SizedBox(height: 20),
 
                       // Title
                       Text(
-                        'Tạo tài khoản',
-                        style: GoogleFonts.nunito(
+                        'Tao tai khoan',
+                        style: GoogleFonts.playfairDisplay(
                           fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.luxuryEspresso,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Text(
-                        'Đăng ký để bắt đầu hành trình',
+                        'Dang ky de bat dau hanh trinh',
                         style: GoogleFonts.nunito(
-                          fontSize: 16,
-                          color: Colors.white.withValues(alpha: 0.85),
+                          fontSize: 15,
+                          color: AppColors.luxuryText,
                         ),
                       ),
+
                       const SizedBox(height: 28),
 
-                      // Glassmorphism card
+                      // Form card
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.95),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 40,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
+                          color: AppColors.luxurySurface,
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: AppColors.luxuryBorder,
+                            width: 0.5,
+                          ),
                         ),
                         child: Form(
                           key: _formKey,
                           child: Column(
                             children: [
-                              // Username
                               TextFormField(
-                                controller: _usernameController,
+                                controller: _usernameCtrl,
                                 decoration: const InputDecoration(
-                                  labelText: 'Tên người dùng',
+                                  labelText: 'Ten nguoi dung',
                                   prefixIcon: Icon(Icons.person_outlined),
                                 ),
-                                validator: (v) => v == null || v.trim().isEmpty
-                                    ? 'Vui lòng nhập tên'
-                                    : null,
+                                validator: (v) =>
+                                    v == null || v.trim().isEmpty
+                                        ? 'Vui long nhap ten'
+                                        : null,
                               ),
                               const SizedBox(height: 14),
-
-                              // Email
                               TextFormField(
-                                controller: _emailController,
+                                controller: _emailCtrl,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: const InputDecoration(
                                   labelText: 'Email',
                                   prefixIcon: Icon(Icons.email_outlined),
                                 ),
                                 validator: (v) {
-                                  if (v == null || v.trim().isEmpty) return 'Vui lòng nhập email';
-                                  if (!v.contains('@')) return 'Email không hợp lệ';
+                                  if (v == null || v.trim().isEmpty) {
+                                    return 'Vui long nhap email';
+                                  }
+                                  if (!v.contains('@')) {
+                                    return 'Email khong hop le';
+                                  }
                                   return null;
                                 },
                               ),
                               const SizedBox(height: 14),
-
-                              // Password
                               TextFormField(
-                                controller: _passwordController,
-                                obscureText: _obscurePassword,
+                                controller: _passCtrl,
+                                obscureText: _obscurePass,
                                 decoration: InputDecoration(
-                                  labelText: 'Mật khẩu',
-                                  prefixIcon: const Icon(Icons.lock_outlined),
+                                  labelText: 'Mat khau',
+                                  prefixIcon:
+                                      const Icon(Icons.lock_outlined),
                                   suffixIcon: IconButton(
-                                    icon: Icon(_obscurePassword
+                                    icon: Icon(_obscurePass
                                         ? Icons.visibility_off_outlined
                                         : Icons.visibility_outlined),
                                     onPressed: () => setState(
-                                        () => _obscurePassword = !_obscurePassword),
+                                        () => _obscurePass =
+                                            !_obscurePass),
                                   ),
                                 ),
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) return 'Vui lòng nhập mật khẩu';
-                                  if (v.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
+                                  if (v == null || v.isEmpty) {
+                                    return 'Vui long nhap mat khau';
+                                  }
+                                  if (v.length < 6) {
+                                    return 'Mat khau phai co it nhat 6 ky tu';
+                                  }
                                   return null;
                                 },
                               ),
                               const SizedBox(height: 14),
-
-                              // Confirm password
                               TextFormField(
-                                controller: _confirmPasswordController,
+                                controller: _confirmCtrl,
                                 obscureText: _obscureConfirm,
                                 decoration: InputDecoration(
-                                  labelText: 'Xác nhận mật khẩu',
-                                  prefixIcon: const Icon(Icons.lock_outlined),
+                                  labelText: 'Xac nhan mat khau',
+                                  prefixIcon:
+                                      const Icon(Icons.lock_outlined),
                                   suffixIcon: IconButton(
                                     icon: Icon(_obscureConfirm
                                         ? Icons.visibility_off_outlined
                                         : Icons.visibility_outlined),
                                     onPressed: () => setState(
-                                        () => _obscureConfirm = !_obscureConfirm),
+                                        () => _obscureConfirm =
+                                            !_obscureConfirm),
                                   ),
                                 ),
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) return 'Vui lòng xác nhận mật khẩu';
-                                  if (v != _passwordController.text) return 'Mật khẩu xác nhận không khớp';
+                                  if (v == null || v.isEmpty) {
+                                    return 'Vui long xac nhan mat khau';
+                                  }
+                                  if (v != _passCtrl.text) {
+                                    return 'Mat khau xac nhan khong khop';
+                                  }
                                   return null;
                                 },
                               ),
 
-                              // Error
                               if (auth.errorMessage != null) ...[
                                 const SizedBox(height: 14),
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: AppColors.dangerBg,
-                                    borderRadius: BorderRadius.circular(12),
+                                    color: AppColors.luxuryDanger.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(28),
+                                    border: Border.all(
+                                      color: AppColors.luxuryDanger.withValues(alpha: 0.2),
+                                      width: 0.5,
+                                    ),
                                   ),
                                   child: Row(
                                     children: [
                                       const Icon(Icons.error_outline,
-                                          color: AppColors.danger, size: 20),
+                                          color: AppColors.luxuryDanger, size: 20),
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
                                           auth.errorMessage!,
-                                          style: GoogleFonts.workSans(
-                                              color: AppColors.danger, fontSize: 14),
+                                          style: GoogleFonts.nunito(
+                                              color: AppColors.luxuryDanger,
+                                              fontSize: 13),
                                         ),
                                       ),
                                     ],
@@ -249,32 +322,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                               const SizedBox(height: 20),
 
-                              // Register button
+                              // Register button — Button-in-Button
                               SizedBox(
                                 width: double.infinity,
-                                height: 54,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    gradient: AppTheme.primaryButtonGradient,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primary.withValues(alpha: 0.3),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: auth.isLoading ? null : _register,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      shadowColor: Colors.transparent,
+                                height: 56,
+                                child: GestureDetector(
+                                  onTap: auth.isLoading ? null : _register,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(28),
+                                      gradient: AppColors.luxuryGradient,
                                     ),
-                                    child: auth.isLoading
-                                        ? const SizedBox(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        if (auth.isLoading)
+                                          const SizedBox(
                                             width: 22,
                                             height: 22,
                                             child: CircularProgressIndicator(
@@ -282,7 +345,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                               color: Colors.white,
                                             ),
                                           )
-                                        : const Text('Đăng ký'),
+                                        else ...[
+                                          Text(
+                                            'Dang ky',
+                                            style: GoogleFonts.nunito(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            width: 28,
+                                            height: 28,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white.withValues(alpha: 0.15),
+                                            ),
+                                            child: const Icon(
+                                              Icons.arrow_forward_rounded,
+                                              size: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -298,20 +386,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Đã có tài khoản? ',
+                            'Da co tai khoan? ',
                             style: GoogleFonts.nunito(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              fontSize: 15,
+                              color: AppColors.luxuryText,
+                              fontSize: 14,
                             ),
                           ),
                           GestureDetector(
                             onTap: () => context.go('/login'),
                             child: Text(
-                              'Đăng nhập',
+                              'Dang nhap',
                               style: GoogleFonts.nunito(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
+                                color: AppColors.luxuryBrown,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                                 decoration: TextDecoration.underline,
                               ),
                             ),
@@ -323,8 +411,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

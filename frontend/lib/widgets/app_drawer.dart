@@ -20,15 +20,15 @@ class AppDrawer extends StatelessWidget {
 
     return Drawer(
       child: Container(
-        color: AppColors.surface,
+        color: AppColors.luxurySurface,
         child: Column(
           children: [
-            // â”€â”€â”€ Header: Dark sidebar style â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // ─── Header: Dark editorial sidebar ──────────────
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 48, 20, 24),
               decoration: const BoxDecoration(
-                color: AppColors.ink,
+                gradient: AppColors.luxuryGradientDark,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,15 +38,15 @@ class AppDrawer extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: AppColors.blue,
+                      color: AppColors.luxuryGold,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       avatarLetter,
-                      style: GoogleFonts.workSans(
+                      style: GoogleFonts.playfairDisplay(
                         fontWeight: FontWeight.w700,
-                        fontSize: 20,
+                        fontSize: 22,
                         color: Colors.white,
                       ),
                     ),
@@ -54,9 +54,9 @@ class AppDrawer extends StatelessWidget {
                   const SizedBox(height: 14),
                   Text(
                     username,
-                    style: GoogleFonts.workSans(
+                    style: GoogleFonts.playfairDisplay(
                       color: const Color(0xFFEDE6D3),
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -64,8 +64,8 @@ class AppDrawer extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       email,
-                      style: GoogleFonts.workSans(
-                        color: const Color(0xFF9AA3B8),
+                      style: GoogleFonts.nunito(
+                        color: AppColors.luxuryBrownPale,
                         fontSize: 13,
                       ),
                     ),
@@ -73,7 +73,7 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            // â”€â”€â”€ Menu items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // ─── Menu items ────────────────────────────────
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -121,22 +121,25 @@ class AppDrawer extends StatelessWidget {
                     '/profile',
                   ),
                   const SizedBox(height: 8),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Divider(height: 1),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Divider(
+                      height: 1,
+                      color: AppColors.luxuryBorder.withValues(alpha: 0.6),
+                    ),
                   ),
                   _buildLogoutItem(context),
                 ],
               ),
             ),
-            // â”€â”€â”€ Version â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // ─── Version ──────────────────────────────────
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
                 'VocaEng v1.0.0',
-                style: GoogleFonts.ibmPlexMono(
+                style: GoogleFonts.nunito(
                   fontSize: 11,
-                  color: AppColors.textHint,
+                  color: AppColors.luxuryTextHint,
                 ),
               ),
             ),
@@ -168,7 +171,7 @@ class AppDrawer extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: isActive ? AppColors.surfaceSubtle : Colors.transparent,
+              color: isActive ? AppColors.luxuryBeige.withValues(alpha: 0.3) : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -176,15 +179,15 @@ class AppDrawer extends StatelessWidget {
                 Icon(
                   icon,
                   size: 18,
-                  color: isActive ? AppColors.ink : AppColors.inkSoft,
+                  color: isActive ? AppColors.luxuryEspresso : AppColors.luxuryText,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   title,
-                  style: GoogleFonts.workSans(
+                  style: GoogleFonts.nunito(
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                    color: isActive ? AppColors.ink : AppColors.textSecondary,
+                    color: isActive ? AppColors.luxuryEspresso : AppColors.luxuryText,
                   ),
                 ),
                 const Spacer(),
@@ -192,7 +195,7 @@ class AppDrawer extends StatelessWidget {
                   Icon(
                     Icons.chevron_right,
                     size: 16,
-                    color: AppColors.textHint,
+                    color: AppColors.luxuryTextHint,
                   ),
               ],
             ),
@@ -220,15 +223,15 @@ class AppDrawer extends StatelessWidget {
                 Icon(
                   Icons.logout_rounded,
                   size: 18,
-                  color: AppColors.danger,
+                  color: AppColors.luxuryDanger,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'Đăng xuất',
-                  style: GoogleFonts.workSans(
+                  style: GoogleFonts.nunito(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.danger,
+                    color: AppColors.luxuryDanger,
                   ),
                 ),
               ],

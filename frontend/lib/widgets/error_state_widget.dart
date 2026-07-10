@@ -26,19 +26,19 @@ class ErrorStateWidget extends StatelessWidget {
             const CatWidget(size: 100, expression: CatExpression.sad),
             const SizedBox(height: 24),
             Text(
-              'Rất tiếc!',
-              style: GoogleFonts.workSans(
+              'Rat tiec!',
+              style: GoogleFonts.playfairDisplay(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: AppColors.luxuryEspresso,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: GoogleFonts.workSans(
+              style: GoogleFonts.nunito(
                 fontSize: 15,
-                color: AppColors.inkSoft,
+                color: AppColors.luxuryText,
               ),
               textAlign: TextAlign.center,
             ),
@@ -46,9 +46,9 @@ class ErrorStateWidget extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 subtitle!,
-                style: GoogleFonts.workSans(
+                style: GoogleFonts.nunito(
                   fontSize: 14,
-                  color: AppColors.textHint,
+                  color: AppColors.luxuryTextHint,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -61,10 +61,10 @@ class ErrorStateWidget extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    gradient: AppTheme.primaryButtonGradient,
+                    gradient: AppColors.luxuryGradientLight,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
+                        color: AppColors.luxuryBrown.withValues(alpha: 0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -73,7 +73,7 @@ class ErrorStateWidget extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: onRetry,
                     icon: const Icon(Icons.refresh_rounded, size: 20),
-                    label: const Text('Thá»­ láº¡i'),
+                    label: const Text('Thu lai'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       foregroundColor: Colors.white,
