@@ -1,11 +1,18 @@
 import uuid
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
 
-from models import UserDailyActivity, UserAchievement, User, Vocabulary
+from models import (
+    MockTest,
+    QuizResult,
+    UserDailyActivity,
+    UserAchievement,
+    User,
+    Vocabulary,
+)
 from schemas import (
     RecordActivityRequest,
     RecordActivityResponse,
@@ -37,8 +44,11 @@ XP_REWARDS = {
 OTHER_ACHIEVEMENTS = {
     "first_word": {"title": "🌱 Bắt Đầu", "desc": "Thêm từ vựng đầu tiên", "icon": "seedling"},
     "word_50": {"title": "📚 50 Từ Vựng", "desc": "Đã thêm 50 từ", "icon": "books"},
-    "word_200": {"title": "📖 200 Từ Vựng", "desc": "Đã thêm 200 từ", "icon": "dictionary"},
+    "word_100": {"title": "📖 100 Từ Vựng", "desc": "Đã học 100 từ", "icon": "dictionary"},
+    "word_500": {"title": "📮 500 Từ Vựng", "desc": "Đã học 500 từ", "icon": "postbox"},
+    "word_1000": {"title": "🗺️ 1000 Từ Vựng", "desc": "Đã học 1000 từ", "icon": "map"},
     "perfect_quiz": {"title": "🎯 Hoàn Hảo", "desc": "Quiz đạt 100%", "icon": "star"},
+    "perfect_mini_test": {"title": "💌 Bưu Kiện Hoàn Hảo", "desc": "Mini Test đạt 100%", "icon": "letter"},
     "quiz_10": {"title": "🎮 10 Quiz", "desc": "Đã làm 10 bài quiz", "icon": "gamepad"},
     "night_owl": {"title": "🦉 Cú Đêm", "desc": "Học sau 10 giờ tối", "icon": "moon"},
 }
@@ -329,7 +339,11 @@ class GamificationService:
         vocab_count = await self.db.scalar(vocab_count_query) or 0
 
         word_milestones = [
-            (1, "first_word"), (50, "word_50"), (200, "word_200"),
+            (1, "first_word"),
+            (50, "word_50"),
+            (100, "word_100"),
+            (500, "word_500"),
+            (1000, "word_1000"),
         ]
         for count, key in word_milestones:
             if vocab_count >= count and not await self._has_achievement(user_id, key):
@@ -353,5 +367,57 @@ class GamificationService:
                     icon=ach.icon,
                     unlocked_at=ach.unlocked_at,
                 ))
+
+        quiz_count = await self.db.scalar(
+            select(func.count()).select_from(QuizResult).where(
+                QuizResult.user_id == user_id
+            )
+        ) or 0
+        mock_test_count = await self.db.scalar(
+            select(func.count()).select_from(MockTest).where(
+                MockTest.user_id == user_id
+            )
+        ) or 0
+        perfect_quiz = await self.db.scalar(
+            select(func.count()).select_from(QuizResult).where(
+                QuizResult.user_id == user_id,
+                QuizResult.score_percent >= 100,
+            )
+        ) or 0
+        perfect_mini_test = await self.db.scalar(
+            select(func.count()).select_from(MockTest).where(
+                MockTest.user_id == user_id,
+                MockTest.score_percent >= 100,
+            )
+        ) or 0
+        other_checks = [
+            (quiz_count + mock_test_count >= 10, "quiz_10"),
+            (perfect_quiz > 0, "perfect_quiz"),
+            (perfect_mini_test > 0, "perfect_mini_test"),
+            (datetime.now().hour >= 22, "night_owl"),
+        ]
+        for achieved, key in other_checks:
+            if not achieved or await self._has_achievement(user_id, key):
+                continue
+            info = OTHER_ACHIEVEMENTS[key]
+            achievement = UserAchievement(
+                id=str(uuid.uuid4()),
+                user_id=user_id,
+                achievement_key=key,
+                title=info["title"],
+                description=info["desc"],
+                icon=info["icon"],
+            )
+            self.db.add(achievement)
+            await self.db.commit()
+            await self.db.refresh(achievement)
+            new_ones.append(AchievementResponse(
+                id=str(achievement.id),
+                achievement_key=achievement.achievement_key,
+                title=achievement.title,
+                description=achievement.description,
+                icon=achievement.icon,
+                unlocked_at=achievement.unlocked_at,
+            ))
 
         return new_ones

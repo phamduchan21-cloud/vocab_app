@@ -1,3 +1,35 @@
+## Ponytail Mode (bat buoc)
+
+Nguon: https://github.com/DietrichGebert/ponytail
+
+Ponytail la che do "lazy senior developer": hieu day du van de, sau do chon giai phap nho nhat thuc su dung. Mac dinh ap dung muc `full` cho moi tac vu code trong du an.
+
+Truoc khi viet code, dung o bac dau tien dap ung duoc yeu cau:
+
+1. Tinh nang nay co that su can ton tai khong? Neu khong, bo qua theo YAGNI.
+2. Codebase da co helper, service, widget, provider hoac pattern phu hop chua? Neu co, tai su dung.
+3. Standard library co giai quyet duoc khong? Neu co, dung no.
+4. Native platform hoac native widget co ho tro khong? Neu co, dung no.
+5. Dependency da cai co giai quyet duoc khong? Neu co, tai su dung; khong them dependency moi neu co the tranh.
+6. Co the giai quyet dung bang mot dong khong? Neu co, dung mot dong.
+7. Chi sau do moi viet phan code toi thieu hoat dong dung.
+
+Quy tac thuc thi:
+
+- Doc task va trace luong thuc te end-to-end truoc khi chon giai phap; "lazy" khong co nghia la bo qua viec hieu code.
+- Sua loi o nguyen nhan goc. Kiem tra moi caller cua ham/service dung chung va sua mot lan tai diem chung neu co the.
+- Khong tao abstraction, boilerplate, scaffolding hoac config "de sau nay" neu khong duoc yeu cau.
+- Uu tien xoa hon them, boring hon clever, it file hon nhieu file, diff ngan nhat nhung phai dung cho.
+- Neu hai cach ngan nhu nhau, chon cach dung hon o edge case.
+- Khong toi gian hoa input validation tai trust boundary, error handling ngan mat du lieu, security, accessibility hoac bat ky yeu cau nao user noi ro.
+- Logic khong tam thuong phai de lai mot kiem tra nho nhat co the chay; one-liner tam thuong khong can test rieng.
+- Neu co tinh gian co chu dich voi gioi han that, them comment `ponytail:` neu ro gioi han va khi nao can nang cap.
+- Khi user yeu cau day du hon, thuc hien dung yeu cau va khong tranh luan lai.
+
+Che do: `lite` chi neu phuong an gon hon; `full` (mac dinh) bat buoc theo ladder; `ultra` uu tien YAGNI va deletion toi da. Tat khi user noi `stop ponytail` hoac `normal mode`.
+
+---
+
 # 🛡️ QUY TẮC & LUẬT LỆ DỰ ÁN — MeuBeu
 
 > **File này quy định bắt buộc trước khi code.** Đọc kỹ trước khi thực hiện bất kỳ thay đổi nào.

@@ -4,10 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
-import '../providers/dashboard_provider.dart';
+import '../models/quiz_topic.dart';
 import '../providers/quiz_provider.dart';
 import '../widgets/app_bottom_nav.dart';
-import '../widgets/flashcard_topic_sheet.dart';
 import '../services/ai_service.dart';
 import '../services/api_service.dart';
 
@@ -29,11 +28,31 @@ class _QuizListScreenState extends State<QuizListScreen>
   late final Animation<Offset> _slideAnim;
 
   static const _skillTypes = [
-    _SkillTypeData('all', '📚', 'Tất cả'),
-    _SkillTypeData('vocabulary', '📖', 'Từ vựng'),
-    _SkillTypeData('grammar', '📐', 'Ngữ pháp'),
-    _SkillTypeData('reading', '📝', 'Đọc hiểu'),
-    _SkillTypeData('listening', '👂', 'Nghe hiểu'),
+    _SkillTypeData('all', Icons.auto_awesome, 'Kết hợp', 'Đủ 4 kỹ năng'),
+    _SkillTypeData(
+      'vocabulary',
+      Icons.menu_book_rounded,
+      'Từ vựng',
+      'Từ và nghĩa',
+    ),
+    _SkillTypeData(
+      'grammar',
+      Icons.account_tree_outlined,
+      'Ngữ pháp',
+      'Cấu trúc câu',
+    ),
+    _SkillTypeData(
+      'reading',
+      Icons.chrome_reader_mode_outlined,
+      'Đọc hiểu',
+      'Đọc và suy luận',
+    ),
+    _SkillTypeData(
+      'listening',
+      Icons.headphones_rounded,
+      'Nghe hiểu',
+      'Giọng Anh-Mỹ',
+    ),
   ];
 
   @override
@@ -52,10 +71,6 @@ class _QuizListScreenState extends State<QuizListScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<QuizProvider>().fetchCategories();
-      final dashboard = context.read<DashboardProvider>();
-      if (dashboard.data == null && !dashboard.isLoading) {
-        dashboard.loadDashboard();
-      }
     });
   }
 
@@ -87,39 +102,17 @@ class _QuizListScreenState extends State<QuizListScreen>
       context.go('/quiz/play');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('AI không khả dụng: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('AI không khả dụng: $e')));
     }
-  }
-
-  void _openTopicSheet() {
-    final quiz = context.read<QuizProvider>();
-    final dashboard = context.read<DashboardProvider>();
-    // Lấy topics từ từ vựng người dùng + question bank topics
-    final userTopics = dashboard.data?.topics.map((item) => item.topic).toList() ?? [];
-    const bankTopics = ['family', 'travel', 'work', 'food'];
-    final allTopics = <String>{...userTopics, ...bankTopics};
-    final topics = allTopics.toList()..sort();
-    final topicItemCount = <String, int>{};
-    if (dashboard.data != null) {
-      for (final t in dashboard.data!.topics) {
-        topicItemCount[t.topic] = t.total;
-      }
-    }
-
-    FlashcardTopicSheet.show(
-      context,
-      topics: topics,
-      topicItemCount: topicItemCount,
-      selectedTopic: quiz.selectedTopic,
-      onTopicChanged: (topic) => quiz.setTopic(topic),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final quiz = context.watch<QuizProvider>();
+    final pageWidth = MediaQuery.sizeOf(context).width;
+    final pagePadding = ((pageWidth - 1120) / 2).clamp(20.0, 48.0);
 
     return Scaffold(
       backgroundColor: AppColors.luxuryBg,
@@ -141,7 +134,7 @@ class _QuizListScreenState extends State<QuizListScreen>
         child: SlideTransition(
           position: _slideAnim,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            padding: EdgeInsets.fromLTRB(pagePadding, 16, pagePadding, 32),
             children: [
               // ─── Hero Card (luxury gradient) ───────────
               Container(
@@ -172,7 +165,10 @@ class _QuizListScreenState extends State<QuizListScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.18),
                               borderRadius: BorderRadius.circular(20),
@@ -265,16 +261,25 @@ class _QuizListScreenState extends State<QuizListScreen>
                   decoration: BoxDecoration(
                     color: AppColors.luxuryDanger.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.luxuryDanger.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: AppColors.luxuryDanger.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: AppColors.luxuryDanger, size: 18),
+                      const Icon(
+                        Icons.error_outline,
+                        color: AppColors.luxuryDanger,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           quiz.errorMessage!,
-                          style: GoogleFonts.nunito(fontSize: 13, color: AppColors.luxuryDanger),
+                          style: GoogleFonts.nunito(
+                            fontSize: 13,
+                            color: AppColors.luxuryDanger,
+                          ),
                         ),
                       ),
                     ],
@@ -317,44 +322,101 @@ class _QuizListScreenState extends State<QuizListScreen>
             ),
             const SizedBox(height: 12),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 10,
+              runSpacing: 10,
               children: _skillTypes.map((st) {
                 final selected = _selectedSkillType == st.key;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedSkillType = st.key),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? AppColors.luxuryBrown.withValues(alpha: 0.10)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: selected ? AppColors.luxuryBrown : AppColors.luxuryBorder,
-                        width: selected ? 1.5 : 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(st.emoji, style: const TextStyle(fontSize: 14)),
-                        const SizedBox(width: 6),
-                        Text(
-                          st.label,
-                          style: GoogleFonts.nunito(
-                            fontSize: 13,
-                            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                            color: selected ? AppColors.luxuryBrown : AppColors.luxuryText,
+                return Semantics(
+                  button: true,
+                  selected: selected,
+                  label: 'Kỹ năng ${st.label}',
+                  child: SizedBox(
+                    width: 148,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () => setState(() => _selectedSkillType = st.key),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? AppColors.luxuryBrown.withValues(alpha: 0.09)
+                              : AppColors.luxuryBg,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: selected
+                                ? AppColors.luxuryBrown
+                                : AppColors.luxuryBorder,
+                            width: selected ? 1.8 : 1,
                           ),
                         ),
-                      ],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              st.icon,
+                              size: 22,
+                              color: selected
+                                  ? AppColors.luxuryBrown
+                                  : AppColors.luxuryText,
+                            ),
+                            const SizedBox(height: 9),
+                            Text(
+                              st.label,
+                              style: GoogleFonts.nunito(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.luxuryEspresso,
+                              ),
+                            ),
+                            Text(
+                              st.description,
+                              style: GoogleFonts.nunito(
+                                fontSize: 11,
+                                color: AppColors.luxuryText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 );
               }).toList(),
             ),
+
+            if (_selectedSkillType == 'listening') ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.luxuryGold.withValues(alpha: 0.09),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.luxuryGold.withValues(alpha: 0.28),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.graphic_eq_rounded,
+                      color: AppColors.luxuryBrown,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Bạn sẽ nghe đúng đoạn hội thoại tiếng Anh bằng giọng Anh-Mỹ rõ ràng, sau đó chọn đáp án.',
+                        style: GoogleFonts.nunito(
+                          fontSize: 12,
+                          color: AppColors.luxuryEspresso,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
 
             const SizedBox(height: 20),
             Container(height: 1.5, color: AppColors.luxuryBorder),
@@ -370,35 +432,7 @@ class _QuizListScreenState extends State<QuizListScreen>
               ),
             ),
             const SizedBox(height: 12),
-            GestureDetector(
-              onTap: _openTopicSheet,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: AppColors.luxuryBg,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.luxuryBorder),
-                ),
-                child: Row(
-                  children: [
-                    const Text('📚', style: TextStyle(fontSize: 18)),
-                    const SizedBox(width: 10),
-                    Text(
-                      quiz.selectedTopic == 'all'
-                          ? 'Tất cả chủ đề'
-                          : quiz.selectedTopic,
-                      style: GoogleFonts.nunito(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.luxuryEspresso,
-                      ),
-                    ),
-                    const Spacer(),
-                    Icon(Icons.keyboard_arrow_down, color: AppColors.luxuryText, size: 20),
-                  ],
-                ),
-              ),
-            ),
+            _buildTopicGrid(quiz),
 
             const SizedBox(height: 20),
 
@@ -442,41 +476,159 @@ class _QuizListScreenState extends State<QuizListScreen>
     );
   }
 
+  Widget _buildTopicGrid(QuizProvider quiz) {
+    final topics = <QuizTopic>[
+      const QuizTopic(key: 'all', label: 'Tất cả chủ đề'),
+      ...quiz.topics,
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = (constraints.maxWidth - 10) / 2;
+        return Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: topics.map((topic) {
+            final selected = quiz.selectedTopic == topic.key;
+            return SizedBox(
+              width: cardWidth,
+              child: Semantics(
+                button: true,
+                selected: selected,
+                label: 'Chủ đề ${topic.label}',
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(13),
+                  onTap: () => quiz.setTopic(topic.key),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? AppColors.luxuryBrown.withValues(alpha: 0.09)
+                          : AppColors.luxuryBg,
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(
+                        color: selected
+                            ? AppColors.luxuryBrown
+                            : AppColors.luxuryBorder,
+                        width: selected ? 1.8 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: _topicColor(
+                              topic.key,
+                            ).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            _topicIcon(topic.key),
+                            size: 18,
+                            color: _topicColor(topic.key),
+                          ),
+                        ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: Text(
+                            topic.label,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.nunito(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.luxuryEspresso,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                        if (selected)
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            size: 17,
+                            color: AppColors.luxuryBrown,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  IconData _topicIcon(String key) => switch (key) {
+    'family' => Icons.family_restroom_rounded,
+    'travel' => Icons.flight_takeoff_rounded,
+    'work' => Icons.work_outline_rounded,
+    'food' => Icons.restaurant_rounded,
+    'health' => Icons.favorite_outline_rounded,
+    'education' => Icons.school_outlined,
+    'technology' => Icons.devices_rounded,
+    'daily_life' => Icons.wb_sunny_outlined,
+    _ => Icons.grid_view_rounded,
+  };
+
+  Color _topicColor(String key) => switch (key) {
+    'health' => AppColors.luxuryDanger,
+    'education' => AppColors.luxuryGreen,
+    'food' => AppColors.luxuryGold,
+    'technology' => AppColors.luxuryBrown,
+    _ => AppColors.luxuryBrownLight,
+  };
+
   Widget _buildCountChip(String label, bool selected, VoidCallback onTap) {
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: selected ? AppColors.luxuryBrown : AppColors.luxurySurface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: selected ? AppColors.luxuryBrown : AppColors.luxuryBorder,
-              width: selected ? 1.5 : 1,
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: '$label câu hỏi',
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: selected ? AppColors.luxuryBrown : AppColors.luxurySurface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: selected
+                    ? AppColors.luxuryBrown
+                    : AppColors.luxuryBorder,
+                width: selected ? 1.5 : 1,
+              ),
             ),
-          ),
-          child: Column(
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.nunito(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? Colors.white : AppColors.luxuryEspresso,
+            child: Column(
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.nunito(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? Colors.white : AppColors.luxuryEspresso,
+                  ),
                 ),
-              ),
-              Text(
-                'câu hỏi',
-                style: GoogleFonts.nunito(
-                  fontSize: 11,
-                  color: selected
-                      ? Colors.white.withValues(alpha: 0.80)
-                      : AppColors.luxuryText,
+                Text(
+                  'câu hỏi',
+                  style: GoogleFonts.nunito(
+                    fontSize: 11,
+                    color: selected
+                        ? Colors.white.withValues(alpha: 0.80)
+                        : AppColors.luxuryText,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -590,7 +742,11 @@ class _QuizListScreenState extends State<QuizListScreen>
                         color: Colors.white.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 20),
+                      child: const Icon(
+                        Icons.smart_toy_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Text(
@@ -626,7 +782,10 @@ class _QuizListScreenState extends State<QuizListScreen>
                         borderRadius: BorderRadius.circular(999),
                         onTap: () => _startAIQuiz(quiz),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -647,7 +806,11 @@ class _QuizListScreenState extends State<QuizListScreen>
                                   color: Colors.white.withValues(alpha: 0.25),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                child: const Icon(Icons.auto_awesome, size: 14, color: Colors.white),
+                                child: const Icon(
+                                  Icons.auto_awesome,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
                               ),
                             ],
                           ),
@@ -688,7 +851,11 @@ class _QuizListScreenState extends State<QuizListScreen>
                 color: AppColors.luxuryGold.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(Icons.emoji_events_outlined, color: AppColors.luxuryGold, size: 24),
+              child: Icon(
+                Icons.emoji_events_outlined,
+                color: AppColors.luxuryGold,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 14),
             Column(
@@ -696,7 +863,10 @@ class _QuizListScreenState extends State<QuizListScreen>
               children: [
                 Text(
                   'Chuỗi Quiz',
-                  style: GoogleFonts.nunito(fontSize: 12, color: AppColors.luxuryText),
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    color: AppColors.luxuryText,
+                  ),
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -714,7 +884,10 @@ class _QuizListScreenState extends State<QuizListScreen>
                       padding: const EdgeInsets.only(bottom: 3),
                       child: Text(
                         'ngày',
-                        style: GoogleFonts.nunito(fontSize: 13, color: AppColors.luxuryText),
+                        style: GoogleFonts.nunito(
+                          fontSize: 13,
+                          color: AppColors.luxuryText,
+                        ),
                       ),
                     ),
                   ],
@@ -780,7 +953,11 @@ class _QuizListScreenState extends State<QuizListScreen>
                   score: '8/10',
                   scoreColor: AppColors.luxuryGreen,
                 ),
-                Container(height: 1.5, color: AppColors.luxuryBorder, margin: const EdgeInsets.symmetric(horizontal: 16)),
+                Container(
+                  height: 1.5,
+                  color: AppColors.luxuryBorder,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                ),
                 _RecentQuizItem(
                   icon: Icons.hearing,
                   iconBg: AppColors.luxuryBrownPale.withValues(alpha: 0.2),
@@ -809,9 +986,10 @@ class _QuizListScreenState extends State<QuizListScreen>
 
 class _SkillTypeData {
   final String key;
-  final String emoji;
+  final IconData icon;
   final String label;
-  const _SkillTypeData(this.key, this.emoji, this.label);
+  final String description;
+  const _SkillTypeData(this.key, this.icon, this.label, this.description);
 }
 
 class _RecentQuizItem extends StatelessWidget {
@@ -860,7 +1038,10 @@ class _RecentQuizItem extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: GoogleFonts.nunito(fontSize: 12, color: AppColors.luxuryText),
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    color: AppColors.luxuryText,
+                  ),
                 ),
               ],
             ),

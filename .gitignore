@@ -12,6 +12,7 @@ frontend/.dart_tool/
 frontend/.packages
 frontend/.pub/
 frontend/build/
+frontend/build_*/
 frontend/android/.gradle/
 frontend/android/local.properties
 frontend/ios/Pods/
@@ -29,6 +30,14 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+desktop.ini
+
+# Local run and verification artifacts
+backend/*.log
+backend/*.err
+backend/*.err.log
+frontend/*.err
+verify_output/
 
 .vercel
 .env*

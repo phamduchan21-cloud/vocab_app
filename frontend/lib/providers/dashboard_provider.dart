@@ -45,6 +45,10 @@ class DashboardProvider extends ChangeNotifier {
         _safeGet(() => _service.getSkills()),
       ]);
 
+      if (results.every((result) => result == null)) {
+        throw StateError('All dashboard requests failed');
+      }
+
       _data = DashboardData(
         stats: (results[0] as DashboardStats?) ?? DashboardStats(),
         review: (results[1] as TodayReviewData?) ?? TodayReviewData(),

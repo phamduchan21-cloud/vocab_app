@@ -99,7 +99,7 @@ class VocabularyService:
         await self.db.refresh(vocab)
         return vocab
 
-    async def update(self, id: str, user_id: str, word: Optional[str] = None, meaning: Optional[str] = None, example: Optional[str] = None, pronunciation: Optional[str] = None, topic: Optional[str] = None) -> Optional[Vocabulary]:
+    async def update(self, id: str, user_id: str, word: Optional[str] = None, meaning: Optional[str] = None, example: Optional[str] = None, pronunciation: Optional[str] = None, topic: Optional[str] = None, personal_note: Optional[str] = None) -> Optional[Vocabulary]:
         vocab = await self.get_by_id(id, user_id)
         if not vocab:
             return None
@@ -113,6 +113,8 @@ class VocabularyService:
             vocab.pronunciation = pronunciation
         if topic is not None:
             vocab.topic = topic
+        if personal_note is not None:
+            vocab.personal_note = personal_note
         await self.db.commit()
         await self.db.refresh(vocab)
         return vocab
@@ -141,21 +143,20 @@ class VocabularyService:
             return None
         ef = max(1.3, (vocab.ease_factor or 2.5) + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)))
         count = vocab.review_count or 0
+        previous_interval = vocab.review_interval or 0
         interval = 1
         if quality < 3:
             count = 0
         elif count == 0:
             interval, count = 1, 1
         elif count == 1:
-            interval, count = 3, 2
-        elif count == 2:
-            interval, count = 7, 3
-        elif count == 3:
-            interval, count = 16, 4
+            interval, count = 6, 2
         else:
-            interval, count = 30, count + 1
+            interval = max(1, round(max(previous_interval, 6) * ef))
+            count += 1
         vocab.ease_factor = round(ef, 2)
         vocab.review_count = count
+        vocab.review_interval = interval
         vocab.next_review_date = date.today() + timedelta(days=interval)
         if quality >= 3:
             vocab.times_correct = (vocab.times_correct or 0) + 1

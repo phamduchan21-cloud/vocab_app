@@ -42,7 +42,10 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text(
           'Xoá từ vựng',
-          style: GoogleFonts.nunito(fontWeight: FontWeight.w600, color: AppColors.ink),
+          style: GoogleFonts.nunito(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
         ),
         content: Text(
           'Bạn có chắc muốn xoá từ "${vocab.word}"?',
@@ -51,7 +54,13 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Huỷ', style: GoogleFonts.nunito(fontWeight: FontWeight.w600, color: AppColors.inkSoft)),
+            child: Text(
+              'Huỷ',
+              style: GoogleFonts.nunito(
+                fontWeight: FontWeight.w600,
+                color: AppColors.inkSoft,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -61,9 +70,14 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.danger,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-            child: Text('Xoá', style: GoogleFonts.nunito(fontWeight: FontWeight.w600)),
+            child: Text(
+              'Xoá',
+              style: GoogleFonts.nunito(fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -75,13 +89,11 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
     final vocabProvider = context.watch<VocabularyProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Từ vựng'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Từ vựng'), centerTitle: true),
       drawer: const AppDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/vocabulary/new'),
+        tooltip: 'Thêm từ mới',
         backgroundColor: AppColors.rose,
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
@@ -89,69 +101,92 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
       body: Column(
         children: [
           // Search + Filter
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Column(
-              children: [
-                // Search bar
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 880),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Column(
+                  children: [
+                    // Search bar
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm từ vựng...',
-                      hintStyle: GoogleFonts.nunito(color: AppColors.textHint),
-                      prefixIcon: const Icon(Icons.search, color: AppColors.textHint),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, color: AppColors.textHint),
-                              onPressed: () {
-                                _searchController.clear();
-                                vocabProvider.setSearch('');
-                                setState(() {});
-                              },
-                            )
-                          : null,
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Tìm kiếm từ vựng...',
+                          hintStyle: GoogleFonts.nunito(
+                            color: AppColors.textHint,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: AppColors.textHint,
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                          ),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    color: AppColors.textHint,
+                                  ),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    vocabProvider.setSearch('');
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
+                        ),
+                        onChanged: (value) {
+                          vocabProvider.setSearch(value);
+                          setState(() {});
+                        },
+                      ),
                     ),
-                    onChanged: (value) {
-                      vocabProvider.setSearch(value);
-                      setState(() {});
-                    },
-                  ),
+                    const SizedBox(height: 12),
+                    // Filter chips
+                    SizedBox(
+                      height: 38,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          _buildFilterChip(
+                            'Tất cả',
+                            vocabProvider.selectedTopic == 'all',
+                            () => vocabProvider.setTopic('all'),
+                          ),
+                          ...vocabProvider.topics.map(
+                            (topic) => _buildFilterChip(
+                              topic,
+                              vocabProvider.selectedTopic == topic,
+                              () => vocabProvider.setTopic(topic),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                // Filter chips
-                SizedBox(
-                  height: 38,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      _buildFilterChip('Tất cả', vocabProvider.selectedTopic == 'all', () => vocabProvider.setTopic('all')),
-                      ...vocabProvider.topics.map((topic) => _buildFilterChip(topic, vocabProvider.selectedTopic == topic, () => vocabProvider.setTopic(topic))),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           // Body
-          Expanded(
-            child: _buildBody(context, vocabProvider),
-          ),
+          Expanded(child: _buildBody(context, vocabProvider)),
         ],
       ),
     );
@@ -160,25 +195,22 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
   Widget _buildFilterChip(String label, bool selected, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            gradient: selected ? AppTheme.primaryGradient : null,
-            color: selected ? null : AppColors.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            label == 'all' ? 'Tất cả' : label,
-            style: GoogleFonts.nunito(
-              fontSize: 13,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-              color: selected ? Colors.white : AppColors.inkSoft,
-            ),
+      child: FilterChip(
+        selected: selected,
+        onSelected: (_) => onTap(),
+        showCheckmark: false,
+        label: Text(
+          label == 'all' ? 'Tất cả' : label,
+          style: GoogleFonts.nunito(
+            fontSize: 13,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected ? Colors.white : AppColors.inkSoft,
           ),
         ),
+        backgroundColor: AppColors.surfaceContainerHighest,
+        selectedColor: AppColors.rose,
+        side: BorderSide.none,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
       ),
     );
   }
@@ -217,17 +249,22 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
 
     return RefreshIndicator(
       onRefresh: () => provider.fetchAll(),
-      child: ListView.builder(
-        padding: const EdgeInsets.only(top: 4, bottom: 80),
-        itemCount: displayItems.length,
-        itemBuilder: (context, index) {
-          final vocab = displayItems[index];
-          return VocabCard(
-            vocab: vocab,
-            onEdit: () => context.push('/vocabulary/${vocab.id}/edit'),
-            onDelete: () => _confirmDelete(context, vocab),
-          );
-        },
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 880),
+          child: ListView.builder(
+            padding: const EdgeInsets.only(top: 4, bottom: 96),
+            itemCount: displayItems.length,
+            itemBuilder: (context, index) {
+              final vocab = displayItems[index];
+              return VocabCard(
+                vocab: vocab,
+                onEdit: () => context.push('/vocabulary/${vocab.id}/edit'),
+                onDelete: () => _confirmDelete(context, vocab),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

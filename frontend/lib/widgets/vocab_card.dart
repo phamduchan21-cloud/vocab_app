@@ -24,116 +24,120 @@ class VocabCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: AppColors.luxurySurface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
-      ),
+    return Semantics(
+      button: onEdit != null,
+      label: '${vocab.word}, nghĩa là ${vocab.meaning}',
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(11),
-          border: Border.all(color: AppColors.luxuryBorder.withValues(alpha: 0.4), width: 0.5),
+          color: AppColors.luxurySurface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
         ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(11),
-          onTap: onEdit,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            child: Row(
-              children: [
-                // Avatar letter
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: _topicColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      vocab.word.isNotEmpty ? vocab.word[0].toUpperCase() : '?',
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(
+              color: AppColors.luxuryBorder.withValues(alpha: 0.4),
+              width: 0.5,
+            ),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(11),
+            onTap: onEdit,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(
+                children: [
+                  // Avatar letter
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: _topicColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        vocab.word.isNotEmpty
+                            ? vocab.word[0].toUpperCase()
+                            : '?',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 14),
-                // Word + meaning
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        vocab.word,
-                        style: GoogleFonts.playfairDisplay(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: AppColors.luxuryEspresso,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        vocab.meaning,
-                        style: GoogleFonts.nunito(
-                          color: AppColors.luxuryText,
-                          fontSize: 14,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                // Topic badge + actions
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (vocab.topic.isNotEmpty && vocab.topic != 'general')
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: _topicColor.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          vocab.topic,
-                          style: GoogleFonts.nunito(
-                            fontSize: 10,
-                            color: _topicColor,
-                            fontWeight: FontWeight.w500,
+                  const SizedBox(width: 14),
+                  // Word + meaning
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          vocab.word,
+                          style: GoogleFonts.playfairDisplay(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: AppColors.luxuryEspresso,
                           ),
                         ),
-                      ),
-                    if (onEdit != null) ...[
-                      SpeakerButton(text: vocab.word, size: 26),
-                      const SizedBox(width: 4),
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 18),
-                        color: AppColors.luxuryText,
-                        onPressed: onEdit,
-                        splashRadius: 18,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                      ),
+                        const SizedBox(height: 2),
+                        Text(
+                          vocab.meaning,
+                          style: GoogleFonts.nunito(
+                            color: AppColors.luxuryText,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Compact actions keep the card readable on narrow screens.
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SpeakerButton(text: vocab.word, size: 40),
+                      if (onEdit != null || onDelete != null)
+                        PopupMenuButton<String>(
+                          tooltip: 'Tùy chọn cho ${vocab.word}',
+                          onSelected: (value) {
+                            if (value == 'edit') onEdit?.call();
+                            if (value == 'delete') onDelete?.call();
+                          },
+                          itemBuilder: (context) => [
+                            if (onEdit != null)
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: ListTile(
+                                  leading: Icon(Icons.edit_outlined),
+                                  title: Text('Chỉnh sửa'),
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
+                            if (onDelete != null)
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.delete_outline,
+                                    color: AppColors.luxuryDanger,
+                                  ),
+                                  title: Text('Xóa từ'),
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
+                          ],
+                        ),
                     ],
-                    if (onDelete != null)
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 18),
-                        color: AppColors.luxuryDanger,
-                        onPressed: onDelete,
-                        splashRadius: 18,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                      ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

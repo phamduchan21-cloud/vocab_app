@@ -92,6 +92,7 @@ class ProfileProvider extends ChangeNotifier {
 
     try {
       await _service.updateDisplayName(trimmed);
+      await loadProfile();
       return null;
     } catch (e) {
       return 'Không thể cập nhật tên hiển thị.';
@@ -135,6 +136,53 @@ class ProfileProvider extends ChangeNotifier {
       return null;
     } catch (e) {
       return 'Không thể cập nhật mục tiêu học tập.';
+    } finally {
+      _isUpdatingProfile = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String?> updateLearningPreferences(
+    Map<String, dynamic> changes,
+  ) async {
+    if (_isUpdatingProfile) return null;
+    _isUpdatingProfile = true;
+    notifyListeners();
+
+    try {
+      final goals = <String, dynamic>{
+        ...?_userProfile?.learningGoals,
+        ...changes,
+      };
+      await _service.updateProfile({'learning_goals': goals});
+      await loadProfile();
+      return null;
+    } catch (e) {
+      return 'Không thể cập nhật cài đặt học tập.';
+    } finally {
+      _isUpdatingProfile = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String?> completeOnboarding({
+    required String englishLevel,
+    required int dailyWordGoal,
+    required Map<String, dynamic> learningGoals,
+  }) async {
+    if (_isUpdatingProfile) return null;
+    _isUpdatingProfile = true;
+    notifyListeners();
+
+    try {
+      await _service.updateProfile({
+        'english_level': englishLevel,
+        'daily_word_goal': dailyWordGoal,
+        'learning_goals': learningGoals,
+      });
+      return null;
+    } catch (_) {
+      return 'Không thể lưu lộ trình lúc này. Vui lòng thử lại.';
     } finally {
       _isUpdatingProfile = false;
       notifyListeners();

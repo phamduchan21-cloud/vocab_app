@@ -14,7 +14,7 @@ from schemas import (
     QuizQuestion,
 )
 from seed_data import SEED_VOCABULARIES
-from question_bank import get_questions, AVAILABLE_TOPICS
+from question_bank import QUESTION_BANK, get_questions
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +28,7 @@ def _bank_question_to_quiz(bq: dict) -> QuizQuestion:
         vocabId=bq.get("id", ""),
         explanation=bq.get("explanation", ""),
         transcript=bq.get("transcript"),
+        level=bq.get("level", "A2"),
     )
 
 
@@ -81,36 +82,37 @@ class QuizService:
         skill_type: Optional[str] = None,
         topic: Optional[str] = None,
     ) -> Tuple[List[QuizQuestion], int]:
-        # Ưu tiên question bank nếu có topic cụ thể + skill_type
-        if topic and topic != "all" and skill_type:
-            from question_bank import get_questions
-            bank_qs = get_questions(topic, skill_type, count)
+        # Uu tien question bank khi co chu de cu the.
+        if topic and topic != "all":
+            if skill_type:
+                bank_qs = get_questions(topic, skill_type, count)
+            else:
+                bank_qs = []
+                for skill_key in ("vocabulary", "grammar", "reading", "listening"):
+                    bank_qs.extend(get_questions(topic, skill_key, count))
+                random.shuffle(bank_qs)
+                bank_qs = bank_qs[:count]
             if bank_qs:
                 return [_bank_question_to_quiz(q) for q in bank_qs], len(bank_qs)
 
         # Nếu topic = "all" + skill_type cụ thể, gộp từ tất cả topics trong bank
         if (not topic or topic == "all") and skill_type:
-            from question_bank import QUESTION_BANK
             all_bank_qs = []
             for t_key in QUESTION_BANK:
-                from question_bank import get_questions
                 bank_qs = get_questions(t_key, skill_type, count)
                 all_bank_qs.extend(bank_qs)
-            import random as _rnd
-            _rnd.shuffle(all_bank_qs)
+            random.shuffle(all_bank_qs)
             if all_bank_qs:
                 return [_bank_question_to_quiz(q) for q in all_bank_qs[:count]], min(count, len(all_bank_qs))
 
         # Nếu topic = "all" + skill_type = "all", mix từ bank
         if (not topic or topic == "all") and (not skill_type or skill_type == "all"):
-            from question_bank import QUESTION_BANK, get_questions
             all_bank_qs = []
             for t_key in QUESTION_BANK:
                 for s_key in ("vocabulary", "grammar", "reading", "listening"):
                     bank_qs = get_questions(t_key, s_key, count)
                     all_bank_qs.extend(bank_qs)
-            import random as _rnd
-            _rnd.shuffle(all_bank_qs)
+            random.shuffle(all_bank_qs)
             if all_bank_qs:
                 return [_bank_question_to_quiz(q) for q in all_bank_qs[:count]], min(count, len(all_bank_qs))
 

@@ -34,6 +34,9 @@ async def generate_mock_test(
             user_id=current_user.id,
             level=data.level,
             topic=data.topic,
+            question_count=data.question_count,
+            duration_minutes=data.duration_minutes,
+            purpose=data.purpose,
         )
     except ValueError as e:
         raise HTTPException(
@@ -67,6 +70,10 @@ async def submit_mock_test(
         user_id=current_user.id,
         test_id=data.test_id,
         answers=data.answers,
+        topic=data.topic,
+        duration_seconds=data.duration_seconds,
+        purpose=data.purpose,
+        difficulty=data.difficulty,
     )
     return result
 

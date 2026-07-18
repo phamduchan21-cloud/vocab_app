@@ -77,7 +77,10 @@ class _QuizResultScreenState extends State<QuizResultScreen>
               const SizedBox(height: 16),
               Text(
                 'Không có kết quả cho bài quiz này',
-                style: GoogleFonts.nunito(fontSize: 16, color: AppColors.luxuryText),
+                style: GoogleFonts.nunito(
+                  fontSize: 16,
+                  color: AppColors.luxuryText,
+                ),
               ),
               const SizedBox(height: 24),
               Container(
@@ -91,7 +94,10 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                     borderRadius: BorderRadius.circular(999),
                     onTap: () => context.go('/quiz'),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -111,7 +117,11 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                               color: Colors.white.withValues(alpha: 0.25),
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            child: const Icon(Icons.arrow_back_rounded, size: 14, color: Colors.white),
+                            child: const Icon(
+                              Icons.arrow_back_rounded,
+                              size: 14,
+                              color: Colors.white,
+                            ),
                           ),
                         ],
                       ),
@@ -132,8 +142,10 @@ class _QuizResultScreenState extends State<QuizResultScreen>
     final color = isGood
         ? AppColors.luxuryGreen
         : isMedium
-            ? AppColors.luxuryGold
-            : AppColors.luxuryDanger;
+        ? AppColors.luxuryGold
+        : AppColors.luxuryDanger;
+    final pageWidth = MediaQuery.sizeOf(context).width;
+    final pagePadding = ((pageWidth - 760) / 2).clamp(20.0, 64.0);
 
     return Scaffold(
       backgroundColor: AppColors.luxuryBg,
@@ -156,7 +168,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(32, 32, 32, 60),
+        padding: EdgeInsets.fromLTRB(pagePadding, 32, pagePadding, 60),
         child: FadeTransition(
           opacity: _fadeAnim,
           child: SlideTransition(
@@ -176,8 +188,8 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                   isGood
                       ? 'Xuất sắc!'
                       : isMedium
-                          ? 'Cố gắng hơn nhé!'
-                          : 'Cần ôn tập thêm!',
+                      ? 'Cố gắng hơn nhé!'
+                      : 'Cần ôn tập thêm!',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -198,7 +210,11 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _ResultStat(value: '${result.correctAnswers}', label: 'Đúng', color: AppColors.luxuryGreen),
+                    _ResultStat(
+                      value: '${result.correctAnswers}',
+                      label: 'Đúng',
+                      color: AppColors.luxuryGreen,
+                    ),
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 24),
                       width: 1.5,
@@ -231,7 +247,10 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                     decoration: BoxDecoration(
                       color: AppColors.luxuryBg,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+                      border: Border.all(
+                        color: AppColors.luxuryBorder,
+                        width: 1.5,
+                      ),
                     ),
                     padding: const EdgeInsets.all(3),
                     child: Container(
@@ -255,33 +274,47 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                           const SizedBox(height: 16),
                           ...result.details!.asMap().entries.map((entry) {
                             final detail = entry.value as Map<String, dynamic>;
-                            final isCorrect = detail['selected'] == detail['correctAnswer'];
+                            final isCorrect =
+                                detail['selected'] == detail['correctAnswer'];
                             return Container(
                               margin: const EdgeInsets.only(bottom: 8),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: isCorrect
-                                    ? AppColors.luxuryGreen.withValues(alpha: 0.06)
-                                    : AppColors.luxuryDanger.withValues(alpha: 0.05),
+                                    ? AppColors.luxuryGreen.withValues(
+                                        alpha: 0.06,
+                                      )
+                                    : AppColors.luxuryDanger.withValues(
+                                        alpha: 0.05,
+                                      ),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: isCorrect
-                                      ? AppColors.luxuryGreen.withValues(alpha: 0.3)
-                                      : AppColors.luxuryDanger.withValues(alpha: 0.2),
+                                      ? AppColors.luxuryGreen.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : AppColors.luxuryDanger.withValues(
+                                          alpha: 0.2,
+                                        ),
                                 ),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Icon(
-                                    isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                                    color: isCorrect ? AppColors.luxuryGreen : AppColors.luxuryDanger,
+                                    isCorrect
+                                        ? Icons.check_circle_rounded
+                                        : Icons.cancel_rounded,
+                                    color: isCorrect
+                                        ? AppColors.luxuryGreen
+                                        : AppColors.luxuryDanger,
                                     size: 20,
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Câu ${entry.key + 1}',
@@ -294,14 +327,19 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                                         const SizedBox(height: 2),
                                         Text(
                                           'Bạn chọn: ${detail['selected'] ?? 'Chưa chọn'}',
-                                          style: GoogleFonts.nunito(fontSize: 13, color: AppColors.luxuryText),
+                                          style: GoogleFonts.nunito(
+                                            fontSize: 13,
+                                            color: AppColors.luxuryText,
+                                          ),
                                         ),
                                         Text(
                                           'Đáp án: ${detail['correctAnswer']}',
                                           style: GoogleFonts.nunito(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w600,
-                                            color: isCorrect ? AppColors.luxuryGreen : AppColors.luxuryDanger,
+                                            color: isCorrect
+                                                ? AppColors.luxuryGreen
+                                                : AppColors.luxuryDanger,
                                           ),
                                         ),
                                       ],
@@ -325,7 +363,10 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+                          border: Border.all(
+                            color: AppColors.luxuryBorder,
+                            width: 1.5,
+                          ),
                         ),
                         child: Material(
                           color: AppColors.luxurySurface,
@@ -381,10 +422,16 @@ class _QuizResultScreenState extends State<QuizResultScreen>
                                     width: 28,
                                     height: 28,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.25),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.25,
+                                      ),
                                       borderRadius: BorderRadius.circular(14),
                                     ),
-                                    child: const Icon(Icons.home_rounded, size: 14, color: Colors.white),
+                                    child: const Icon(
+                                      Icons.home_rounded,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ],
                               ),

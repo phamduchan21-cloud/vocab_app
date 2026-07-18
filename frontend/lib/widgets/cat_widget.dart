@@ -1,281 +1,406 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import '../app.dart';
 
 class CatWidget extends StatelessWidget {
-  final double size;
-  final CatExpression expression;
-
   const CatWidget({
     super.key,
     this.size = 120,
     this.expression = CatExpression.normal,
   });
 
+  final double size;
+  final CatExpression expression;
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: _CatPainter(expression: expression),
+    return Semantics(
+      image: true,
+      label: _semanticLabel(expression),
+      child: SizedBox.square(
+        dimension: size,
+        child: CustomPaint(painter: _PostcatPainter(expression: expression)),
       ),
     );
   }
+
+  String _semanticLabel(CatExpression value) {
+    return switch (value) {
+      CatExpression.happy => 'Mèo Sol vui vẻ',
+      CatExpression.talking => 'Mèo Sol đang trò chuyện',
+      CatExpression.love => 'Mèo Sol yêu thích',
+      CatExpression.sad => 'Mèo Sol đang buồn',
+      CatExpression.normal => 'Mèo Sol',
+    };
+  }
 }
 
-enum CatExpression {
-  normal,
-  happy,
-  talking,
-  love,
-  sad,
-}
+enum CatExpression { normal, happy, talking, love, sad }
 
-class _CatPainter extends CustomPainter {
+class _PostcatPainter extends CustomPainter {
+  const _PostcatPainter({required this.expression});
+
   final CatExpression expression;
 
-  _CatPainter({this.expression = CatExpression.normal});
+  static const _fur = Color(0xFF358D87);
+  static const _furLight = Color(0xFF67B8B0);
+  static const _furDark = Color(0xFF174F4B);
+  static const _cream = Color(0xFFFFF5E5);
+  static const _coral = Color(0xFFEE6659);
+  static const _pink = Color(0xFFFFA39B);
+  static const _gold = Color(0xFFF5B940);
+  static const _ink = Color(0xFF183B38);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final scale = size.width / 120;
-    final purple = AppColors.lavender;
-    final pink = AppColors.lavender;
-    final darkPurple = const Color(0xFF5B21B6);
-    final white = Colors.white;
-    final lightPurple = AppColors.rose.withValues(alpha: 0.10);
+    final scale = math.min(size.width, size.height) / 120;
+    final dx = (size.width - 120 * scale) / 2;
+    final dy = (size.height - 120 * scale) / 2;
+    canvas.save();
+    canvas.translate(dx, dy);
+    canvas.scale(scale);
 
-    // === Body ===
-    final bodyPaint = Paint()..color = purple;
+    _drawShadow(canvas);
+    _drawTail(canvas);
+    _drawBody(canvas);
+    _drawHead(canvas);
+    _drawFace(canvas);
+    _drawScarf(canvas);
+    _drawPaws(canvas);
 
-    // Body (oval)
+    canvas.restore();
+  }
+
+  void _drawShadow(Canvas canvas) {
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(60 * scale, 80 * scale), width: 70 * scale, height: 55 * scale),
-      bodyPaint,
+      const Rect.fromLTWH(25, 106, 74, 9),
+      Paint()..color = _ink.withValues(alpha: 0.11),
     );
+  }
 
-    // Belly (lighter)
-    final bellyPaint = Paint()..color = lightPurple;
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(60 * scale, 82 * scale), width: 40 * scale, height: 30 * scale),
-      bellyPaint,
-    );
-
-    // === Head ===
-    final headPaint = Paint()..color = purple;
-
-    // Main head circle
-    canvas.drawCircle(Offset(60 * scale, 35 * scale), 30 * scale, headPaint);
-
-    // === Ears ===
-    final earPath = Path()
-      ..moveTo(38 * scale, 20 * scale)
-      ..lineTo(28 * scale, 0 * scale)
-      ..lineTo(48 * scale, 10 * scale)
-      ..close();
-    canvas.drawPath(earPath, headPaint);
-
-    final earPath2 = Path()
-      ..moveTo(82 * scale, 20 * scale)
-      ..lineTo(92 * scale, 0 * scale)
-      ..lineTo(72 * scale, 10 * scale)
-      ..close();
-    canvas.drawPath(earPath2, headPaint);
-
-    // Inner ears (pink)
-    final innerEarPaint = Paint()..color = pink;
-    final innerEarPath = Path()
-      ..moveTo(40 * scale, 18 * scale)
-      ..lineTo(33 * scale, 4 * scale)
-      ..lineTo(47 * scale, 12 * scale)
-      ..close();
-    canvas.drawPath(innerEarPath, innerEarPaint);
-
-    final innerEarPath2 = Path()
-      ..moveTo(80 * scale, 18 * scale)
-      ..lineTo(87 * scale, 4 * scale)
-      ..lineTo(73 * scale, 12 * scale)
-      ..close();
-    canvas.drawPath(innerEarPath2, innerEarPaint);
-
-    // === Eyes ===
-    // White of eyes
-    final eyeWhitePaint = Paint()..color = white;
-    canvas.drawCircle(Offset(47 * scale, 32 * scale), 8 * scale, eyeWhitePaint);
-    canvas.drawCircle(Offset(73 * scale, 32 * scale), 8 * scale, eyeWhitePaint);
-
-    // Pupils
-    final pupilPaint = Paint()..color = darkPurple;
-    canvas.drawCircle(Offset(47 * scale, 32 * scale), 4.5 * scale, pupilPaint);
-    canvas.drawCircle(Offset(73 * scale, 32 * scale), 4.5 * scale, pupilPaint);
-
-    // Eye shine
-    final shinePaint = Paint()..color = white;
-    canvas.drawCircle(Offset(44 * scale, 29 * scale), 2.5 * scale, shinePaint);
-    canvas.drawCircle(Offset(70 * scale, 29 * scale), 2.5 * scale, shinePaint);
-
-    // === Eyes expression ===
-    switch (expression) {
-      case CatExpression.happy:
-        // Squeezed happy eyes (arcs)
-        canvas.drawCircle(Offset(47 * scale, 32 * scale), 8 * scale, eyeWhitePaint);
-        canvas.drawCircle(Offset(73 * scale, 32 * scale), 8 * scale, eyeWhitePaint);
-        canvas.drawCircle(Offset(47 * scale, 32 * scale), 4.5 * scale, pupilPaint);
-        canvas.drawCircle(Offset(73 * scale, 32 * scale), 4.5 * scale, pupilPaint);
-        canvas.drawCircle(Offset(44 * scale, 29 * scale), 2.5 * scale, shinePaint);
-        canvas.drawCircle(Offset(70 * scale, 29 * scale), 2.5 * scale, shinePaint);
-        break;
-      case CatExpression.love:
-        // Heart eyes
-        _drawHeart(canvas, Offset(47 * scale, 33 * scale), 6 * scale, pink);
-        _drawHeart(canvas, Offset(73 * scale, 33 * scale), 6 * scale, pink);
-        break;
-      case CatExpression.talking:
-        // Normal eyes, slightly wider
-        canvas.drawCircle(Offset(47 * scale, 31 * scale), 9 * scale, eyeWhitePaint);
-        canvas.drawCircle(Offset(73 * scale, 31 * scale), 9 * scale, eyeWhitePaint);
-        canvas.drawCircle(Offset(47 * scale, 31 * scale), 5 * scale, pupilPaint);
-        canvas.drawCircle(Offset(73 * scale, 31 * scale), 5 * scale, pupilPaint);
-        canvas.drawCircle(Offset(44 * scale, 28 * scale), 2.5 * scale, shinePaint);
-        canvas.drawCircle(Offset(70 * scale, 28 * scale), 2.5 * scale, shinePaint);
-        break;
-      case CatExpression.sad:
-        // Closed sad eyes (half circle)
-        final sadEyePaint = Paint()..color = purple;
-        final sadPath = Path()
-          ..moveTo(39 * scale, 32 * scale)
-          ..quadraticBezierTo(47 * scale, 38 * scale, 55 * scale, 32 * scale)
-          ..close();
-        canvas.drawPath(sadPath, sadEyePaint);
-        final sadPath2 = Path()
-          ..moveTo(65 * scale, 32 * scale)
-          ..quadraticBezierTo(73 * scale, 38 * scale, 81 * scale, 32 * scale)
-          ..close();
-        canvas.drawPath(sadPath2, sadEyePaint);
-        break;
-      default:
-        // Normal — already drawn above
-        break;
-    }
-
-    // === Nose (pink) ===
-    final nosePaint = Paint()..color = pink;
-    final nosePath = Path()
-      ..moveTo(60 * scale, 38 * scale)
-      ..lineTo(56 * scale, 42 * scale)
-      ..lineTo(64 * scale, 42 * scale)
-      ..close();
-    canvas.drawPath(nosePath, nosePaint);
-
-    // === Mouth ===
-    final mouthPaint = Paint()
-      ..color = darkPurple
+  void _drawTail(Canvas canvas) {
+    final outline = Paint()
+      ..color = _furDark
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5 * scale;
-
-    switch (expression) {
-      case CatExpression.happy:
-        // Big happy smile
-        final smilePath = Path()
-          ..moveTo(50 * scale, 44 * scale)
-          ..quadraticBezierTo(60 * scale, 54 * scale, 70 * scale, 44 * scale);
-        canvas.drawPath(smilePath, mouthPaint);
-        // Cheek blush
-        final blushPaint = Paint()..color = pink.withValues(alpha: 0.3);
-        canvas.drawCircle(Offset(40 * scale, 44 * scale), 5 * scale, blushPaint);
-        canvas.drawCircle(Offset(80 * scale, 44 * scale), 5 * scale, blushPaint);
-        break;
-      case CatExpression.talking:
-        // Open mouth (talking)
-        final openMouthPaint = Paint()..color = darkPurple;
-        canvas.drawOval(
-          Rect.fromCenter(center: Offset(60 * scale, 48 * scale), width: 14 * scale, height: 10 * scale),
-          openMouthPaint,
-        );
-        break;
-      case CatExpression.sad:
-        // Sad frown
-        final sadMouthPath = Path()
-          ..moveTo(50 * scale, 48 * scale)
-          ..quadraticBezierTo(60 * scale, 44 * scale, 70 * scale, 48 * scale);
-        canvas.drawPath(sadMouthPath, mouthPaint);
-        break;
-      default:
-        // Normal small smile
-        final normalMouthPath = Path()
-          ..moveTo(54 * scale, 44 * scale)
-          ..quadraticBezierTo(60 * scale, 48 * scale, 66 * scale, 44 * scale);
-        canvas.drawPath(normalMouthPath, mouthPaint);
-        break;
-    }
-
-    // === Whiskers ===
-    final whiskerPaint = Paint()
-      ..color = darkPurple
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2 * scale;
-
-    // Left whiskers
-    canvas.drawLine(Offset(40 * scale, 40 * scale), Offset(22 * scale, 36 * scale), whiskerPaint);
-    canvas.drawLine(Offset(40 * scale, 43 * scale), Offset(20 * scale, 44 * scale), whiskerPaint);
-    canvas.drawLine(Offset(40 * scale, 46 * scale), Offset(22 * scale, 52 * scale), whiskerPaint);
-
-    // Right whiskers
-    canvas.drawLine(Offset(80 * scale, 40 * scale), Offset(98 * scale, 36 * scale), whiskerPaint);
-    canvas.drawLine(Offset(80 * scale, 43 * scale), Offset(100 * scale, 44 * scale), whiskerPaint);
-    canvas.drawLine(Offset(80 * scale, 46 * scale), Offset(98 * scale, 52 * scale), whiskerPaint);
-
-    // === Paws ===
-    final pawPaint = Paint()..color = purple;
-    // Left paw
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(38 * scale, 98 * scale), width: 18 * scale, height: 12 * scale),
-      pawPaint,
-    );
-    // Right paw
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(82 * scale, 98 * scale), width: 18 * scale, height: 12 * scale),
-      pawPaint,
-    );
-
-    // Paw pads (pink)
-    final padPaint = Paint()..color = pink;
-    canvas.drawCircle(Offset(38 * scale, 98 * scale), 3 * scale, padPaint);
-    canvas.drawCircle(Offset(82 * scale, 98 * scale), 3 * scale, padPaint);
-
-    // === Tail ===
-    final tailPaint = Paint()
-      ..color = purple
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 8 * scale
+      ..strokeWidth = 15
       ..strokeCap = StrokeCap.round;
-    final tailPath = Path()
-      ..moveTo(30 * scale, 90 * scale)
-      ..quadraticBezierTo(0 * scale, 70 * scale, 10 * scale, 50 * scale)
-      ..quadraticBezierTo(18 * scale, 38 * scale, 16 * scale, 30 * scale);
-    canvas.drawPath(tailPath, tailPaint);
+    final fill = Paint()
+      ..color = _fur
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10.5
+      ..strokeCap = StrokeCap.round;
+    final path = Path()
+      ..moveTo(85, 91)
+      ..cubicTo(112, 98, 114, 66, 97, 65)
+      ..cubicTo(89, 64, 90, 53, 100, 52);
+    canvas.drawPath(path, outline);
+    canvas.drawPath(path, fill);
+    canvas.drawCircle(const Offset(100, 52), 4.9, Paint()..color = _cream);
+  }
+
+  void _drawBody(Canvas canvas) {
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(29, 59, 62, 51),
+        const Radius.circular(28),
+      ),
+      Paint()..color = _furDark,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(32, 61, 56, 47),
+        const Radius.circular(25),
+      ),
+      Paint()..color = _fur,
+    );
+    canvas.drawOval(
+      const Rect.fromLTWH(45, 70, 30, 34),
+      Paint()..color = _cream.withValues(alpha: 0.92),
+    );
+
+    final leftArm = Path()
+      ..moveTo(38, 72)
+      ..cubicTo(29, 83, 34, 96, 46, 98)
+      ..cubicTo(50, 97, 51, 92, 47, 89)
+      ..cubicTo(43, 84, 43, 78, 48, 74)
+      ..close();
+    final rightArm = Path()
+      ..moveTo(82, 72)
+      ..cubicTo(91, 83, 86, 96, 74, 98)
+      ..cubicTo(70, 97, 69, 92, 73, 89)
+      ..cubicTo(77, 84, 77, 78, 72, 74)
+      ..close();
+    canvas.drawPath(leftArm, Paint()..color = _furLight);
+    canvas.drawPath(rightArm, Paint()..color = _furLight);
+  }
+
+  void _drawHead(Canvas canvas) {
+    final leftEar = Path()
+      ..moveTo(27, 31)
+      ..quadraticBezierTo(22, 17, 30, 8)
+      ..quadraticBezierTo(43, 13, 48, 22)
+      ..close();
+    final rightEar = Path()
+      ..moveTo(93, 31)
+      ..quadraticBezierTo(98, 17, 90, 8)
+      ..quadraticBezierTo(77, 13, 72, 22)
+      ..close();
+    canvas.drawPath(leftEar, Paint()..color = _furDark);
+    canvas.drawPath(rightEar, Paint()..color = _furDark);
+
+    final leftInner = Path()
+      ..moveTo(29, 24)
+      ..quadraticBezierTo(27, 16, 31, 12)
+      ..quadraticBezierTo(39, 16, 42, 22)
+      ..close();
+    final rightInner = Path()
+      ..moveTo(91, 24)
+      ..quadraticBezierTo(93, 16, 89, 12)
+      ..quadraticBezierTo(81, 16, 78, 22)
+      ..close();
+    canvas.drawPath(leftInner, Paint()..color = _pink);
+    canvas.drawPath(rightInner, Paint()..color = _pink);
+
+    canvas.drawOval(
+      const Rect.fromLTWH(20, 17, 80, 61),
+      Paint()..color = _furDark,
+    );
+    canvas.drawOval(const Rect.fromLTWH(23, 19, 74, 56), Paint()..color = _fur);
+
+    final forehead = Path()
+      ..moveTo(50, 21)
+      ..quadraticBezierTo(53, 30, 56, 22)
+      ..quadraticBezierTo(60, 31, 64, 22)
+      ..quadraticBezierTo(67, 30, 70, 21);
+    canvas.drawPath(
+      forehead,
+      Paint()
+        ..color = _furLight
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round,
+    );
+
+    canvas.drawOval(
+      const Rect.fromLTWH(39, 43, 42, 27),
+      Paint()..color = _cream,
+    );
+  }
+
+  void _drawFace(Canvas canvas) {
+    if (expression == CatExpression.love) {
+      _drawHeart(canvas, const Offset(44, 39), 8, _coral);
+      _drawHeart(canvas, const Offset(76, 39), 8, _coral);
+    } else if (expression == CatExpression.happy) {
+      _drawHappyEye(canvas, const Offset(44, 40));
+      _drawHappyEye(canvas, const Offset(76, 40));
+    } else {
+      _drawSparkleEye(
+        canvas,
+        const Offset(44, 39),
+        sad: expression == CatExpression.sad,
+      );
+      _drawSparkleEye(
+        canvas,
+        const Offset(76, 39),
+        sad: expression == CatExpression.sad,
+      );
+    }
+
+    canvas.drawOval(
+      const Rect.fromLTWH(29, 49, 15, 8),
+      Paint()..color = _pink.withValues(alpha: 0.5),
+    );
+    canvas.drawOval(
+      const Rect.fromLTWH(76, 49, 15, 8),
+      Paint()..color = _pink.withValues(alpha: 0.5),
+    );
+
+    final nose = Path()
+      ..moveTo(60, 49)
+      ..cubicTo(55, 45, 52, 50, 60, 55)
+      ..cubicTo(68, 50, 65, 45, 60, 49)
+      ..close();
+    canvas.drawPath(nose, Paint()..color = _coral);
+
+    final mouthPaint = Paint()
+      ..color = _ink
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    switch (expression) {
+      case CatExpression.talking:
+        canvas.drawOval(
+          const Rect.fromLTWH(53, 57, 14, 11),
+          Paint()..color = _ink,
+        );
+        canvas.drawOval(
+          const Rect.fromLTWH(56, 62, 8, 4),
+          Paint()..color = _pink,
+        );
+      case CatExpression.sad:
+        final frown = Path()
+          ..moveTo(53, 64)
+          ..quadraticBezierTo(60, 57, 67, 64);
+        canvas.drawPath(frown, mouthPaint);
+        final tear = Path()
+          ..moveTo(82, 48)
+          ..quadraticBezierTo(87, 55, 82, 58)
+          ..quadraticBezierTo(77, 55, 82, 48)
+          ..close();
+        canvas.drawPath(tear, Paint()..color = const Color(0xFF71C9E8));
+      default:
+        final smile = Path()
+          ..moveTo(50, 57)
+          ..quadraticBezierTo(55, 64, 60, 58)
+          ..quadraticBezierTo(65, 64, 70, 57);
+        canvas.drawPath(smile, mouthPaint);
+    }
+
+    final whisker = Paint()
+      ..color = _furDark.withValues(alpha: 0.78)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(const Offset(36, 55), const Offset(18, 52), whisker);
+    canvas.drawLine(const Offset(36, 59), const Offset(17, 61), whisker);
+    canvas.drawLine(const Offset(84, 55), const Offset(102, 52), whisker);
+    canvas.drawLine(const Offset(84, 59), const Offset(103, 61), whisker);
+  }
+
+  void _drawSparkleEye(Canvas canvas, Offset center, {required bool sad}) {
+    final eyeRect = Rect.fromCenter(
+      center: center.translate(0, sad ? 2 : 0),
+      width: 18,
+      height: sad ? 16 : 20,
+    );
+    canvas.drawOval(eyeRect, Paint()..color = _cream);
+    canvas.drawOval(eyeRect.deflate(3), Paint()..color = _ink);
+    canvas.drawCircle(
+      center.translate(-2.4, -3.2),
+      2.8,
+      Paint()..color = Colors.white,
+    );
+    canvas.drawCircle(
+      center.translate(3, 2.7),
+      1.25,
+      Paint()..color = Colors.white,
+    );
+    if (sad) {
+      canvas.drawArc(
+        Rect.fromCenter(center: center.translate(0, -8), width: 18, height: 9),
+        math.pi,
+        math.pi,
+        false,
+        Paint()
+          ..color = _furDark
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+  }
+
+  void _drawHappyEye(Canvas canvas, Offset center) {
+    canvas.drawArc(
+      Rect.fromCenter(center: center, width: 17, height: 13),
+      math.pi,
+      math.pi,
+      false,
+      Paint()
+        ..color = _ink
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  void _drawScarf(Canvas canvas) {
+    final collar = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(36, 69, 48, 12),
+      const Radius.circular(6),
+    );
+    canvas.drawRRect(collar, Paint()..color = _furDark);
+    canvas.drawRRect(collar.deflate(2), Paint()..color = _coral);
+    canvas.drawRect(const Rect.fromLTWH(48, 71, 5, 8), Paint()..color = _cream);
+    canvas.drawRect(
+      const Rect.fromLTWH(55, 71, 5, 8),
+      Paint()..color = const Color(0xFF65B8CB),
+    );
+    canvas.drawRect(const Rect.fromLTWH(62, 71, 5, 8), Paint()..color = _cream);
+
+    final scarfEnd = Path()
+      ..moveTo(72, 77)
+      ..lineTo(85, 84)
+      ..lineTo(78, 89)
+      ..lineTo(68, 78)
+      ..close();
+    canvas.drawPath(scarfEnd, Paint()..color = _coral);
+
+    canvas.drawCircle(const Offset(60, 80), 6.5, Paint()..color = _furDark);
+    canvas.drawCircle(const Offset(60, 80), 4.6, Paint()..color = _gold);
+    canvas.drawCircle(
+      const Offset(58.6, 78.4),
+      1.2,
+      Paint()..color = Colors.white.withValues(alpha: 0.7),
+    );
+  }
+
+  void _drawPaws(Canvas canvas) {
+    canvas.drawOval(
+      const Rect.fromLTWH(31, 96, 29, 15),
+      Paint()..color = _furDark,
+    );
+    canvas.drawOval(
+      const Rect.fromLTWH(60, 96, 29, 15),
+      Paint()..color = _furDark,
+    );
+    canvas.drawOval(
+      const Rect.fromLTWH(34, 97, 25, 11),
+      Paint()..color = _furLight,
+    );
+    canvas.drawOval(
+      const Rect.fromLTWH(61, 97, 25, 11),
+      Paint()..color = _furLight,
+    );
+    for (final x in [42.0, 50.0, 70.0, 78.0]) {
+      canvas.drawCircle(
+        Offset(x, 102),
+        1.4,
+        Paint()..color = _cream.withValues(alpha: 0.9),
+      );
+    }
   }
 
   void _drawHeart(Canvas canvas, Offset center, double size, Color color) {
-    final paint = Paint()..color = color;
     final path = Path()
-      ..moveTo(center.dx, center.dy - size * 0.25)
+      ..moveTo(center.dx, center.dy + size * 0.55)
       ..cubicTo(
-        center.dx - size * 0.6, center.dy - size * 0.8,
-        center.dx - size, center.dy + size * 0.2,
-        center.dx, center.dy + size * 0.5,
+        center.dx - size,
+        center.dy,
+        center.dx - size * 0.55,
+        center.dy - size * 0.8,
+        center.dx,
+        center.dy - size * 0.2,
       )
       ..cubicTo(
-        center.dx + size, center.dy + size * 0.2,
-        center.dx + size * 0.6, center.dy - size * 0.8,
-        center.dx, center.dy - size * 0.25,
+        center.dx + size * 0.55,
+        center.dy - size * 0.8,
+        center.dx + size,
+        center.dy,
+        center.dx,
+        center.dy + size * 0.55,
       )
       ..close();
-    canvas.drawPath(path, paint);
+    canvas.drawPath(path, Paint()..color = color);
+    canvas.drawCircle(
+      center.translate(-size * 0.25, -size * 0.2),
+      size * 0.16,
+      Paint()..color = Colors.white.withValues(alpha: 0.72),
+    );
   }
 
   @override
-  bool shouldRepaint(covariant _CatPainter oldDelegate) {
-    return oldDelegate.expression != expression;
-  }
+  bool shouldRepaint(covariant _PostcatPainter oldDelegate) =>
+      oldDelegate.expression != expression;
 }

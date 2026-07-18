@@ -2,11 +2,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from core.config import settings
 from database import init_db, close_db, async_session_factory
 from routers import auth, vocabulary, quiz, dashboard, gamification, mock_test, ai
+from services.auth_service import AuthServiceError
 
 
 @asynccontextmanager
@@ -20,14 +22,22 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Ứng dụng Học Từ Vựng API",
-    description="FastAPI backend cho ứng dụng học từ vựng tích hợp Supabase",
+    title="SolVocab API",
+    description="API học từ vựng thích nghi cho SolVocab, tích hợp Supabase",
     version="1.1.0",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
     redirect_slashes=False,
 )
+
+
+@app.exception_handler(AuthServiceError)
+async def auth_service_error_handler(_, exc: AuthServiceError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+    )
 
 # CORS — use FRONTEND_URL in production, * for dev
 origins = ["*"]
@@ -56,7 +66,7 @@ app.include_router(ai.router)
 async def root():
     """Root endpoint — health check."""
     return {
-        "message": "Ứng dụng Học Từ Vựng API",
+        "message": "SolVocab API",
         "version": "1.1.0",
         "docs": "/docs",
     }

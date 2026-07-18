@@ -1,5 +1,6 @@
 import '../models/quiz_category.dart';
 import '../models/quiz_result.dart';
+import '../models/quiz_topic.dart';
 import 'api_service.dart';
 
 class QuizService {
@@ -14,14 +15,19 @@ class QuizService {
         .toList();
   }
 
+  Future<List<QuizTopic>> getTopics() async {
+    final response = await _api.get('/api/quiz/topics');
+    return (response as List)
+        .map((item) => QuizTopic.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<List<Map<String, dynamic>>> generateQuiz({
     int count = 5,
     String? topic,
     String? skillType,
   }) async {
-    final body = <String, dynamic>{
-      'count': count,
-    };
+    final body = <String, dynamic>{'count': count};
     if (topic != null && topic.isNotEmpty && topic != 'all') {
       body['topic'] = topic;
     }
@@ -41,10 +47,7 @@ class QuizService {
     String? topic,
     String? skillType,
   }) async {
-    final body = <String, dynamic>{
-      'quiz_type': quizType,
-      'answers': answers,
-    };
+    final body = <String, dynamic>{'quiz_type': quizType, 'answers': answers};
     if (topic != null && topic.isNotEmpty && topic != 'all') {
       body['topic'] = topic;
     }
@@ -56,17 +59,17 @@ class QuizService {
     return QuizResult.fromJson(response);
   }
 
-  Future<Map<String, dynamic>> getHistory({int page = 1, int limit = 20}) async {
-    final response = await _api.get('/api/quiz/history', queryParams: {
-      'page': page.toString(),
-      'limit': limit.toString(),
-    });
+  Future<Map<String, dynamic>> getHistory({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final response = await _api.get(
+      '/api/quiz/history',
+      queryParams: {'page': page.toString(), 'limit': limit.toString()},
+    );
     final items = (response['items'] as List)
         .map((item) => QuizResult.fromJson(item))
         .toList();
-    return {
-      'items': items,
-      'total': response['total'] ?? 0,
-    };
+    return {'items': items, 'total': response['total'] ?? 0};
   }
 }

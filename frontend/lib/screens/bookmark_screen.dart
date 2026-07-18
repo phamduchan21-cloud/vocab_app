@@ -41,15 +41,13 @@ class _EntryAnimationState extends State<_EntryAnimation>
         curve: const Cubic(0.34, 1.56, 0.64, 1),
       ),
     );
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Cubic(0.34, 1.56, 0.64, 1),
-      ),
-    );
+    _slide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Cubic(0.34, 1.56, 0.64, 1),
+          ),
+        );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _controller.forward();
     });
@@ -181,13 +179,13 @@ class _BookmarkWord {
     String tagLabel;
     if (v.reviewCount == 0) {
       tag = _WordTag.new_;
-      tagLabel = 'Moi';
+      tagLabel = 'Mới';
     } else if (v.reviewCount < 5) {
       tag = _WordTag.learning;
-      tagLabel = 'Dang hoc';
+      tagLabel = 'Đang học';
     } else {
       tag = _WordTag.mastered;
-      tagLabel = 'Da thuoc';
+      tagLabel = 'Đã thuộc';
     }
     return _BookmarkWord(
       id: v.id,
@@ -213,7 +211,12 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  static const List<String> _tabLabels = ['Tat ca', 'Moi', 'Dang hoc', 'Da thuoc'];
+  static const List<String> _tabLabels = [
+    'Tất cả',
+    'Mới',
+    'Đang học',
+    'Đã thuộc',
+  ];
 
   @override
   void initState() {
@@ -277,9 +280,9 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<VocabularyProvider>();
     final isLoading = provider.isLoading && provider.items.isEmpty;
-    final hasError =
-        provider.errorMessage != null && provider.items.isEmpty;
-    final isEmptyState = !provider.isLoading &&
+    final hasError = provider.errorMessage != null && provider.items.isEmpty;
+    final isEmptyState =
+        !provider.isLoading &&
         provider.errorMessage == null &&
         provider.items.isEmpty;
     // ponytail: bookmarkedCount unused, removed
@@ -305,34 +308,39 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(children: [
-                            Text(
-                              'Tu da luu',
-                              style: GoogleFonts.playfairDisplay(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 26,
-                                color: AppColors.luxuryEspresso,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.luxuryBrown
-                                    .withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                '${provider.bookmarked.length}',
-                                style: GoogleFonts.nunito(
-                                  fontSize: 12,
+                          Row(
+                            children: [
+                              Text(
+                                'Từ đã lưu',
+                                style: GoogleFonts.playfairDisplay(
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.luxuryBrown,
+                                  fontSize: 26,
+                                  color: AppColors.luxuryEspresso,
                                 ),
                               ),
-                            ),
-                          ]),
+                              const SizedBox(width: 10),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.luxuryBrown.withValues(
+                                    alpha: 0.08,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '${provider.bookmarked.length}',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.luxuryBrown,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 6),
                           Text(
                             'Từ bạn đã đánh dấu để ôn lại sau',
@@ -346,7 +354,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                     ),
                     const SizedBox(width: 16),
                     _LuxuryPill(
-                      label: 'On tap',
+                      label: 'Ôn tập',
                       color: AppColors.luxuryBrown,
                       icon: Icons.play_arrow_rounded,
                       onPressed: () => context.go('/flashcard'),
@@ -371,9 +379,12 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                     ),
                     decoration: InputDecoration(
                       isDense: true,
-                      prefixIcon: Icon(Icons.search,
-                          size: 18, color: AppColors.luxuryTextHint),
-                      hintText: 'Tim tu da luu...',
+                      prefixIcon: Icon(
+                        Icons.search,
+                        size: 18,
+                        color: AppColors.luxuryTextHint,
+                      ),
+                      hintText: 'Tìm từ đã lưu...',
                       hintStyle: GoogleFonts.nunito(
                         fontSize: 14,
                         color: AppColors.luxuryTextHint,
@@ -381,21 +392,23 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                       filled: true,
                       fillColor: AppColors.luxurySurface,
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            BorderSide(color: AppColors.luxuryBorder),
+                        borderSide: BorderSide(color: AppColors.luxuryBorder),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            BorderSide(color: AppColors.luxuryBorder),
+                        borderSide: BorderSide(color: AppColors.luxuryBorder),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                            color: AppColors.luxuryBrown, width: 1.5),
+                          color: AppColors.luxuryBrown,
+                          width: 1.5,
+                        ),
                       ),
                     ),
                   ),
@@ -415,17 +428,18 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                         1 => _WordTag.new_,
                         2 => _WordTag.learning,
                         3 => _WordTag.mastered,
-                        _ => null
+                        _ => null,
                       };
                       final count = _countForTag(tag);
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _selectedTabIndex = i),
+                          onTap: () => setState(() => _selectedTabIndex = i),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: isActive
                                   ? AppColors.luxuryEspresso
@@ -460,7 +474,12 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
               // ─── Body ─────────────────────────────────
               Expanded(
                 child: _buildBody(
-                    isLoading, hasError, isEmptyState, provider, hPad),
+                  isLoading,
+                  hasError,
+                  isEmptyState,
+                  provider,
+                  hPad,
+                ),
               ),
             ],
           ),
@@ -469,8 +488,13 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     );
   }
 
-  Widget _buildBody(bool isLoading, bool hasError, bool isEmptyState,
-      VocabularyProvider provider, double hPad) {
+  Widget _buildBody(
+    bool isLoading,
+    bool hasError,
+    bool isEmptyState,
+    VocabularyProvider provider,
+    double hPad,
+  ) {
     if (isLoading) {
       return const SkeletonLoading(type: SkeletonType.grid, count: 8);
     }
@@ -492,12 +516,15 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                 color: AppColors.luxuryBrown.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: const Icon(Icons.bookmark_border,
-                  size: 36, color: AppColors.luxuryBrown),
+              child: const Icon(
+                Icons.bookmark_border,
+                size: 36,
+                color: AppColors.luxuryBrown,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
-              'Chua co tu vung nao',
+              'Chưa có từ vựng nào',
               style: GoogleFonts.playfairDisplay(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -506,7 +533,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Them tu moi de bat dau hoc tap nhe!',
+              'Thêm từ mới để bắt đầu học tập nhé!',
               style: GoogleFonts.nunito(
                 fontSize: 13,
                 color: AppColors.luxuryText,
@@ -514,7 +541,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
             ),
             const SizedBox(height: 20),
             _LuxuryPill(
-              label: 'Them tu moi',
+              label: 'Thêm từ mới',
               color: AppColors.luxuryBrown,
               icon: Icons.add_rounded,
               onPressed: () => context.push('/vocabulary/new'),
@@ -540,8 +567,8 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
             const SizedBox(height: 16),
             Text(
               _searchQuery.isNotEmpty
-                  ? 'Khong tim thay tu nao'
-                  : 'Chua co tu nao trong muc nay',
+                  ? 'Không tìm thấy từ nào'
+                  : 'Chưa có từ nào trong mục này',
               style: GoogleFonts.nunito(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -556,7 +583,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                   setState(() => _searchQuery = '');
                 },
                 child: Text(
-                  'Xoa bo loc',
+                  'Xóa bộ lọc',
                   style: GoogleFonts.nunito(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -581,43 +608,58 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   }
 
   Widget _buildStampGrid(
-      List<_BookmarkWord> words, double maxWidth, VocabularyProvider provider) {
+    List<_BookmarkWord> words,
+    double maxWidth,
+    VocabularyProvider provider,
+  ) {
     const spacing = 14.0;
-    final crossAxisCount = maxWidth < 500 ? 3 : 4;
-    final itemWidth = (maxWidth - spacing * (crossAxisCount - 1)) / crossAxisCount;
+    final crossAxisCount = maxWidth < 480
+        ? 1
+        : maxWidth < 760
+        ? 2
+        : maxWidth < 1100
+        ? 3
+        : 4;
+    final itemWidth =
+        (maxWidth - spacing * (crossAxisCount - 1)) / crossAxisCount;
     final rows = <Widget>[];
     for (var i = 0; i < words.length; i += crossAxisCount) {
       final rowEnd = (i + crossAxisCount).clamp(0, words.length);
       final rowItems = <Widget>[];
       for (var j = i; j < rowEnd; j++) {
         final word = words[j];
-        rowItems.add(SizedBox(
-          width: itemWidth,
-          child: _WordStamp(
-            word: word,
-            onStarToggle: () {
-              final vocab = provider.items.firstWhere(
-                (v) => v.id == word.id,
-                orElse: () => provider.items.first,
-              );
-              provider.toggleBookmark(vocab);
-            },
-          ),
-        ));
-      }
-      rows.add(Padding(
-        padding: EdgeInsets.only(bottom: spacing),
-        child: Row(
-            children: List.generate(rowItems.length, (k) {
-          return Padding(
-            padding: EdgeInsets.only(
-              left: k == 0 ? 0 : spacing / 2,
-              right: k == rowItems.length - 1 ? 0 : spacing / 2,
+        rowItems.add(
+          SizedBox(
+            width: itemWidth,
+            child: _WordStamp(
+              word: word,
+              onStarToggle: () {
+                final vocab = provider.items.firstWhere(
+                  (v) => v.id == word.id,
+                  orElse: () => provider.items.first,
+                );
+                provider.toggleBookmark(vocab);
+              },
             ),
-            child: rowItems[k],
-          );
-        })),
-      ));
+          ),
+        );
+      }
+      rows.add(
+        Padding(
+          padding: EdgeInsets.only(bottom: spacing),
+          child: Row(
+            children: List.generate(rowItems.length, (k) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  left: k == 0 ? 0 : spacing / 2,
+                  right: k == rowItems.length - 1 ? 0 : spacing / 2,
+                ),
+                child: rowItems[k],
+              );
+            }),
+          ),
+        ),
+      );
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: rows);
   }
@@ -692,8 +734,7 @@ class _WordStamp extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: tagBg,
                   borderRadius: BorderRadius.circular(20),

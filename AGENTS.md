@@ -27,6 +27,21 @@ Flutter: imports → constants → model → service → provider → screen
 - **Tiếng Việt** cho text người dùng thấy
 - **Tiếng Anh** cho code (biến, hàm, class, comment)
 
+### 4. Ponytail Mode
+- Ưu tiên **không build thêm** nếu tính năng không thật sự cần (YAGNI)
+- Trước khi viết code mới, kiểm tra theo thứ tự:
+  1. Đã có sẵn trong codebase chưa
+  2. Standard library có làm được không
+  3. Native platform/widget có hỗ trợ không
+  4. Dependency đã cài có giải quyết được không
+  5. Chỉ khi không còn lựa chọn nào khác mới viết code mới
+- Ưu tiên **reuse** helper, service, widget, provider và pattern đã có trong dự án
+- Ưu tiên **xóa bớt** hơn là thêm abstraction mới
+- Không thêm dependency mới nếu có thể tránh
+- Chọn diff nhỏ nhất nhưng phải đúng **gốc vấn đề**, không vá triệu chứng
+- Khi sửa hàm/service dùng chung, phải kiểm tra các caller liên quan để tránh sửa lệch một nhánh
+- Với logic không tầm thường, luôn để lại **một kiểm tra tối thiểu chạy được** (test nhỏ, self-check, hoặc verify command phù hợp)
+
 ---
 
 ## ⚙️ Backend (FastAPI + Supabase)

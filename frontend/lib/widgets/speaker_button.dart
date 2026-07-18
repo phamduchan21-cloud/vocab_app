@@ -92,7 +92,7 @@ class _SpeakerButtonState extends State<SpeakerButton>
             color: _isSpeaking ? color : color.withValues(alpha: 0.7),
           ),
           padding: EdgeInsets.zero,
-          tooltip: _isSpeaking ? 'Đang phát...' : 'Nghe phát âm',
+          tooltip: _isSpeaking ? 'Dừng phát âm' : 'Nghe phát âm',
           splashRadius: widget.size * 0.5,
         ),
       ),

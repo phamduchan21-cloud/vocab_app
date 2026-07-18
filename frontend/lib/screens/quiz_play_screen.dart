@@ -8,7 +8,9 @@ import 'package:provider/provider.dart';
 
 import '../app.dart';
 import '../providers/quiz_provider.dart';
+import '../services/tts_service.dart';
 import '../widgets/app_bottom_nav.dart';
+import '../widgets/speaker_button.dart';
 
 const _entryCurve = Cubic(0.34, 1.56, 0.64, 1);
 
@@ -24,31 +26,136 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
   static const int _totalSeconds = 60;
 
   static const List<Map<String, dynamic>> _fallbackQuestions = [
-    {'question': 'Từ "resilient" có nghĩa là gì?', 'options': ['Kiên cường, bền bỉ', 'Hoãn lại', 'Chân thật', 'Kết quả'], 'correctAnswer': 'Kiên cường, bền bỉ'},
-    {'question': 'Từ "genuine" có nghĩa là gì?', 'options': ['Miễn cưỡng', 'Kết quả', 'Chân thật, thật sự', 'Thận trọng'], 'correctAnswer': 'Chân thật, thật sự'},
-    {'question': 'Từ nào đồng nghĩa với "tough"?', 'options': ['fragile', 'resilient', 'gentle', 'cautious'], 'correctAnswer': 'resilient'},
-    {'question': 'Trái nghĩa của "postpone" là?', 'options': ['delay', 'advance', 'cancel', 'reschedule'], 'correctAnswer': 'advance'},
-    {'question': 'Be ___ when crossing the street at night.', 'options': ['resilient', 'postpone', 'cautious', 'genuine'], 'correctAnswer': 'cautious'},
-    {'question': 'Từ "thrive" có nghĩa là gì?', 'options': ['Phát triển mạnh', 'Hoãn lại', 'Kết quả', 'Thận trọng'], 'correctAnswer': 'Phát triển mạnh'},
-    {'question': 'Từ nào đồng nghĩa với "flourish"?', 'options': ['struggle', 'decline', 'thrive', 'pause'], 'correctAnswer': 'thrive'},
-    {'question': 'Từ "reluctant" có nghĩa là gì?', 'options': ['Nhất quán', 'Miễn cưỡng, ngần ngại', 'Kiên cường', 'Chân thật'], 'correctAnswer': 'Miễn cưỡng, ngần ngại'},
-    {'question': 'The ___ of the election was unexpected.', 'options': ['outcome', 'postpone', 'genuine', 'cautious'], 'correctAnswer': 'outcome'},
-    {'question': 'Từ "consistent" có nghĩa là gì?', 'options': ['Thận trọng', 'Kết quả', 'Nhất quán, ổn định', 'Hoãn lại'], 'correctAnswer': 'Nhất quán, ổn định'},
-    {'question': 'Từ "abundant" có nghĩa là gì?', 'options': ['Dồi dào, phong phú', 'Thiếu thốn', 'Mạnh mẽ', 'Nhanh nhẹn'], 'correctAnswer': 'Dồi dào, phong phú'},
-    {'question': 'She gave a ___ speech that moved everyone.', 'options': ['tedious', 'passionate', 'confusing', 'resilient'], 'correctAnswer': 'passionate'},
-    {'question': 'Từ "ambiguous" có nghĩa là gì?', 'options': ['Rõ ràng', 'Mơ hồ, không rõ ràng', 'Mạnh mẽ', 'Dễ thương'], 'correctAnswer': 'Mơ hồ, không rõ ràng'},
-    {'question': 'Đồng nghĩa của "begin" là?', 'options': ['start', 'stop', 'delay', 'cancel'], 'correctAnswer': 'start'},
-    {'question': 'Trái nghĩa của "expensive" là?', 'options': ['costly', 'cheap', 'valuable', 'dear'], 'correctAnswer': 'cheap'},
-    {'question': 'He is very ___ — he always tells the truth.', 'options': ['resilient', 'genuine', 'postpone', 'reluctant'], 'correctAnswer': 'genuine'},
-    {'question': 'Từ "temporary" có nghĩa là gì?', 'options': ['Vĩnh viễn', 'Tạm thời', 'Nhanh chóng', 'Quan trọng'], 'correctAnswer': 'Tạm thời'},
-    {'question': 'The weather is ___ today, very cold.', 'options': ['freezing', 'boiling', 'pleasant', 'resilient'], 'correctAnswer': 'freezing'},
-    {'question': 'Từ nào trái nghĩa với "ancient"?', 'options': ['old', 'modern', 'historic', 'classic'], 'correctAnswer': 'modern'},
-    {'question': 'Từ "negotiate" có nghĩa là gì?', 'options': ['Đàm phán, thương lượng', 'Từ chối', 'Đồng ý', 'Tranh luận'], 'correctAnswer': 'Đàm phán, thương lượng'},
-    {'question': 'She ___ the job offer because it paid well.', 'options': ['accepted', 'refused', 'postponed', 'rejected'], 'correctAnswer': 'accepted'},
-    {'question': 'Từ "vulnerable" có nghĩa là gì?', 'options': ['Mạnh mẽ', 'Dễ bị tổn thương', 'Kiên định', 'Độc lập'], 'correctAnswer': 'Dễ bị tổn thương'},
-    {'question': 'The company ___ its employees for their hard work.', 'options': ['ignored', 'appreciated', 'criticized', 'disliked'], 'correctAnswer': 'appreciated'},
-    {'question': 'Từ "comprehensive" có nghĩa là gì?', 'options': ['Toàn diện', 'Hạn chế', 'Đơn giản', 'Phức tạp'], 'correctAnswer': 'Toàn diện'},
-    {'question': 'He has a ___ attitude towards learning.', 'options': ['negative', 'positive', 'reluctant', 'passive'], 'correctAnswer': 'positive'},
+    {
+      'question': 'Từ "resilient" có nghĩa là gì?',
+      'options': ['Kiên cường, bền bỉ', 'Hoãn lại', 'Chân thật', 'Kết quả'],
+      'correctAnswer': 'Kiên cường, bền bỉ',
+    },
+    {
+      'question': 'Từ "genuine" có nghĩa là gì?',
+      'options': ['Miễn cưỡng', 'Kết quả', 'Chân thật, thật sự', 'Thận trọng'],
+      'correctAnswer': 'Chân thật, thật sự',
+    },
+    {
+      'question': 'Từ nào đồng nghĩa với "tough"?',
+      'options': ['fragile', 'resilient', 'gentle', 'cautious'],
+      'correctAnswer': 'resilient',
+    },
+    {
+      'question': 'Trái nghĩa của "postpone" là?',
+      'options': ['delay', 'advance', 'cancel', 'reschedule'],
+      'correctAnswer': 'advance',
+    },
+    {
+      'question': 'Be ___ when crossing the street at night.',
+      'options': ['resilient', 'postpone', 'cautious', 'genuine'],
+      'correctAnswer': 'cautious',
+    },
+    {
+      'question': 'Từ "thrive" có nghĩa là gì?',
+      'options': ['Phát triển mạnh', 'Hoãn lại', 'Kết quả', 'Thận trọng'],
+      'correctAnswer': 'Phát triển mạnh',
+    },
+    {
+      'question': 'Từ nào đồng nghĩa với "flourish"?',
+      'options': ['struggle', 'decline', 'thrive', 'pause'],
+      'correctAnswer': 'thrive',
+    },
+    {
+      'question': 'Từ "reluctant" có nghĩa là gì?',
+      'options': [
+        'Nhất quán',
+        'Miễn cưỡng, ngần ngại',
+        'Kiên cường',
+        'Chân thật',
+      ],
+      'correctAnswer': 'Miễn cưỡng, ngần ngại',
+    },
+    {
+      'question': 'The ___ of the election was unexpected.',
+      'options': ['outcome', 'postpone', 'genuine', 'cautious'],
+      'correctAnswer': 'outcome',
+    },
+    {
+      'question': 'Từ "consistent" có nghĩa là gì?',
+      'options': ['Thận trọng', 'Kết quả', 'Nhất quán, ổn định', 'Hoãn lại'],
+      'correctAnswer': 'Nhất quán, ổn định',
+    },
+    {
+      'question': 'Từ "abundant" có nghĩa là gì?',
+      'options': ['Dồi dào, phong phú', 'Thiếu thốn', 'Mạnh mẽ', 'Nhanh nhẹn'],
+      'correctAnswer': 'Dồi dào, phong phú',
+    },
+    {
+      'question': 'She gave a ___ speech that moved everyone.',
+      'options': ['tedious', 'passionate', 'confusing', 'resilient'],
+      'correctAnswer': 'passionate',
+    },
+    {
+      'question': 'Từ "ambiguous" có nghĩa là gì?',
+      'options': ['Rõ ràng', 'Mơ hồ, không rõ ràng', 'Mạnh mẽ', 'Dễ thương'],
+      'correctAnswer': 'Mơ hồ, không rõ ràng',
+    },
+    {
+      'question': 'Đồng nghĩa của "begin" là?',
+      'options': ['start', 'stop', 'delay', 'cancel'],
+      'correctAnswer': 'start',
+    },
+    {
+      'question': 'Trái nghĩa của "expensive" là?',
+      'options': ['costly', 'cheap', 'valuable', 'dear'],
+      'correctAnswer': 'cheap',
+    },
+    {
+      'question': 'He is very ___ — he always tells the truth.',
+      'options': ['resilient', 'genuine', 'postpone', 'reluctant'],
+      'correctAnswer': 'genuine',
+    },
+    {
+      'question': 'Từ "temporary" có nghĩa là gì?',
+      'options': ['Vĩnh viễn', 'Tạm thời', 'Nhanh chóng', 'Quan trọng'],
+      'correctAnswer': 'Tạm thời',
+    },
+    {
+      'question': 'The weather is ___ today, very cold.',
+      'options': ['freezing', 'boiling', 'pleasant', 'resilient'],
+      'correctAnswer': 'freezing',
+    },
+    {
+      'question': 'Từ nào trái nghĩa với "ancient"?',
+      'options': ['old', 'modern', 'historic', 'classic'],
+      'correctAnswer': 'modern',
+    },
+    {
+      'question': 'Từ "negotiate" có nghĩa là gì?',
+      'options': ['Đàm phán, thương lượng', 'Từ chối', 'Đồng ý', 'Tranh luận'],
+      'correctAnswer': 'Đàm phán, thương lượng',
+    },
+    {
+      'question': 'She ___ the job offer because it paid well.',
+      'options': ['accepted', 'refused', 'postponed', 'rejected'],
+      'correctAnswer': 'accepted',
+    },
+    {
+      'question': 'Từ "vulnerable" có nghĩa là gì?',
+      'options': ['Mạnh mẽ', 'Dễ bị tổn thương', 'Kiên định', 'Độc lập'],
+      'correctAnswer': 'Dễ bị tổn thương',
+    },
+    {
+      'question': 'The company ___ its employees for their hard work.',
+      'options': ['ignored', 'appreciated', 'criticized', 'disliked'],
+      'correctAnswer': 'appreciated',
+    },
+    {
+      'question': 'Từ "comprehensive" có nghĩa là gì?',
+      'options': ['Toàn diện', 'Hạn chế', 'Đơn giản', 'Phức tạp'],
+      'correctAnswer': 'Toàn diện',
+    },
+    {
+      'question': 'He has a ___ attitude towards learning.',
+      'options': ['negative', 'positive', 'reluctant', 'passive'],
+      'correctAnswer': 'positive',
+    },
   ];
 
   final List<String?> _selectedAnswers = [];
@@ -88,20 +195,22 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
   @override
   void dispose() {
     _timer?.cancel();
+    TtsService.stop();
     _animController.dispose();
     super.dispose();
   }
 
   void _loadQuestions() {
     final provider = context.read<QuizProvider>();
-    final source = provider.currentQuestions.isNotEmpty
-        ? provider.currentQuestions
-        : List<Map<String, dynamic>>.from(_fallbackQuestions)
+    final source =
+        provider.currentQuestions.isNotEmpty
+              ? provider.currentQuestions
+              : List<Map<String, dynamic>>.from(_fallbackQuestions)
           ..shuffle(Random(DateTime.now().millisecondsSinceEpoch));
 
     _questions
       ..clear()
-      ..addAll(source.take(10));
+      ..addAll(source);
     _selectedAnswers
       ..clear()
       ..addAll(List<String?>.filled(_questions.length, null));
@@ -136,6 +245,7 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
 
   void _goNext() {
     _timer?.cancel();
+    TtsService.stop();
     if (_currentIndex >= _questions.length - 1) {
       _finishQuiz();
       return;
@@ -150,6 +260,7 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
 
   void _goPrev() {
     _timer?.cancel();
+    TtsService.stop();
     if (_currentIndex <= 0) return;
     setState(() {
       _currentIndex--;
@@ -267,15 +378,28 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
         appBar: AppBar(
           backgroundColor: AppColors.luxurySurface,
           foregroundColor: AppColors.luxuryEspresso,
-          title: Text('Quiz', style: GoogleFonts.playfairDisplay(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.luxuryEspresso)),
+          title: Text(
+            'Quiz',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryEspresso,
+            ),
+          ),
         ),
-        body: const Center(child: Text('Không có câu hỏi nào. Vui lòng thử lại sau.')),
+        body: const Center(
+          child: Text('Không có câu hỏi nào. Vui lòng thử lại sau.'),
+        ),
       );
     }
     if (_currentIndex >= total) _currentIndex = total - 1;
     final item = _questions[_currentIndex];
+    final transcript = item['transcript'] as String?;
+    final isListening = transcript != null && transcript.trim().isNotEmpty;
     final options = (item['options'] as List).cast<String>();
     final selected = _selectedAnswers[_currentIndex];
+    final pageWidth = MediaQuery.sizeOf(context).width;
+    final pagePadding = ((pageWidth - 820) / 2).clamp(20.0, 64.0);
 
     return Scaffold(
       backgroundColor: AppColors.luxuryBg,
@@ -302,7 +426,7 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
           child: SlideTransition(
             position: _slideAnim,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              padding: EdgeInsets.fromLTRB(pagePadding, 16, pagePadding, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -328,7 +452,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                                 value: (_currentIndex + 1) / total,
                                 minHeight: 6,
                                 backgroundColor: AppColors.luxuryBorder,
-                                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.luxuryBrown),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  AppColors.luxuryBrown,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -339,7 +465,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                                 minHeight: 3,
                                 backgroundColor: AppColors.luxuryBorder,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  _secondsLeft <= 10 ? AppColors.luxuryDanger : AppColors.luxuryTextHint,
+                                  _secondsLeft <= 10
+                                      ? AppColors.luxuryDanger
+                                      : AppColors.luxuryTextHint,
                                 ),
                               ),
                             ),
@@ -348,14 +476,19 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: _secondsLeft <= 10
                               ? AppColors.luxuryDanger.withValues(alpha: 0.12)
                               : AppColors.luxuryBg,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: _secondsLeft <= 10 ? AppColors.luxuryDanger.withValues(alpha: 0.3) : AppColors.luxuryBorder,
+                            color: _secondsLeft <= 10
+                                ? AppColors.luxuryDanger.withValues(alpha: 0.3)
+                                : AppColors.luxuryBorder,
                           ),
                         ),
                         child: Row(
@@ -364,7 +497,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                             Icon(
                               Icons.timer_outlined,
                               size: 12,
-                              color: _secondsLeft <= 10 ? AppColors.luxuryDanger : AppColors.luxuryTextHint,
+                              color: _secondsLeft <= 10
+                                  ? AppColors.luxuryDanger
+                                  : AppColors.luxuryTextHint,
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -372,7 +507,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                               style: GoogleFonts.nunito(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: _secondsLeft <= 10 ? AppColors.luxuryDanger : AppColors.luxuryTextHint,
+                                color: _secondsLeft <= 10
+                                    ? AppColors.luxuryDanger
+                                    : AppColors.luxuryTextHint,
                               ),
                             ),
                           ],
@@ -382,12 +519,20 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                   ),
                   const SizedBox(height: 20),
 
+                  if (isListening) ...[
+                    _buildListeningCard(transcript),
+                    const SizedBox(height: 14),
+                  ],
+
                   // Question card with double-bezel
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.luxuryBg,
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+                      border: Border.all(
+                        color: AppColors.luxuryBorder,
+                        width: 1.5,
+                      ),
                     ),
                     padding: const EdgeInsets.all(3),
                     child: Container(
@@ -418,63 +563,79 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                       itemBuilder: (context, index) {
                         final option = options[index];
                         final isSelected = option == selected;
-                        return InkWell(
-                          onTap: () => _selectAnswer(option),
-                          borderRadius: BorderRadius.circular(14),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.luxuryBg,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: isSelected ? AppColors.luxuryBrown : AppColors.luxuryBorder,
-                                width: isSelected ? 2 : 1.5,
-                              ),
-                            ),
-                            padding: const EdgeInsets.all(3),
+                        return Semantics(
+                          button: true,
+                          selected: isSelected,
+                          label:
+                              'Đáp án ${String.fromCharCode(65 + index)}: $option',
+                          child: InkWell(
+                            onTap: () => _selectAnswer(option),
+                            borderRadius: BorderRadius.circular(14),
                             child: Container(
-                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.luxuryBrown.withValues(alpha: 0.06)
-                                    : AppColors.luxurySurface,
-                                borderRadius: BorderRadius.circular(11),
+                                color: AppColors.luxuryBg,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppColors.luxuryBrown
+                                      : AppColors.luxuryBorder,
+                                  width: isSelected ? 2 : 1.5,
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: isSelected ? AppColors.luxuryBrown : Colors.transparent,
-                                      border: Border.all(
-                                        color: isSelected ? AppColors.luxuryBrown : AppColors.luxuryBorder,
-                                        width: 1.5,
+                              padding: const EdgeInsets.all(3),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? AppColors.luxuryBrown.withValues(
+                                          alpha: 0.06,
+                                        )
+                                      : AppColors.luxurySurface,
+                                  borderRadius: BorderRadius.circular(11),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isSelected
+                                            ? AppColors.luxuryBrown
+                                            : Colors.transparent,
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? AppColors.luxuryBrown
+                                              : AppColors.luxuryBorder,
+                                          width: 1.5,
+                                        ),
                                       ),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        String.fromCharCode(65 + index),
-                                        style: GoogleFonts.nunito(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: isSelected ? Colors.white : AppColors.luxuryText,
+                                      child: Center(
+                                        child: Text(
+                                          String.fromCharCode(65 + index),
+                                          style: GoogleFonts.nunito(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: isSelected
+                                                ? Colors.white
+                                                : AppColors.luxuryText,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      option,
-                                      style: GoogleFonts.nunito(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.luxuryEspresso,
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        option,
+                                        style: GoogleFonts.nunito(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.luxuryEspresso,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -495,7 +656,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildPrimaryNavButton(
-                          label: _currentIndex < total - 1 ? 'Câu tiếp theo' : 'Xem kết quả',
+                          label: _currentIndex < total - 1
+                              ? 'Câu tiếp theo'
+                              : 'Xem kết quả',
                           onPressed: _goNext,
                         ),
                       ),
@@ -506,6 +669,88 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildListeningCard(String transcript) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: AppColors.luxuryGradientDark,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.luxuryEspresso.withValues(alpha: 0.14),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 62,
+            height: 62,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+            ),
+            child: Center(
+              child: SpeakerButton(
+                text: transcript,
+                size: 48,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.graphic_eq_rounded,
+                      color: Colors.white,
+                      size: 17,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'ENGLISH LISTENING',
+                      style: GoogleFonts.nunito(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white.withValues(alpha: 0.75),
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  'Nghe đoạn hội thoại',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Nhấn nút loa để nghe lại • Giọng Anh-Mỹ',
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -530,7 +775,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                 style: GoogleFonts.nunito(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: onPressed != null ? AppColors.luxuryBrown : AppColors.luxuryTextHint,
+                  color: onPressed != null
+                      ? AppColors.luxuryBrown
+                      : AppColors.luxuryTextHint,
                 ),
               ),
             ),
@@ -540,7 +787,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
     );
   }
 
-  Widget _buildPrimaryNavButton({required String label, VoidCallback? onPressed}) {
+  Widget _buildPrimaryNavButton({
+    required String label,
+    VoidCallback? onPressed,
+  }) {
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.luxuryGradient,
@@ -595,6 +845,8 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
     final elapsed = DateTime.now().difference(_startedAt!).inSeconds;
     final minutes = (elapsed ~/ 60).toString().padLeft(2, '0');
     final seconds = (elapsed % 60).toString().padLeft(2, '0');
+    final pageWidth = MediaQuery.sizeOf(context).width;
+    final pagePadding = ((pageWidth - 760) / 2).clamp(20.0, 64.0);
 
     return Scaffold(
       backgroundColor: AppColors.luxuryBg,
@@ -609,7 +861,7 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
       bottomNavigationBar: const AppBottomNav(selectedIndex: 1),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+          padding: EdgeInsets.fromLTRB(pagePadding, 20, pagePadding, 32),
           child: FadeTransition(
             opacity: _fadeAnim,
             child: SlideTransition(
@@ -623,7 +875,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: accuracy >= 70 ? AppColors.luxuryGreen : AppColors.luxuryDanger,
+                        color: accuracy >= 70
+                            ? AppColors.luxuryGreen
+                            : AppColors.luxuryDanger,
                         width: 2.5,
                       ),
                       color: AppColors.luxurySurface,
@@ -634,7 +888,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: accuracy >= 70 ? AppColors.luxuryGreen : AppColors.luxuryDanger,
+                          color: accuracy >= 70
+                              ? AppColors.luxuryGreen
+                              : AppColors.luxuryDanger,
                         ),
                       ),
                     ),
@@ -663,7 +919,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                       const SizedBox(width: 10),
                       _ResultBox(label: 'XP', value: '+${_score * 10}'),
                       const SizedBox(width: 10),
-                      _ResultBox(label: 'Thời gian', value: '$minutes:$seconds'),
+                      _ResultBox(
+                        label: 'Thời gian',
+                        value: '$minutes:$seconds',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 22),
@@ -673,7 +932,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                     decoration: BoxDecoration(
                       color: AppColors.luxuryBg,
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+                      border: Border.all(
+                        color: AppColors.luxuryBorder,
+                        width: 1.5,
+                      ),
                     ),
                     padding: const EdgeInsets.all(3),
                     child: Container(
@@ -697,7 +959,8 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                           const SizedBox(height: 14),
                           ...List.generate(_questions.length, (index) {
                             final item = _questions[index];
-                            final selected = _selectedAnswers[index] ?? 'Bỏ trống';
+                            final selected =
+                                _selectedAnswers[index] ?? 'Bỏ trống';
                             final correct = item['correctAnswer'] as String;
                             final isCorrect = selected == correct;
                             return Container(
@@ -705,13 +968,21 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
                                 color: isCorrect
-                                    ? AppColors.luxuryGreen.withValues(alpha: 0.06)
-                                    : AppColors.luxuryDanger.withValues(alpha: 0.05),
+                                    ? AppColors.luxuryGreen.withValues(
+                                        alpha: 0.06,
+                                      )
+                                    : AppColors.luxuryDanger.withValues(
+                                        alpha: 0.05,
+                                      ),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isCorrect
-                                      ? AppColors.luxuryGreen.withValues(alpha: 0.3)
-                                      : AppColors.luxuryDanger.withValues(alpha: 0.2),
+                                      ? AppColors.luxuryGreen.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : AppColors.luxuryDanger.withValues(
+                                          alpha: 0.2,
+                                        ),
                                 ),
                               ),
                               child: Column(
@@ -728,13 +999,18 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                                   const SizedBox(height: 6),
                                   Text(
                                     'Bạn chọn: $selected',
-                                    style: GoogleFonts.nunito(fontSize: 13, color: AppColors.luxuryText),
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 13,
+                                      color: AppColors.luxuryText,
+                                    ),
                                   ),
                                   Text(
                                     'Đáp án đúng: $correct',
                                     style: GoogleFonts.nunito(
                                       fontSize: 13,
-                                      color: isCorrect ? AppColors.luxuryGreen : AppColors.luxuryDanger,
+                                      color: isCorrect
+                                          ? AppColors.luxuryGreen
+                                          : AppColors.luxuryDanger,
                                     ),
                                   ),
                                 ],
@@ -754,7 +1030,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+                            border: Border.all(
+                              color: AppColors.luxuryBorder,
+                              width: 1.5,
+                            ),
                           ),
                           child: Material(
                             color: AppColors.luxurySurface,
@@ -763,7 +1042,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                               borderRadius: BorderRadius.circular(999),
                               onTap: () => context.go('/quiz'),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 child: Center(
                                   child: Text(
                                     'Về trang chủ',
@@ -799,7 +1080,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                                 _loadQuestions();
                               },
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -817,10 +1100,16 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
                                       width: 28,
                                       height: 28,
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.25),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.25,
+                                        ),
                                         borderRadius: BorderRadius.circular(14),
                                       ),
-                                      child: const Icon(Icons.refresh_rounded, size: 16, color: Colors.white),
+                                      child: const Icon(
+                                        Icons.refresh_rounded,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -845,10 +1134,7 @@ class _ResultBox extends StatelessWidget {
   final String label;
   final String value;
 
-  const _ResultBox({
-    required this.label,
-    required this.value,
-  });
+  const _ResultBox({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -879,7 +1165,10 @@ class _ResultBox extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 label,
-                style: GoogleFonts.nunito(fontSize: 12, color: AppColors.luxuryText),
+                style: GoogleFonts.nunito(
+                  fontSize: 12,
+                  color: AppColors.luxuryText,
+                ),
               ),
             ],
           ),

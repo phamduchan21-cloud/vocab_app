@@ -4,20 +4,62 @@
   <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Ứng dụng học từ vựng online">
+  <meta name="description" content="Ứng dụng học từ vựng tiếng Anh SolVocab">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="VocabApp">
+  <meta name="apple-mobile-web-app-title" content="SolVocab">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-  <link rel="icon" type="image/png" href="favicon.png"/>
-  <title>VocabApp - Học từ vựng</title>
+  <link rel="icon" type="image/svg+xml" href="solvocab-mark.svg"/>
+  <link rel="alternate icon" type="image/png" href="favicon.png"/>
+  <title>SolVocab</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: #f3f7f2;
+    }
+
+    .app-loader {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      gap: 14px;
+      color: #17372e;
+      font: 600 16px/1.5 Georgia, serif;
+      text-align: center;
+    }
+
+    .app-loader::before {
+      width: 34px;
+      height: 34px;
+      margin: 0 auto;
+      border: 4px solid #d8e7de;
+      border-top-color: #0f766e;
+      border-radius: 50%;
+      content: '';
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <div class="app-loader" aria-live="polite">Đang tải SolVocab...</div>
   <script>
-    window.__passkeysWebBundleUrl = 'https://github.com/corbado/flutter-passkeys/releases/download/2.4.0/bundle.js';
+    const appLoader = document.querySelector('.app-loader');
+    const appObserver = new MutationObserver(() => {
+      if (document.querySelector('flutter-view, flt-glass-pane')) {
+        appLoader?.remove();
+        appObserver.disconnect();
+      }
+    });
+    appObserver.observe(document.body, { childList: true, subtree: true });
   </script>
-  <script src="https://github.com/corbado/flutter-passkeys/releases/download/2.4.0/bundle.js"></script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

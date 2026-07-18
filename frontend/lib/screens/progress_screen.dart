@@ -178,9 +178,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
   ) {
     if (topics.isEmpty || vocabCount == 0) {
       return [
-        (label: 'Da thuoc', pct: 0.0, color: AppColors.luxuryGreen),
-        (label: 'Dang hoc', pct: 0.0, color: AppColors.luxuryBrownLight),
-        (label: 'Moi', pct: 1.0, color: AppColors.luxuryBorder),
+        (label: 'Đã thuộc', pct: 0.0, color: AppColors.luxuryGreen),
+        (label: 'Đang học', pct: 0.0, color: AppColors.luxuryBrownLight),
+        (label: 'Mới', pct: 1.0, color: AppColors.luxuryBorder),
       ];
     }
     final totalMastered = topics.fold<int>(0, (s, t) => s + t.mastered);
@@ -188,9 +188,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final total = math.max(totalVocab, vocabCount);
     if (total == 0) {
       return [
-        (label: 'Da thuoc', pct: 0.0, color: AppColors.luxuryGreen),
-        (label: 'Dang hoc', pct: 0.0, color: AppColors.luxuryBrownLight),
-        (label: 'Moi', pct: 1.0, color: AppColors.luxuryBorder),
+        (label: 'Đã thuộc', pct: 0.0, color: AppColors.luxuryGreen),
+        (label: 'Đang học', pct: 0.0, color: AppColors.luxuryBrownLight),
+        (label: 'Mới', pct: 1.0, color: AppColors.luxuryBorder),
       ];
     }
     final mastered = (totalMastered / total).clamp(0.0, 1.0);
@@ -198,9 +198,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final learning = remaining * 0.5;
     final new_ = remaining - learning;
     return [
-      (label: 'Da thuoc', pct: mastered, color: AppColors.luxuryGreen),
-      (label: 'Dang hoc', pct: learning, color: AppColors.luxuryBrownLight),
-      (label: 'Moi', pct: new_, color: AppColors.luxuryBorder),
+      (label: 'Đã thuộc', pct: mastered, color: AppColors.luxuryGreen),
+      (label: 'Đang học', pct: learning, color: AppColors.luxuryBrownLight),
+      (label: 'Mới', pct: new_, color: AppColors.luxuryBorder),
     ];
   }
 
@@ -242,11 +242,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
   ) {
     if (achievements.isEmpty) {
       return [
-        (icon: '\u{1F525}', name: '7 ngay streak', locked: true),
-        (icon: '\u{1F4D8}', name: '100 tu', locked: true),
-        (icon: '\u{1F3AF}', name: 'Diem tuyet doi', locked: true),
-        (icon: '\u{1F319}', name: 'Cu dem', locked: true),
-        (icon: '\u{1F3C6}', name: '30 ngay streak', locked: true),
+        (icon: '\u{1F525}', name: 'Chuỗi 7 ngày', locked: true),
+        (icon: '\u{1F4D8}', name: '100 từ', locked: true),
+        (icon: '\u{1F3AF}', name: 'Điểm tuyệt đối', locked: true),
+        (icon: '\u{1F319}', name: 'Cú đêm', locked: true),
+        (icon: '\u{1F3C6}', name: 'Chuỗi 30 ngày', locked: true),
       ];
     }
     return achievements.map((a) {
@@ -288,7 +288,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       bottomNavigationBar: const AppBottomNav(selectedIndex: 4),
       appBar: AppBar(
         title: Text(
-          'Tien do',
+          'Tiến độ',
           style: GoogleFonts.playfairDisplay(
             color: AppColors.luxuryEspresso,
             fontSize: 22,
@@ -347,7 +347,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       bottomNavigationBar: const AppBottomNav(selectedIndex: 4),
       appBar: AppBar(
         title: Text(
-          'Tien do',
+          'Tiến độ',
           style: GoogleFonts.playfairDisplay(
             color: AppColors.luxuryEspresso,
             fontSize: 22,
@@ -387,7 +387,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       bottomNavigationBar: const AppBottomNav(selectedIndex: 4),
       appBar: AppBar(
         title: Text(
-          'Tien do',
+          'Tiến độ',
           style: GoogleFonts.playfairDisplay(
             color: AppColors.luxuryEspresso,
             fontSize: 22,
@@ -438,7 +438,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Tien do hoc tap',
+          'Tiến độ học tập',
           style: GoogleFonts.playfairDisplay(
             fontSize: 26,
             fontWeight: FontWeight.w700,
@@ -448,8 +448,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
         const SizedBox(height: 6),
         Text(
           isNewUser
-              ? 'Chua co du lieu. Hay bat dau hoc tu moi!'
-              : 'Theo doi qua trinh hoc tu vung cua ban.',
+              ? 'Chưa có dữ liệu. Hãy bắt đầu với một phiên học ngắn.'
+              : 'Theo dõi khả năng ghi nhớ và nhịp học của bạn.',
           style: GoogleFonts.nunito(
             fontSize: 14,
             color: AppColors.luxuryText,
@@ -465,45 +465,53 @@ class _ProgressScreenState extends State<ProgressScreen> {
       required int quizAvg,
       required int xp}) {
     return LayoutBuilder(builder: (context, constraints) {
-      final gap = constraints.maxWidth > 480 ? 12.0 : 8.0;
+      final useFourColumns = constraints.maxWidth >= 760;
+      final gap = useFourColumns ? 12.0 : 8.0;
+      final columns = useFourColumns ? 4 : 2;
+      final cardWidth = (constraints.maxWidth - gap * (columns - 1)) / columns;
       return Wrap(spacing: gap, runSpacing: gap, children: [
         _statCard(
+            width: cardWidth,
             icon: '\u{1F4D8}',
             iconBg:
                 AppColors.luxuryBrown.withValues(alpha: 0.10),
             iconColor: AppColors.luxuryBrown,
             value: '$vocabCount',
-            label: 'Tu da hoc'),
+            label: 'Từ đã học'),
         _statCard(
+            width: cardWidth,
             icon: '\u{1F525}',
             iconBg: AppColors.luxuryGold.withValues(alpha: 0.10),
             iconColor: AppColors.luxuryGold,
             value: '$streak',
-            label: 'Ngay lien tiep'),
+            label: 'Ngày liên tiếp'),
         _statCard(
+            width: cardWidth,
             icon: '\u{1F3AF}',
             iconBg: AppColors.luxuryGreen.withValues(alpha: 0.10),
             iconColor: AppColors.luxuryGreen,
             value: '$quizAvg%',
-            label: 'Diem quiz TB'),
+            label: 'Điểm quiz TB'),
         _statCard(
+            width: cardWidth,
             icon: '\u{2B50}',
             iconBg: AppColors.luxuryBrownPale.withValues(alpha: 0.20),
             iconColor: AppColors.luxuryBrown,
             value: _formatNumber(xp),
-            label: 'Tong XP'),
+            label: 'Tổng XP'),
       ]);
     });
   }
 
   Widget _statCard(
-      {required String icon,
+      {required double width,
+      required String icon,
       required Color iconBg,
       required Color iconColor,
       required String value,
       required String label}) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width > 480 ? null : double.infinity,
+      width: width,
       child: _DoubleBezel(
         borderRadius: 14,
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
@@ -576,7 +584,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Hoat dong 7 ngay qua',
+            'Hoạt động 7 ngày qua',
             style: GoogleFonts.nunito(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -636,7 +644,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Muc do ghi nho',
+            'Mức độ ghi nhớ',
             style: GoogleFonts.nunito(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -717,7 +725,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 style: TextStyle(fontSize: 18)),
             const SizedBox(width: 8),
             Text(
-              'Ky nang',
+              'Kỹ năng',
               style: GoogleFonts.nunito(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -753,7 +761,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${s.completed} bai',
+                              '${s.completed} bài',
                               style: GoogleFonts.nunito(
                                 fontSize: 11,
                                 color: AppColors.luxuryText,
@@ -793,7 +801,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Lich hoc 14 tuan gan day',
+            'Lịch học 14 tuần gần đây',
             style: GoogleFonts.nunito(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -851,7 +859,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Text(
-          'Huy hieu',
+          'Huy hiệu',
           style: GoogleFonts.playfairDisplay(
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -863,7 +871,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
-            'Chua co huy hieu nao. Hoc tap cham chi de mo khoa!',
+            'Chưa có huy hiệu. Duy trì nhịp học để mở khóa thành tựu đầu tiên.',
             style: GoogleFonts.nunito(
               fontSize: 13,
               color: AppColors.luxuryTextHint,

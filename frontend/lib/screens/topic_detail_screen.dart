@@ -29,19 +29,30 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final topicProv = context.read<TopicProvider>();
-      final topic = topicProv.topics.where(
-        (t) => t.lessonId.toString() == widget.lessonId,
-      ).firstOrNull;
+      final topic = topicProv.topics
+          .where((t) => t.lessonId.toString() == widget.lessonId)
+          .firstOrNull;
       if (topic != null) {
         _topicName = topic.title;
       }
 
       // Map lesson ID to topic name
       final lessonTopicMap = {
-        '1': 'greetings', '2': 'family', '3': 'numbers', '4': 'daily',
-        '5': 'food', '6': 'travel', '7': 'shopping', '8': 'weather',
-        '9': 'health', '10': 'work', '11': 'education', '12': 'entertainment',
-        '13': 'technology', '14': 'emotions', '15': 'society',
+        '1': 'greetings',
+        '2': 'family',
+        '3': 'numbers',
+        '4': 'daily',
+        '5': 'food',
+        '6': 'travel',
+        '7': 'shopping',
+        '8': 'weather',
+        '9': 'health',
+        '10': 'work',
+        '11': 'education',
+        '12': 'entertainment',
+        '13': 'technology',
+        '14': 'emotions',
+        '15': 'society',
       };
       final topicKey = lessonTopicMap[widget.lessonId] ?? widget.lessonId;
       _topicName ??= topicKey;
@@ -68,28 +79,64 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
       body: Column(
         children: [
           // Action buttons
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      final quiz = context.read<QuizProvider>();
-                      quiz.setTopic(_topicName?.toLowerCase() ?? '');
-                      context.go('/quiz/play');
-                    },
-                    icon: const Icon(Icons.play_arrow_rounded, size: 18),
-                    label: Text(
-                      'Làm quiz',
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 880),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: AppColors.ink.withValues(alpha: 0.08),
                     ),
                   ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${topicProv.vocabItems.length} từ trong bài',
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.ink,
+                              ),
+                            ),
+                            Text(
+                              'Nghe, đọc ví dụ rồi kiểm tra ngay.',
+                              style: GoogleFonts.nunito(
+                                fontSize: 13,
+                                color: AppColors.inkSoft,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          final quiz = context.read<QuizProvider>();
+                          quiz.setTopic(_topicName?.toLowerCase() ?? '');
+                          context.go('/quiz/play');
+                        },
+                        icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                        label: Text(
+                          'Bắt đầu quiz',
+                          style: GoogleFonts.nunito(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
           // Body
@@ -107,9 +154,8 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
     if (provider.errorMessage != null && provider.vocabItems.isEmpty) {
       return ErrorStateWidget(
         message: provider.errorMessage!,
-        onRetry: () => provider.loadVocabByTopic(
-          topic: _topicName?.toLowerCase() ?? '',
-        ),
+        onRetry: () =>
+            provider.loadVocabByTopic(topic: _topicName?.toLowerCase() ?? ''),
       );
     }
 
@@ -117,23 +163,45 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
 
     if (items.isEmpty) {
       return Center(
-        child: Text(
-          'Chưa có từ vựng cho chủ đề này.',
-          style: GoogleFonts.nunito(fontSize: 16, color: AppColors.inkSoft),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.menu_book_outlined,
+              size: 52,
+              color: AppColors.inkSoft,
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'Chủ đề này chưa có từ vựng',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Hãy quay lại và chọn một chủ đề khác.',
+              style: GoogleFonts.nunito(color: AppColors.inkSoft),
+            ),
+          ],
         ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return _VocabCardTile(
-          item: item,
-          onAdd: () => _addToMyVocab(item),
-        );
-      },
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 880),
+        child: ListView.builder(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return _VocabCardTile(item: item, onAdd: () => _addToMyVocab(item));
+          },
+        ),
+      ),
     );
   }
 

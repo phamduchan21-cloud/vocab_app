@@ -136,7 +136,7 @@ class AppDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'VocaEng v1.0.0',
+                'SolVocab',
                 style: GoogleFonts.nunito(
                   fontSize: 11,
                   color: AppColors.luxuryTextHint,

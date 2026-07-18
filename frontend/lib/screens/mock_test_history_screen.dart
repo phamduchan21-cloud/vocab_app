@@ -24,6 +24,10 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
   int _page = 1;
   bool _isLoadingMore = false;
   final _scrollController = ScrollController();
+  String _levelFilter = 'all';
+  String _scoreFilter = 'all';
+  String _dateFilter = 'all';
+  String? _topicFilter;
 
   @override
   void initState() {
@@ -65,8 +69,14 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Lịch sử mini-test',
-            style: GoogleFonts.nunito(fontWeight: FontWeight.w700, fontSize: 18, color: AppColors.ink)),
+        title: Text(
+          'Lịch sử mini-test',
+          style: GoogleFonts.nunito(
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+            color: AppColors.ink,
+          ),
+        ),
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink,
         elevation: 0,
@@ -76,13 +86,22 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.rose.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text('${prov.historyTotal} bài',
-                    style: GoogleFonts.ibmPlexMono(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.rose)),
+                child: Text(
+                  '${prov.historyTotal} bài',
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.rose,
+                  ),
+                ),
               ),
             ),
         ],
@@ -98,8 +117,15 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
   }
 
   Widget _buildBody(bool isLoading, bool hasError, MockTestProvider prov) {
-    if (isLoading) return const SkeletonLoading(type: SkeletonType.list, count: 6);
-    if (hasError) return ErrorStateWidget(message: prov.errorMessage!, onRetry: () => prov.loadHistory(page: 1, limit: 50));
+    if (isLoading) {
+      return const SkeletonLoading(type: SkeletonType.list, count: 6);
+    }
+    if (hasError) {
+      return ErrorStateWidget(
+        message: prov.errorMessage!,
+        onRetry: () => prov.loadHistory(page: 1, limit: 50),
+      );
+    }
     if (prov.history.isEmpty) {
       return const EmptyStateWidget(
         title: 'Chưa có bài kiểm tra nào',
@@ -107,18 +133,46 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
         showCat: false,
       );
     }
+    final pageWidth = MediaQuery.sizeOf(context).width;
+    final pagePadding = ((pageWidth - 900) / 2).clamp(16.0, 64.0);
+    final filteredHistory = prov.history.where((item) {
+      if (_levelFilter != 'all' && item.testLevel != _levelFilter) return false;
+      if (_scoreFilter == 'high' && item.scorePercent < 80) return false;
+      if (_scoreFilter == 'medium' &&
+          (item.scorePercent < 50 || item.scorePercent >= 80)) {
+        return false;
+      }
+      if (_scoreFilter == 'low' && item.scorePercent >= 50) return false;
+      if (_topicFilter != null && item.topic != _topicFilter) return false;
+      if (_dateFilter != 'all' && item.completedAt != null) {
+        final days = _dateFilter == '7' ? 7 : 30;
+        if (DateTime.now().difference(item.completedAt!).inDays > days) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+    final topics = prov.history
+        .map((item) => item.topic)
+        .whereType<String>()
+        .toSet()
+        .toList();
 
     return ListView(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+      padding: EdgeInsets.fromLTRB(pagePadding, 16, pagePadding, 80),
       children: [
         // Stats summary card
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppColors.rose.withValues(alpha: 0.08), AppColors.rose.withValues(alpha: 0.02)],
-              begin: Alignment.topLeft, end: Alignment.bottomRight,
+              colors: [
+                AppColors.rose.withValues(alpha: 0.08),
+                AppColors.rose.withValues(alpha: 0.02),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.rose.withValues(alpha: 0.12)),
@@ -126,45 +180,195 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
           child: Row(
             children: [
               Container(
-                width: 48, height: 48,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: AppColors.rose.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.analytics_rounded, color: AppColors.rose, size: 22),
+                child: const Icon(
+                  Icons.analytics_rounded,
+                  color: AppColors.rose,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 14),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Tổng quan', style: GoogleFonts.nunito(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                const SizedBox(height: 4),
-                Text('${prov.historyTotal} bài kiểm tra',
-                    style: GoogleFonts.nunito(fontSize: 12, color: AppColors.inkSoft)),
-              ])),
-              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('${_avgScore(prov.history)}%',
-                    style: GoogleFonts.ibmPlexMono(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.rose)),
-                Text('TB', style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft)),
-              ]),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tổng quan',
+                      style: GoogleFonts.nunito(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${prov.historyTotal} bài kiểm tra',
+                      style: GoogleFonts.nunito(
+                        fontSize: 12,
+                        color: AppColors.inkSoft,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${_avgScore(prov.history)}%',
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.rose,
+                    ),
+                  ),
+                  Text(
+                    'TB',
+                    style: GoogleFonts.nunito(
+                      fontSize: 11,
+                      color: AppColors.inkSoft,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Bộ lọc',
+          style: GoogleFonts.nunito(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: AppColors.ink,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 7,
+          runSpacing: 7,
+          children: [
+            _filterChip(
+              'Mọi cấp độ',
+              _levelFilter == 'all',
+              () => setState(() => _levelFilter = 'all'),
+            ),
+            _filterChip(
+              'Cơ bản',
+              _levelFilter == 'beginner',
+              () => setState(() => _levelFilter = 'beginner'),
+            ),
+            _filterChip(
+              'Trung cấp',
+              _levelFilter == 'intermediate',
+              () => setState(() => _levelFilter = 'intermediate'),
+            ),
+            _filterChip(
+              'Nâng cao',
+              _levelFilter == 'advanced',
+              () => setState(() => _levelFilter = 'advanced'),
+            ),
+            _filterChip(
+              '7 ngày',
+              _dateFilter == '7',
+              () => setState(
+                () => _dateFilter = _dateFilter == '7' ? 'all' : '7',
+              ),
+            ),
+            _filterChip(
+              '30 ngày',
+              _dateFilter == '30',
+              () => setState(
+                () => _dateFilter = _dateFilter == '30' ? 'all' : '30',
+              ),
+            ),
+            _filterChip(
+              '≥ 80%',
+              _scoreFilter == 'high',
+              () => setState(
+                () => _scoreFilter = _scoreFilter == 'high' ? 'all' : 'high',
+              ),
+            ),
+            _filterChip(
+              '50–79%',
+              _scoreFilter == 'medium',
+              () => setState(
+                () =>
+                    _scoreFilter = _scoreFilter == 'medium' ? 'all' : 'medium',
+              ),
+            ),
+            _filterChip(
+              '< 50%',
+              _scoreFilter == 'low',
+              () => setState(
+                () => _scoreFilter = _scoreFilter == 'low' ? 'all' : 'low',
+              ),
+            ),
+            ...topics.map(
+              (topic) => _filterChip(
+                topic,
+                _topicFilter == topic,
+                () => setState(
+                  () => _topicFilter = _topicFilter == topic ? null : topic,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 20),
         // List header
         Row(
           children: [
-            Text('Tất cả bài kiểm tra',
-                style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+            Text(
+              '${filteredHistory.length} bài phù hợp',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 12),
         // Items
-        ...prov.history.map((item) => _buildHistoryItem(item)),
+        if (filteredHistory.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 28),
+            child: Center(child: Text('Không có bài test phù hợp bộ lọc.')),
+          )
+        else
+          ...filteredHistory.map((item) => _buildHistoryItem(item)),
         if (_isLoadingMore)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
-            child: Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5))),
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
+              ),
+            ),
           ),
       ],
+    );
+  }
+
+  Widget _filterChip(String label, bool selected, VoidCallback onTap) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onTap(),
+      selectedColor: AppColors.rose,
+      labelStyle: GoogleFonts.nunito(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: selected ? Colors.white : AppColors.inkSoft,
+      ),
     );
   }
 
@@ -178,15 +382,15 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
     final gradeColor = item.grade == 'A'
         ? AppColors.success
         : item.grade == 'B'
-            ? AppColors.rose
-            : item.grade == 'C'
-                ? AppColors.warning
-                : AppColors.danger;
+        ? AppColors.rose
+        : item.grade == 'C'
+        ? AppColors.warning
+        : AppColors.danger;
     final levelLabel = item.testLevel == 'beginner'
         ? 'Cơ bản'
         : item.testLevel == 'intermediate'
-            ? 'Trung cấp'
-            : 'Nâng cao';
+        ? 'Trung cấp'
+        : 'Nâng cao';
     final dateStr = item.completedAt != null
         ? '${item.completedAt!.day}/${item.completedAt!.month}/${item.completedAt!.year} ${item.completedAt!.hour.toString().padLeft(2, '0')}:${item.completedAt!.minute.toString().padLeft(2, '0')}'
         : '';
@@ -202,27 +406,70 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
       child: Row(
         children: [
           // Score ring
-          SizedBox(width: 46, height: 46, child: Stack(fit: StackFit.expand, children: [
-            CircularProgressIndicator(
-              value: item.scorePercent / 100, strokeWidth: 3.5,
-              backgroundColor: AppColors.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(gradeColor),
+          SizedBox(
+            width: 46,
+            height: 46,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                CircularProgressIndicator(
+                  value: item.scorePercent / 100,
+                  strokeWidth: 3.5,
+                  backgroundColor: AppColors.surfaceContainerHighest,
+                  valueColor: AlwaysStoppedAnimation<Color>(gradeColor),
+                ),
+                Center(
+                  child: Text(
+                    '${item.scorePercent.round()}%',
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: gradeColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Center(child: Text('${item.scorePercent.round()}%',
-                style: GoogleFonts.ibmPlexMono(fontSize: 11, fontWeight: FontWeight.w700, color: gradeColor))),
-          ])),
+          ),
           const SizedBox(width: 14),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              _tag(levelLabel, AppColors.rose.withValues(alpha: 0.08), AppColors.rose),
-              const SizedBox(width: 6),
-              _tag('Hạng ${item.grade}', gradeColor.withValues(alpha: 0.10), gradeColor),
-            ]),
-            const SizedBox(height: 6),
-            Text('${item.correctAnswers}/${item.totalQuestions} câu đúng',
-                style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink)),
-            Text(dateStr, style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft)),
-          ])),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _tag(
+                      levelLabel,
+                      AppColors.rose.withValues(alpha: 0.08),
+                      AppColors.rose,
+                    ),
+                    const SizedBox(width: 6),
+                    _tag(
+                      'Hạng ${item.grade}',
+                      gradeColor.withValues(alpha: 0.10),
+                      gradeColor,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${item.correctAnswers}/${item.totalQuestions} câu đúng',
+                  style: GoogleFonts.nunito(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                  ),
+                ),
+                Text(
+                  dateStr,
+                  style: GoogleFonts.nunito(
+                    fontSize: 11,
+                    color: AppColors.inkSoft,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Container(
             decoration: BoxDecoration(
               color: AppColors.rose.withValues(alpha: 0.08),
@@ -245,8 +492,18 @@ class _MockTestHistoryScreenState extends State<MockTestHistoryScreen> {
   Widget _tag(String text, Color bg, Color fg) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
-      child: Text(text, style: GoogleFonts.ibmPlexMono(fontSize: 9, fontWeight: FontWeight.w600, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.ibmPlexMono(
+          fontSize: 9,
+          fontWeight: FontWeight.w600,
+          color: fg,
+        ),
+      ),
     );
   }
 }

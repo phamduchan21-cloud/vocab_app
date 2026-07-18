@@ -3,17 +3,17 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app.dart';
 
-/// Editorial-luxury bottom navigation bar with gold accent and playfair headings.
+/// Primary SolVocab navigation for compact layouts.
 class AppBottomNav extends StatelessWidget {
   final int selectedIndex;
 
   const AppBottomNav({super.key, required this.selectedIndex});
 
   static const List<_NavTab> _tabs = [
-    _NavTab(Icons.home_rounded, 'Trang chủ', '/'),
+    _NavTab(Icons.home_rounded, 'Hôm nay', '/'),
     _NavTab(Icons.quiz_rounded, 'Quiz', '/quiz'),
     _NavTab(Icons.style_rounded, 'Flashcard', '/flashcard'),
-    _NavTab(Icons.assignment_rounded, 'Test', '/mock-test'),
+    _NavTab(Icons.assignment_rounded, 'Kiểm tra', '/mock-test'),
     _NavTab(Icons.person_rounded, 'Hồ sơ', '/profile'),
   ];
 

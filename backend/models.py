@@ -56,6 +56,7 @@ class Vocabulary(Base):
     word = Column(String(100), nullable=False)
     meaning = Column(String(200), nullable=False)
     example = Column(Text, nullable=True)
+    personal_note = Column(Text, nullable=True)
     pronunciation = Column(String(100), nullable=True)              # Phiên âm IPA
     topic = Column(String(50), default="general")
     lesson_id = Column(Integer, nullable=True)                      # 1-15: bài từ vựng
@@ -66,6 +67,7 @@ class Vocabulary(Base):
     next_review_date = Column(Date, nullable=True, default=None)   # Ngày cần ôn tiếp theo
     ease_factor = Column(Float, default=2.5)                        # SM-2 ease factor (mặc định 2.5)
     review_count = Column(Integer, default=0)                       # Số lần đã ôn
+    review_interval = Column(Integer, default=0)                    # Khoảng cách ôn gần nhất (ngày)
     times_correct = Column(Integer, default=0)                      # Số lần trả lời đúng
     times_wrong = Column(Integer, default=0)                        # Số lần trả lời sai
 

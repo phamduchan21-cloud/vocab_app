@@ -6,6 +6,8 @@ Mỗi câu hỏi gồm: level, question, options (4 đáp án đã shuffle), cor
 
 import random
 
+from extended_question_bank import EXTRA_QUESTION_BANK, EXTRA_TOPIC_ALIASES
+
 QUESTION_BANK = {
     "family": {
         "vocabulary": [
@@ -129,11 +131,14 @@ QUESTION_BANK = {
     },
 }
 
+QUESTION_BANK.update(EXTRA_QUESTION_BANK)
+
 TOPIC_ALIASES = {
     "family": "Gia đình & Bạn bè",
     "travel": "Du lịch",
     "work": "Công việc & Nghề nghiệp",
     "food": "Ẩm thực",
+    **EXTRA_TOPIC_ALIASES,
 }
 
 AVAILABLE_TOPICS = list(QUESTION_BANK.keys())
@@ -157,7 +162,7 @@ def get_questions(topic: str, skill_type: str, count: int = 5) -> list:
 
     result = []
     for i, q in enumerate(selected):
-        options = q["options"]
+        options = list(q["options"])
         correct = options[q["correctAnswer"]]
         random.shuffle(options)
         result.append({

@@ -11,12 +11,12 @@ void main() {
       const MaterialApp(
         home: Scaffold(
           body: Center(
-            child: Text('VocaEng - Học Từ Vựng'),
+            child: Text('SolVocab - Học từ vựng'),
           ),
         ),
       ),
     );
 
-    expect(find.text('VocaEng - Học Từ Vựng'), findsOneWidget);
+    expect(find.text('SolVocab - Học từ vựng'), findsOneWidget);
   });
 }

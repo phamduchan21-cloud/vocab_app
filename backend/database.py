@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import text
 from typing import AsyncGenerator
 
 from core.config import settings
@@ -60,6 +61,30 @@ async def init_db():
     if "sqlite" in settings.DATABASE_URL:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            if not await _sqlite_has_column(conn, "vocabularies", "is_bookmarked"):
+                await conn.execute(
+                    text(
+                        "ALTER TABLE vocabularies "
+                        "ADD COLUMN is_bookmarked BOOLEAN DEFAULT 0"
+                    )
+                )
+            if not await _sqlite_has_column(conn, "vocabularies", "review_interval"):
+                await conn.execute(
+                    text(
+                        "ALTER TABLE vocabularies "
+                        "ADD COLUMN review_interval INTEGER DEFAULT 0"
+                    )
+                )
+            if not await _sqlite_has_column(conn, "vocabularies", "personal_note"):
+                await conn.execute(
+                    text("ALTER TABLE vocabularies ADD COLUMN personal_note TEXT")
+                )
+
+
+async def _sqlite_has_column(conn, table: str, column: str) -> bool:
+    """Check lightweight local-dev schema upgrades missed by create_all."""
+    result = await conn.execute(text(f"PRAGMA table_info({table})"))
+    return any(row[1] == column for row in result.fetchall())
 
 
 async def close_db():

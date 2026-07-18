@@ -34,9 +34,7 @@ class ApiService {
   }
 
   Map<String, String> _headers() {
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
+    final headers = <String, String>{'Content-Type': 'application/json'};
     final token = _getToken();
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';
@@ -49,34 +47,58 @@ class ApiService {
     String endpoint, {
     Map<String, String>? queryParams,
     Map<String, dynamic>? body,
+    bool retryOnUnauthorized = true,
   }) async {
-    final uri = Uri.parse('${ApiConfig.baseUrl}$endpoint')
-        .replace(queryParameters: queryParams);
+    final uri = Uri.parse(
+      '${ApiConfig.baseUrl}$endpoint',
+    ).replace(queryParameters: queryParams);
     try {
       late http.Response response;
       switch (method) {
         case 'GET':
-          response = await _http.get(uri, headers: _headers()).timeout(_timeout);
+          response = await _http
+              .get(uri, headers: _headers())
+              .timeout(_timeout);
           break;
         case 'POST':
           response = await _http
-              .post(uri, headers: _headers(), body: body != null ? jsonEncode(body) : null)
+              .post(
+                uri,
+                headers: _headers(),
+                body: body != null ? jsonEncode(body) : null,
+              )
               .timeout(_timeout);
           break;
         case 'PUT':
           response = await _http
-              .put(uri, headers: _headers(), body: body != null ? jsonEncode(body) : null)
+              .put(
+                uri,
+                headers: _headers(),
+                body: body != null ? jsonEncode(body) : null,
+              )
               .timeout(_timeout);
           break;
         case 'DELETE':
-          response = await _http.delete(uri, headers: _headers()).timeout(_timeout);
+          response = await _http
+              .delete(uri, headers: _headers())
+              .timeout(_timeout);
           break;
         default:
           throw ArgumentError('Unsupported method: $method');
       }
-      return _handleResponse(response, method, endpoint, queryParams, body);
+      return _handleResponse(
+        response,
+        method,
+        endpoint,
+        queryParams,
+        body,
+        retryOnUnauthorized,
+      );
     } on SocketException {
-      throw ApiException(0, 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
+      throw ApiException(
+        0,
+        'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.',
+      );
     } on TimeoutException {
       throw ApiException(0, 'Yêu cầu đã hết thời gian chờ. Vui lòng thử lại.');
     }
@@ -91,8 +113,7 @@ class ApiService {
   Future<dynamic> put(String endpoint, {Map<String, dynamic>? body}) =>
       _request('PUT', endpoint, body: body);
 
-  Future<dynamic> delete(String endpoint) =>
-      _request('DELETE', endpoint);
+  Future<dynamic> delete(String endpoint) => _request('DELETE', endpoint);
 
   Future<dynamic> _handleResponse(
     http.Response response,
@@ -100,17 +121,30 @@ class ApiService {
     String endpoint,
     Map<String, String>? queryParams,
     Map<String, dynamic>? body,
+    bool retryOnUnauthorized,
   ) async {
     if (response.statusCode == 401) {
-      try {
-        final refreshed = await Supabase.instance.client.auth.refreshSession();
-        if (refreshed.session != null) {
-          return _request(method, endpoint, queryParams: queryParams, body: body);
+      if (retryOnUnauthorized) {
+        try {
+          final refreshed = await Supabase.instance.client.auth
+              .refreshSession();
+          if (refreshed.session != null) {
+            return _request(
+              method,
+              endpoint,
+              queryParams: queryParams,
+              body: body,
+              retryOnUnauthorized: false,
+            );
+          }
+        } catch (_) {
+          // The shared sign-out below keeps auth state consistent.
         }
-      } catch (_) {
-        await Supabase.instance.client.auth.signOut();
       }
-      throw ApiAuthException('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+      await Supabase.instance.client.auth.signOut();
+      throw ApiAuthException(
+        'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+      );
     }
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.body.isEmpty) return null;

@@ -52,8 +52,12 @@ class VocabularyService {
     await _api.delete('/api/vocabularies/$id');
   }
 
-  Future<void> reviewWord(String id, int quality) async {
-    await _api.put('/api/vocabularies/$id/review', body: {'quality': quality});
+  Future<Vocabulary> reviewWord(String id, int quality) async {
+    final response = await _api.put(
+      '/api/vocabularies/$id/review',
+      body: {'quality': quality},
+    );
+    return Vocabulary.fromJson(response);
   }
 
   Future<Vocabulary> toggleBookmark(String id) async {
@@ -61,17 +65,17 @@ class VocabularyService {
     return Vocabulary.fromJson(response);
   }
 
-  Future<Map<String, dynamic>> getBookmarked({int page = 1, int limit = 50}) async {
-    final response = await _api.get('/api/vocabularies/bookmarked/all', queryParams: {
-      'page': page.toString(),
-      'limit': limit.toString(),
-    });
+  Future<Map<String, dynamic>> getBookmarked({
+    int page = 1,
+    int limit = 50,
+  }) async {
+    final response = await _api.get(
+      '/api/vocabularies/bookmarked/all',
+      queryParams: {'page': page.toString(), 'limit': limit.toString()},
+    );
     final items = (response['items'] as List)
         .map((item) => Vocabulary.fromJson(item))
         .toList();
-    return {
-      'items': items,
-      'total': response['total'] ?? 0,
-    };
+    return {'items': items, 'total': response['total'] ?? 0};
   }
 }

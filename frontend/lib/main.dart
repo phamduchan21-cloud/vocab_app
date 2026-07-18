@@ -37,11 +37,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final ApiService _apiService;
+  late final MockTestService _mockTestService;
 
   @override
   void initState() {
     super.initState();
     _apiService = ApiService();
+    _mockTestService = MockTestService(_apiService);
   }
 
   @override
@@ -56,17 +58,35 @@ class _MyAppState extends State<MyApp> {
       providers: [
         // Expose ApiService for screens that need it directly (e.g. AI Chat)
         Provider<ApiService>.value(value: _apiService),
+        Provider<MockTestService>.value(value: _mockTestService),
 
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => VocabularyProvider(VocabularyService(_apiService))),
-        ChangeNotifierProvider(create: (_) => QuizProvider(QuizService(_apiService))),
-        ChangeNotifierProvider(create: (_) => DashboardProvider(DashboardService(_apiService))),
-        ChangeNotifierProvider(create: (_) => FlashcardProvider(VocabularyService(_apiService), TopicService(_apiService))),
-        ChangeNotifierProvider(create: (_) => ProfileProvider(ProfileService(_apiService))),
-        ChangeNotifierProvider(create: (_) => TopicProvider(TopicService(_apiService))),
-        ChangeNotifierProvider(create: (_) => MockTestProvider(MockTestService(_apiService))),
+        ChangeNotifierProvider(
+          create: (_) => VocabularyProvider(VocabularyService(_apiService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => QuizProvider(QuizService(_apiService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DashboardProvider(DashboardService(_apiService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FlashcardProvider(
+            VocabularyService(_apiService),
+            TopicService(_apiService),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ProfileProvider(ProfileService(_apiService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TopicProvider(TopicService(_apiService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MockTestProvider(_mockTestService),
+        ),
       ],
-      child: const VocabApp(),
+      child: const SolVocabApp(),
     );
   }
 }

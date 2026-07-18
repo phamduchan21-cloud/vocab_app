@@ -58,7 +58,11 @@ const List<Map<String, String>> englishLevels = [
   {'key': 'beginner', 'label': 'Sơ cấp (Beginner)', 'emoji': '🌱'},
   {'key': 'elementary', 'label': 'Tiểu học (Elementary)', 'emoji': '🌿'},
   {'key': 'intermediate', 'label': 'Trung cấp (Intermediate)', 'emoji': '🌳'},
-  {'key': 'upper_intermediate', 'label': 'Trung cao cấp (Upper Intermediate)', 'emoji': '🌲'},
+  {
+    'key': 'upper_intermediate',
+    'label': 'Trung cao cấp (Upper Intermediate)',
+    'emoji': '🌲',
+  },
   {'key': 'advanced', 'label': 'Cao cấp (Advanced)', 'emoji': '🚀'},
   {'key': 'proficient', 'label': 'Thành thạo (Proficient)', 'emoji': '👑'},
 ];
@@ -94,6 +98,8 @@ class UserProfile {
   final int gems;
   final int level;
   final String levelTitle;
+  final Map<String, dynamic> learningGoals;
+  final DateTime? createdAt;
 
   UserProfile({
     required this.id,
@@ -106,18 +112,25 @@ class UserProfile {
     this.gems = 0,
     this.level = 0,
     this.levelTitle = 'Mầm non',
+    this.learningGoals = const {},
+    this.createdAt,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
-        id: json['id'] ?? '',
-        email: json['email'] ?? '',
-        username: json['username'],
-        englishLevel: json['english_level'],
-        dailyWordGoal: json['daily_word_goal'] ?? 10,
-        streak: json['streak'] ?? 0,
-        xp: json['xp'] ?? 0,
-        gems: json['gems'] ?? 0,
-        level: json['level'] ?? 0,
-        levelTitle: json['level_title'] ?? 'Mầm non',
-      );
+    id: json['id'] ?? '',
+    email: json['email'] ?? '',
+    username: json['username'],
+    englishLevel: json['english_level'],
+    dailyWordGoal: json['daily_word_goal'] ?? 10,
+    streak: json['streak'] ?? 0,
+    xp: json['xp'] ?? 0,
+    gems: json['gems'] ?? 0,
+    level: json['level'] ?? 0,
+    levelTitle: json['level_title'] ?? 'Mầm non',
+    learningGoals:
+        (json['learning_goals'] as Map<String, dynamic>?) ?? const {},
+    createdAt: json['created_at'] != null
+        ? DateTime.tryParse(json['created_at'])
+        : null,
+  );
 }

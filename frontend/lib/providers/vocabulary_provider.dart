@@ -24,9 +24,11 @@ class VocabularyProvider extends ChangeNotifier {
     var result = _items;
     if (_searchQuery.isNotEmpty) {
       result = result
-          .where((v) =>
-              v.word.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              v.meaning.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (v) =>
+                v.word.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                v.meaning.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
           .toList();
     }
     if (_selectedTopic != 'all') {
@@ -154,6 +156,35 @@ class VocabularyProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('toggleBookmark error: $e');
+    }
+  }
+
+  Future<bool> bookmarkFromTest({
+    required String word,
+    required String meaning,
+    String topic = 'mini-test',
+  }) async {
+    try {
+      final existing = _items.where(
+        (item) => item.word.toLowerCase() == word.toLowerCase(),
+      );
+      if (existing.isNotEmpty) {
+        if (!existing.first.isBookmarked) {
+          await _service.toggleBookmark(existing.first.id);
+        }
+      } else {
+        final created = await _service.create({
+          'word': word,
+          'meaning': meaning,
+          'topic': topic,
+        });
+        await _service.toggleBookmark(created.id);
+      }
+      await fetchAll();
+      return true;
+    } catch (e) {
+      debugPrint('bookmarkFromTest error: $e');
+      return false;
     }
   }
 

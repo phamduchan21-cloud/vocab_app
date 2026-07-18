@@ -1,4 +1,4 @@
-// auto-generated from VocaEng_MiniTest_Bo1.md
+// Auto-generated from the SolVocab mini-test question bank.
 // Topic keys: family, food, travel
 // Difficulty keys: basic, intermediate, advanced
 

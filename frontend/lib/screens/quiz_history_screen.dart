@@ -100,12 +100,15 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
 
     double avgScore = 0;
     if (quiz.history.isNotEmpty) {
-      avgScore = quiz.history.fold<double>(
+      avgScore =
+          quiz.history.fold<double>(
             0.0,
             (sum, item) => sum + item.scorePercent,
           ) /
           quiz.history.length;
     }
+    final pageWidth = MediaQuery.sizeOf(context).width;
+    final pagePadding = ((pageWidth - 900) / 2).clamp(20.0, 64.0);
 
     return RefreshIndicator(
       onRefresh: () => quiz.fetchHistory(),
@@ -114,7 +117,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
         child: SlideTransition(
           position: _slideAnim,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 60),
+            padding: EdgeInsets.fromLTRB(pagePadding, 20, pagePadding, 60),
             children: [
               // ── Summary card (double-bezel) ────────────
               Container(
@@ -138,7 +141,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
                       _summaryItem('${avgScore.round()}%', 'Điểm TB'),
                       _summaryItem(
                         '${quiz.history.fold(0, (sum, item) => sum + item.correctAnswers)}'
-                        '/${quiz.history.fold(0, (sum, item) => sum + item.totalQuestions)}',
+                            '/${quiz.history.fold(0, (sum, item) => sum + item.totalQuestions)}',
                         'Đúng/Tổng',
                       ),
                     ],
@@ -169,21 +172,32 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+                        border: Border.all(
+                          color: AppColors.luxuryBorder,
+                          width: 1.5,
+                        ),
                       ),
                       child: Material(
                         color: AppColors.luxurySurface,
                         borderRadius: BorderRadius.circular(999),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(999),
-                          onTap: quiz.isLoading ? null : () => quiz.fetchHistory(loadMore: true),
+                          onTap: quiz.isLoading
+                              ? null
+                              : () => quiz.fetchHistory(loadMore: true),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             child: quiz.isLoading
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.luxuryBrown),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.luxuryBrown,
+                                    ),
                                   )
                                 : Text(
                                     'Xem thêm',
@@ -231,8 +245,8 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
     final color = score >= 80
         ? AppColors.luxuryGreen
         : score >= 50
-            ? AppColors.luxuryGold
-            : AppColors.luxuryDanger;
+        ? AppColors.luxuryGold
+        : AppColors.luxuryDanger;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -309,7 +323,11 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right, color: AppColors.luxuryTextHint, size: 20),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.luxuryTextHint,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -323,9 +341,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
       context: context,
       builder: (ctx) => Dialog(
         backgroundColor: AppColors.luxurySurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
@@ -370,35 +386,57 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
                             '${item.correctAnswers}/${item.totalQuestions} '
                                 '(${item.scorePercent.round()}%)',
                           ),
-                          if (item.details != null && item.details!.isNotEmpty) ...[
+                          if (item.details != null &&
+                              item.details!.isNotEmpty) ...[
                             const SizedBox(height: 14),
-                            Container(height: 1.5, color: AppColors.luxuryBorder),
+                            Container(
+                              height: 1.5,
+                              color: AppColors.luxuryBorder,
+                            ),
                             const SizedBox(height: 8),
                             ...item.details!.asMap().entries.map((entry) {
-                              final detail = entry.value as Map<String, dynamic>;
+                              final detail =
+                                  entry.value as Map<String, dynamic>;
                               final correctAnswer =
-                                  detail['correct_answer'] ?? detail['correctAnswer'];
-                              final isCorrect = detail['selected'] == correctAnswer;
+                                  detail['correct_answer'] ??
+                                  detail['correctAnswer'];
+                              final isCorrect =
+                                  detail['selected'] == correctAnswer;
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 6),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isCorrect
-                                      ? AppColors.luxuryGreen.withValues(alpha: 0.06)
-                                      : AppColors.luxuryDanger.withValues(alpha: 0.04),
+                                      ? AppColors.luxuryGreen.withValues(
+                                          alpha: 0.06,
+                                        )
+                                      : AppColors.luxuryDanger.withValues(
+                                          alpha: 0.04,
+                                        ),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
                                     color: isCorrect
-                                        ? AppColors.luxuryGreen.withValues(alpha: 0.25)
-                                        : AppColors.luxuryDanger.withValues(alpha: 0.15),
+                                        ? AppColors.luxuryGreen.withValues(
+                                            alpha: 0.25,
+                                          )
+                                        : AppColors.luxuryDanger.withValues(
+                                            alpha: 0.15,
+                                          ),
                                   ),
                                 ),
                                 child: Row(
                                   children: [
                                     Icon(
-                                      isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                                      isCorrect
+                                          ? Icons.check_circle_rounded
+                                          : Icons.cancel_rounded,
                                       size: 18,
-                                      color: isCorrect ? AppColors.luxuryGreen : AppColors.luxuryDanger,
+                                      color: isCorrect
+                                          ? AppColors.luxuryGreen
+                                          : AppColors.luxuryDanger,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
@@ -425,7 +463,10 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+                        border: Border.all(
+                          color: AppColors.luxuryBorder,
+                          width: 1.5,
+                        ),
                       ),
                       child: Material(
                         color: AppColors.luxurySurface,
@@ -434,7 +475,10 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
                           borderRadius: BorderRadius.circular(999),
                           onTap: () => Navigator.pop(ctx),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -451,10 +495,16 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
                                   width: 24,
                                   height: 24,
                                   decoration: BoxDecoration(
-                                    color: AppColors.luxuryBrown.withValues(alpha: 0.15),
+                                    color: AppColors.luxuryBrown.withValues(
+                                      alpha: 0.15,
+                                    ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: const Icon(Icons.close_rounded, size: 12, color: AppColors.luxuryBrown),
+                                  child: const Icon(
+                                    Icons.close_rounded,
+                                    size: 12,
+                                    color: AppColors.luxuryBrown,
+                                  ),
                                 ),
                               ],
                             ),
@@ -480,13 +530,19 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
           width: 60,
           child: Text(
             label,
-            style: GoogleFonts.nunito(color: AppColors.luxuryText, fontSize: 14),
+            style: GoogleFonts.nunito(
+              color: AppColors.luxuryText,
+              fontSize: 14,
+            ),
           ),
         ),
         Expanded(
           child: Text(
             value,
-            style: GoogleFonts.nunito(color: AppColors.luxuryEspresso, fontSize: 14),
+            style: GoogleFonts.nunito(
+              color: AppColors.luxuryEspresso,
+              fontSize: 14,
+            ),
           ),
         ),
       ],

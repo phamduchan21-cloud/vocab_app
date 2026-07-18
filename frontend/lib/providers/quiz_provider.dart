@@ -2,12 +2,14 @@ import 'package:flutter/foundation.dart';
 
 import '../models/quiz_category.dart';
 import '../models/quiz_result.dart';
+import '../models/quiz_topic.dart';
 import '../services/quiz_service.dart';
 
 class QuizProvider extends ChangeNotifier {
   final QuizService _service;
 
   List<QuizCategory> _categories = [];
+  List<QuizTopic> _topics = [];
   List<Map<String, dynamic>> _currentQuestions = [];
   QuizResult? _lastResult;
   List<QuizResult> _history = [];
@@ -17,6 +19,7 @@ class QuizProvider extends ChangeNotifier {
   String? _selectedSkillType;
 
   List<QuizCategory> get categories => _categories;
+  List<QuizTopic> get topics => _topics;
   List<Map<String, dynamic>> get currentQuestions => _currentQuestions;
   QuizResult? get lastResult => _lastResult;
   List<QuizResult> get history => _history;
@@ -33,7 +36,12 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _categories = await _service.getCategories();
+      final results = await Future.wait([
+        _service.getCategories(),
+        _service.getTopics(),
+      ]);
+      _categories = results[0] as List<QuizCategory>;
+      _topics = results[1] as List<QuizTopic>;
     } catch (e) {
       _categories = [];
       _errorMessage = 'Không thể tải danh mục quiz.';
@@ -50,7 +58,11 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> generateQuiz({int count = 5, String? topic, String? skillType}) async {
+  Future<void> generateQuiz({
+    int count = 5,
+    String? topic,
+    String? skillType,
+  }) async {
     _isLoading = true;
     _errorMessage = null;
     _currentQuestions = [];

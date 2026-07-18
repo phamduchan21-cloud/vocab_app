@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SolVocab postage stamp logo">
+  <rect width="512" height="512" rx="112" fill="#FFF7E8"/>
+  <rect x="42" y="42" width="428" height="428" rx="88" fill="none" stroke="#E95F52" stroke-width="24" stroke-dasharray="18 15"/>
+  <rect x="120" y="172" width="272" height="178" rx="18" fill="#0D716B"/>
+  <path d="M126 184l130 100 130-100" fill="none" stroke="#FFF7E8" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 342l92-80m164 80l-92-80" fill="none" stroke="#FFF7E8" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="355" cy="355" r="72" fill="#F5B940" stroke="#713B2E" stroke-width="10"/>
+  <text x="355" y="384" text-anchor="middle" font-family="Georgia, serif" font-size="86" font-weight="800" fill="#713B2E">S</text>
+</svg>

@@ -7,6 +7,7 @@ import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/account_setup_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/vocabulary_list_screen.dart';
 import 'screens/flashcard_screen.dart';
@@ -40,18 +41,15 @@ Page<dynamic> _slideUpPage(Widget child) {
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, 0.08),
-          end: Offset.zero,
-        ).animate(CurvedAnimation(
-          parent: animation,
-          curve: _springCurve,
-          reverseCurve: _slideCurve,
-        )),
-        child: FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
+        position: Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
+            .animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: _springCurve,
+                reverseCurve: _slideCurve,
+              ),
+            ),
+        child: FadeTransition(opacity: animation, child: child),
       );
     },
   );
@@ -63,18 +61,15 @@ Page<dynamic> _slideRightPage(Widget child) {
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0.18, 0),
-          end: Offset.zero,
-        ).animate(CurvedAnimation(
-          parent: animation,
-          curve: _slideCurve,
-          reverseCurve: _slideCurve,
-        )),
-        child: FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
+        position: Tween<Offset>(begin: const Offset(0.18, 0), end: Offset.zero)
+            .animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: _slideCurve,
+                reverseCurve: _slideCurve,
+              ),
+            ),
+        child: FadeTransition(opacity: animation, child: child),
       );
     },
   );
@@ -86,13 +81,28 @@ Page<dynamic> _scaleFadePage(Widget child) {
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return ScaleTransition(
-        scale: Tween<double>(begin: 0.88, end: 1.0).animate(
-          CurvedAnimation(parent: animation, curve: _springCurve),
-        ),
-        child: FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
+        scale: Tween<double>(
+          begin: 0.88,
+          end: 1.0,
+        ).animate(CurvedAnimation(parent: animation, curve: _springCurve)),
+        child: FadeTransition(opacity: animation, child: child),
+      );
+    },
+  );
+}
+
+Page<dynamic> _authSwitchPage(Widget child) {
+  return _CustomTransitionPage(
+    key: ValueKey(child.runtimeType),
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(parent: animation, curve: _slideCurve);
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0.12, 0),
+          end: Offset.zero,
+        ).animate(curved),
+        child: FadeTransition(opacity: curved, child: child),
       );
     },
   );
@@ -104,109 +114,116 @@ class _CustomTransitionPage extends CustomTransitionPage<dynamic> {
     required super.transitionsBuilder,
     super.key,
   }) : super(
-          transitionDuration: const Duration(milliseconds: 400),
-          reverseTransitionDuration: const Duration(milliseconds: 300),
-        );
+         transitionDuration: const Duration(milliseconds: 400),
+         reverseTransitionDuration: const Duration(milliseconds: 300),
+       );
 }
 
-// ═══════════════════════════════════════════════════════
-// 🍭 VocaEng Candy Design System — dễ thương, trẻ con
-// Pastel palette, squishy radius, playful gradients
-// ═══════════════════════════════════════════════════════
+// SolVocab design system: botanical focus with warm learning accents.
+
+class AppBrand {
+  static const name = 'SolVocab';
+  static const assistantName = 'Sol';
+  static const tagline = 'Từ mới vững vàng. Mỗi ngày tiến bộ.';
+}
 
 class AppColors {
   // ─── Warm candy background ──────────────────────────
-  static const background = Color(0xFFFFF8F3);
-  static const surface = Color(0xFFFFFFFF);
-  static const surfaceDim = Color(0xFFF5EDE8);
-  static const surfaceBright = Color(0xFFFFF8F3);
+  static const background = Color(0xFFF3F7F2);
+  static const surface = Color(0xFFFFFDFC);
+  static const surfaceDim = Color(0xFFE8F0EB);
+  static const surfaceBright = Color(0xFFFFFDFC);
   static const surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const surfaceContainerLow = Color(0xFFFFF3ED);
-  static const surfaceContainer = Color(0xFFFFEDE6);
-  static const surfaceContainerHigh = Color(0xFFFFE7DE);
-  static const surfaceContainerHighest = Color(0xFFFFE0D6);
-  static const surfaceVariant = Color(0xFFFFE0D6);
-  static const surfaceSubtle = Color(0xFFFFF0E9);
+  static const surfaceContainerLow = Color(0xFFF7FAF7);
+  static const surfaceContainer = Color(0xFFEDF4EF);
+  static const surfaceContainerHigh = Color(0xFFE4EEE8);
+  static const surfaceContainerHighest = Color(0xFFD8E7DE);
+  static const surfaceVariant = Color(0xFFD8E7DE);
+  static const surfaceSubtle = Color(0xFFEDF6F0);
 
   // ─── On-colors ─────────────────────────────────────────
-  static const onSurface = Color(0xFF2D2B4E);
-  static const onSurfaceVariant = Color(0xFF6B5E7A);
-  static const inverseSurface = Color(0xFF3A3355);
-  static const inverseOnSurface = Color(0xFFF5F0FF);
+  static const onSurface = Color(0xFF15251F);
+  static const onSurfaceVariant = Color(0xFF536C63);
+  static const inverseSurface = Color(0xFF17372E);
+  static const inverseOnSurface = Color(0xFFF2F8F4);
 
   // ─── Ink (soft plum) ─────────────────────────────────
-  static const ink = Color(0xFF2D2B4E);
-  static const inkSoft = Color(0xFF7B6F8E);
-  static const textHint = Color(0xFFB0A5C0);
+  static const ink = Color(0xFF15251F);
+  static const inkSoft = Color(0xFF557168);
+  static const textHint = Color(0xFF8AA098);
 
   // ─── Accent: Coral Pink (primary) ────────────────────
-  static const blue = Color(0xFFFF6B8A);
-  static const blueDark = Color(0xFFE85575);
-  static const blueLight = Color(0xFFFF8FAA);
-  static const blueBg = Color(0xFFFFF0F3);
-  static const blueContainer = Color(0xFFFF4D72);
+  static const blue = Color(0xFF0F766E);
+  static const blueDark = Color(0xFF0A5A54);
+  static const blueLight = Color(0xFF55A69E);
+  static const blueBg = Color(0xFFE7F5F2);
+  static const blueContainer = Color(0xFF0F766E);
 
   // ─── Playful accent colors ───────────────────────────
-  static const rose = Color(0xFFFF6B8A);
-  static const peach = Color(0xFFFFB088);
-  static const mint = Color(0xFF4CD9B2);
-  static const mintDark = Color(0xFF2BBF99);
-  static const mintBg = Color(0xFFEBFFF8);
-  static const lavender = Color(0xFF9B8EFF);
-  static const lavenderBg = Color(0xFFF5F0FF);
-  static const sunny = Color(0xFFFFBD4A);
-  static const sunnyBg = Color(0xFFFFF8E8);
-  static const sky = Color(0xFF6EC8FF);
-  static const skyBg = Color(0xFFEDF8FF);
+  static const rose = Color(0xFF0F766E);
+  static const peach = Color(0xFFE76F51);
+  static const mint = Color(0xFF4E9B68);
+  static const mintDark = Color(0xFF36794D);
+  static const mintBg = Color(0xFFEAF6ED);
+  static const lavender = Color(0xFF3977A8);
+  static const lavenderBg = Color(0xFFEBF3F8);
+  static const sunny = Color(0xFFEAA544);
+  static const sunnyBg = Color(0xFFFFF4DF);
+  static const sky = Color(0xFF4C91C6);
+  static const skyBg = Color(0xFFEAF4FA);
 
   // ─── Outline (soft) ─────────────────────────────────
-  static const outline = Color(0xFFC5B8D0);
-  static const outlineVariant = Color(0xFFE8DEE8);
+  static const outline = Color(0xFF9DB2A9);
+  static const outlineVariant = Color(0xFFD8E5DE);
 
   // ─── Semantic ──────────────────────────────────────────
-  static const success = Color(0xFF2BBF99);
-  static const successBg = Color(0xFFEBFFF8);
-  static const danger = Color(0xFFFF6B7A);
-  static const dangerBg = Color(0xFFFFF0F0);
-  static const warning = Color(0xFFFFA726);
-  static const warningBg = Color(0xFFFFF8E8);
-  static const tertiary = Color(0xFF9B8EFF);
-  static const tertiaryContainer = Color(0xFF7F6FFF);
+  static const success = Color(0xFF3F8F5B);
+  static const successBg = Color(0xFFEAF6ED);
+  static const danger = Color(0xFFD94F4F);
+  static const dangerBg = Color(0xFFFDECEC);
+  static const warning = Color(0xFFE08B2E);
+  static const warningBg = Color(0xFFFFF4DF);
+  static const tertiary = Color(0xFF3977A8);
+  static const tertiaryContainer = Color(0xFF2D648E);
 
-  // ─── Editorial Luxury palette ──────────────────────
-  static const luxuryBg = Color(0xFFFDFBF7);
-  static const luxurySurface = Color(0xFFFFFCF9);
-  static const luxuryBrown = Color(0xFF8B6F5E);
-  static const luxuryBrownLight = Color(0xFFA88B72);
-  static const luxuryBrownPale = Color(0xFFC4A88B);
-  static const luxuryBeige = Color(0xFFD4BFA5);
-  static const luxuryEspresso = Color(0xFF3D3028);
-  static const luxuryText = Color(0xFF8B7B6E);
-  static const luxuryTextHint = Color(0xFFB0A090);
-  static const luxuryBorder = Color(0xFFEDE0D4);
-  static const luxuryGold = Color(0xFFC49A3C);
-  static const luxuryGreen = Color(0xFF6BA368);
-  static const luxuryDanger = Color(0xFFFF6B7A);
+  // Backward-compatible names used across existing screens.
+  static const luxuryBg = background;
+  static const luxurySurface = surface;
+  static const luxuryBrown = Color(0xFF0F766E);
+  static const luxuryBrownLight = Color(0xFF2A9187);
+  static const luxuryBrownPale = Color(0xFF8AC0B7);
+  static const luxuryBeige = Color(0xFFD9F0E8);
+  static const luxuryEspresso = Color(0xFF102820);
+  static const luxuryText = Color(0xFF557168);
+  static const luxuryTextHint = Color(0xFF8AA098);
+  static const luxuryBorder = Color(0xFFD8E5DE);
+  static const luxuryGold = Color(0xFFE76F51);
+  static const luxuryGreen = Color(0xFF4E9B68);
+  static const luxuryDanger = danger;
   static const luxuryGradient = LinearGradient(
-    colors: [Color(0xFF8B6F5E), Color(0xFFA88B72)],
-    begin: Alignment.topLeft, end: Alignment.bottomRight,
+    colors: [Color(0xFF0F766E), Color(0xFF2A9187)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
   static const luxuryGradientLight = LinearGradient(
-    colors: [Color(0xFFC4A88B), Color(0xFF8B6F5E)],
-    begin: Alignment.topLeft, end: Alignment.bottomRight,
+    colors: [Color(0xFF55A69E), Color(0xFF0F766E)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
   static const luxuryGradientBeige = LinearGradient(
-    colors: [Color(0xFFD4BFA5), Color(0xFFC4A88B)],
-    begin: Alignment.topLeft, end: Alignment.bottomRight,
+    colors: [Color(0xFFD9F0E8), Color(0xFF8AC0B7)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
   static const luxuryGradientDark = LinearGradient(
-    colors: [Color(0xFF8B6F5E), Color(0xFF6B5A4A)],
-    begin: Alignment.topLeft, end: Alignment.bottomRight,
+    colors: [Color(0xFF17372E), Color(0xFF102820)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 
   // ─── Backward-compatible aliases ────────────────────
   static const primary = rose;
-  static const primaryLight = Color(0xFFFF8FAA);
+  static const primaryLight = Color(0xFF55A69E);
   static const primaryDark = rose;
   static const accent1 = rose;
   static const accent2 = mint;
@@ -232,46 +249,46 @@ class AppRadius {
   static const double xxl = 28;
 }
 
-// ─── Gradients — pastel playground ─────────────────────
+// Brand gradients are reserved for primary actions and hero surfaces.
 class AppTheme {
   static const primaryGradient = LinearGradient(
-    colors: [Color(0xFFFF6B8A), Color(0xFFFF8FAA)],
+    colors: [Color(0xFF0F766E), Color(0xFF2A9187)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const secondaryGradient = LinearGradient(
-    colors: [Color(0xFFFF8FAA), Color(0xFFFFB088)],
+    colors: [Color(0xFF2A9187), Color(0xFF4E9B68)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const accentGradient = LinearGradient(
-    colors: [Color(0xFF9B8EFF), Color(0xFF6EC8FF)],
+    colors: [Color(0xFF3977A8), Color(0xFF4C91C6)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const primaryButtonGradient = LinearGradient(
-    colors: [Color(0xFFFF6B8A), Color(0xFFFF8FAA)],
+    colors: [Color(0xFF0F766E), Color(0xFF2A9187)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const heroGradient = LinearGradient(
-    colors: [Color(0xFFFF6B8A), Color(0xFFFFB088)],
+    colors: [Color(0xFF0F766E), Color(0xFFE76F51)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const aiGradient = LinearGradient(
-    colors: [Color(0xFF9B8EFF), Color(0xFFFF6B8A)],
+    colors: [Color(0xFF3977A8), Color(0xFF0F766E)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const mintGradient = LinearGradient(
-    colors: [Color(0xFF4CD9B2), Color(0xFF6EC8FF)],
+    colors: [Color(0xFF4E9B68), Color(0xFF4C91C6)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -281,14 +298,14 @@ class AppTheme {
 // 🚀 App
 // ═══════════════════════════════════════════════════════
 
-class VocabApp extends StatefulWidget {
-  const VocabApp({super.key});
+class SolVocabApp extends StatefulWidget {
+  const SolVocabApp({super.key});
 
   @override
-  State<VocabApp> createState() => _VocabAppState();
+  State<SolVocabApp> createState() => _SolVocabAppState();
 }
 
-class _VocabAppState extends State<VocabApp> {
+class _SolVocabAppState extends State<SolVocabApp> {
   late final GoRouter _router;
 
   @override
@@ -300,11 +317,11 @@ class _VocabAppState extends State<VocabApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'VocaEng',
+      title: AppBrand.name,
       debugShowCheckedModeBanner: false,
       theme: _buildLightTheme(),
       darkTheme: _buildDarkTheme(),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       routerConfig: _router,
     );
   }
@@ -396,16 +413,16 @@ class _VocabAppState extends State<VocabApp> {
           borderRadius: BorderRadius.circular(AppRadius.lg),
           borderSide: BorderSide(color: AppColors.danger, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 16,
+        ),
         prefixIconColor: AppColors.textHint,
         labelStyle: GoogleFonts.nunito(
           color: AppColors.textSecondary,
           fontSize: 14,
         ),
-        hintStyle: GoogleFonts.nunito(
-          color: AppColors.textHint,
-          fontSize: 14,
-        ),
+        hintStyle: GoogleFonts.nunito(color: AppColors.textHint, fontSize: 14),
       ),
 
       // ─── Button ──────────────────────────────────────
@@ -629,9 +646,7 @@ class _VocabAppState extends State<VocabApp> {
         backgroundColor: Color(0xFF2A2840),
         contentTextStyle: TextStyle(color: Color(0xFFE8E0F0)),
       ),
-      dialogTheme: const DialogThemeData(
-        backgroundColor: Color(0xFF1E1C2E),
-      ),
+      dialogTheme: const DialogThemeData(backgroundColor: Color(0xFF1E1C2E)),
     );
   }
 
@@ -642,12 +657,15 @@ class _VocabAppState extends State<VocabApp> {
       redirect: (context, state) {
         final isLoggedIn = auth.isAuthenticated;
         final location = state.matchedLocation;
+        final isAuthPreview = state.uri.queryParameters['preview'] == 'true';
 
         if (location == '/splash' || location == '/onboarding') return null;
 
         final isAuthRoute = location == '/login' || location == '/register';
         if (!isLoggedIn && !isAuthRoute) return '/login';
-        if (isLoggedIn && isAuthRoute) return '/';
+        if (isLoggedIn && isAuthRoute && !isAuthPreview) {
+          return auth.needsOnboarding ? '/setup' : '/';
+        }
 
         return null;
       },
@@ -662,11 +680,15 @@ class _VocabAppState extends State<VocabApp> {
         ),
         GoRoute(
           path: '/login',
-          pageBuilder: (_, _) => _scaleFadePage(const LoginScreen()),
+          pageBuilder: (_, _) => _authSwitchPage(const LoginScreen()),
         ),
         GoRoute(
           path: '/register',
-          pageBuilder: (_, _) => _scaleFadePage(const RegisterScreen()),
+          pageBuilder: (_, _) => _authSwitchPage(const RegisterScreen()),
+        ),
+        GoRoute(
+          path: '/setup',
+          pageBuilder: (_, _) => _slideUpPage(const AccountSetupScreen()),
         ),
         GoRoute(
           path: '/',
@@ -714,21 +736,40 @@ class _VocabAppState extends State<VocabApp> {
               pageBuilder: (_, state) {
                 final level = state.pathParameters['level']!;
                 final topic = state.uri.queryParameters['topic'];
-                return _slideRightPage(MockTestPlayScreen(level: level, topic: topic));
+                final purpose =
+                    state.uri.queryParameters['purpose'] ?? 'general';
+                final count =
+                    int.tryParse(state.uri.queryParameters['count'] ?? '') ??
+                    10;
+                final duration =
+                    int.tryParse(state.uri.queryParameters['duration'] ?? '') ??
+                    10;
+                return _slideRightPage(
+                  MockTestPlayScreen(
+                    level: level,
+                    topic: topic,
+                    purpose: purpose,
+                    questionCount: count,
+                    durationMinutes: duration,
+                  ),
+                );
               },
             ),
             GoRoute(
               path: 'history',
-              pageBuilder: (_, _) => _slideRightPage(const MockTestHistoryScreen()),
+              pageBuilder: (_, _) =>
+                  _slideRightPage(const MockTestHistoryScreen()),
             ),
             GoRoute(
               path: 'result/:id',
               pageBuilder: (_, state) {
                 final result = state.extra as MockTestResult?;
                 if (result == null) {
-                  return _slideRightPage(const Scaffold(
-                    body: Center(child: Text('Không có dữ liệu kết quả')),
-                  ));
+                  return _slideRightPage(
+                    const Scaffold(
+                      body: Center(child: Text('Không có dữ liệu kết quả')),
+                    ),
+                  );
                 }
                 return _slideRightPage(MockTestResultScreen(result: result));
               },
@@ -766,7 +807,8 @@ class _VocabAppState extends State<VocabApp> {
           routes: [
             GoRoute(
               path: 'new',
-              pageBuilder: (_, _) => _slideRightPage(const VocabularyFormScreen()),
+              pageBuilder: (_, _) =>
+                  _slideRightPage(const VocabularyFormScreen()),
             ),
             GoRoute(
               path: ':id/edit',

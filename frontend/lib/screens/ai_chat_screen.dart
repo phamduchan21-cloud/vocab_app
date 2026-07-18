@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../app.dart';
 import '../services/ai_service.dart';
 import '../services/api_service.dart';
-import '../widgets/app_bottom_nav.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -28,7 +27,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     super.initState();
     _aiService = AIService(context.read<ApiService>());
     _messages.add(_ChatMessage(
-      text: 'Chào bạn! 👋 Tôi là Meu, trợ lý AI học tiếng Anh.\n\n'
+      text: 'Chào bạn! Tôi là Sol, trợ lý học tiếng Anh của SolVocab.\n\n'
           'Bạn có thể hỏi tôi về:\n'
           '• 📖 Giải thích từ vựng\n'
           '• 📝 Ví dụ câu\n'
@@ -47,7 +46,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   Future<void> _sendMessage(String text) async {
-    if (text.trim().isEmpty) return;
+    if (text.trim().isEmpty || _isLoading) return;
     setState(() {
       _messages.add(_ChatMessage(text: text.trim(), isUser: true));
       _isLoading = true;
@@ -57,6 +56,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
     try {
       final result = await _aiService.chat(message: text.trim());
+      if (!mounted) return;
       final reply = result['reply'] as String? ?? 'Xin lỗi, tôi chưa có câu trả lời.';
       final suggestions = (result['suggestions'] as List?)?.map((s) => s.toString()).toList() ?? <String>[];
       setState(() {
@@ -64,6 +64,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _messages.add(_ChatMessage(
           text: '❌ Xin lỗi, AI hiện không khả dụng. Vui lòng thử lại sau.',
@@ -93,48 +94,33 @@ class _AIChatScreenState extends State<AIChatScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Row(children: [
-          // Avatar with online status (Stitch style)
-          Stack(
-            children: [
-              Container(
-                width: 32, height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.rose.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(child: Text('🤖', style: TextStyle(fontSize: 18))),
-              ),
-              Positioned(
-                bottom: 0, right: 0,
-                child: Container(
-                  width: 10, height: 10,
-                  decoration: BoxDecoration(
-                    color: AppColors.success,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.surface, width: 2),
-                  ),
-                ),
-              ),
-            ],
+          Container(
+            width: 32, height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.rose.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Center(child: Text('S', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800))),
           ),
           const SizedBox(width: 10),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Meu - Trợ lý AI', style: GoogleFonts.nunito(fontWeight: FontWeight.w600, fontSize: 17, color: AppColors.ink)),
-            Row(children: [
-              Container(width: 6, height: 6, decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.success)),
-              const SizedBox(width: 4),
-              Text(_isLoading ? 'Đang suy nghĩ...' : 'Online',
-                  style: GoogleFonts.nunito(fontSize: 11, color: _isLoading ? AppColors.warning : AppColors.success)),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Sol - Trợ lý học tập', overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.nunito(fontWeight: FontWeight.w700, fontSize: 17, color: AppColors.ink)),
+              Text(_isLoading ? 'Đang chuẩn bị câu trả lời...' : 'Sẵn sàng hỗ trợ',
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft)),
             ]),
-          ]),
+          ),
         ]),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.ink),
           onPressed: () => context.go('/'),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(selectedIndex: 1),
-      body: Column(children: [
+      body: Center(child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 840),
+        child: Column(children: [
         // Messages
         Expanded(
           child: _messages.isEmpty
@@ -156,12 +142,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
               const SizedBox(width: 8),
-              Text('Meu đang trả lời...', style: GoogleFonts.nunito(fontSize: 12, color: AppColors.inkSoft)),
+              Text('Sol đang trả lời...', style: GoogleFonts.nunito(fontSize: 12, color: AppColors.inkSoft)),
             ]),
           ),
         // Input — Stitch glassmorphism
         _buildInput(),
-      ]),
+        ]),
+      )),
     );
   }
 
@@ -204,7 +191,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                     child: TextField(
                       controller: _messageController,
                       decoration: InputDecoration(
-                        hintText: 'Hỏi Meu về từ vựng...',
+                        hintText: 'Hỏi Sol về từ vựng hoặc ngữ pháp...',
                         hintStyle: GoogleFonts.nunito(color: AppColors.textHint, fontSize: 14),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -213,31 +200,28 @@ class _AIChatScreenState extends State<AIChatScreen> {
                       ),
                       style: GoogleFonts.nunito(fontSize: 14, color: AppColors.ink),
                       maxLines: 3, minLines: 1,
+                      enabled: !_isLoading,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (v) => _sendMessage(v),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.mic, size: 20, color: AppColors.inkSoft),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
                   ),
                 ]),
               ),
             ),
             const SizedBox(width: 8),
-            Material(
-              color: AppColors.rose,
-              borderRadius: BorderRadius.circular(24),
-              child: InkWell(
-                onTap: () => _sendMessage(_messageController.text),
-                borderRadius: BorderRadius.circular(24),
-                child: SizedBox(
-                  width: 44, height: 44,
-                  child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
-                ),
+            IconButton.filled(
+              tooltip: 'Gửi tin nhắn',
+              onPressed: _isLoading
+                  ? null
+                  : () => _sendMessage(_messageController.text),
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.rose,
+                disabledBackgroundColor: AppColors.outline,
+                foregroundColor: Colors.white,
+                disabledForegroundColor: Colors.white,
+                minimumSize: const Size(44, 44),
               ),
+              icon: const Icon(Icons.send_rounded, size: 20),
             ),
           ]),
         ]),
@@ -246,16 +230,15 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   Widget _buildSuggestionChip(String label) {
-    return GestureDetector(
-      onTap: () => _sendMessage(label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.outlineVariant),
-        ),
-        child: Text(label, style: GoogleFonts.nunito(fontSize: 13, color: AppColors.onSurfaceVariant)),
-      ),
+    return ActionChip(
+      onPressed: _isLoading ? null : () => _sendMessage(label),
+      side: const BorderSide(color: AppColors.outlineVariant),
+      backgroundColor: AppColors.surface,
+      label: Text(label,
+          style: GoogleFonts.nunito(
+            fontSize: 13,
+            color: AppColors.onSurfaceVariant,
+          )),
     );
   }
 }
@@ -264,7 +247,14 @@ class _ChatMessage {
   final String text;
   final bool isUser;
   final List<String> suggestions;
-  _ChatMessage({required this.text, required this.isUser, this.suggestions = const []});
+  final DateTime createdAt;
+
+  _ChatMessage({
+    required this.text,
+    required this.isUser,
+    this.suggestions = const [],
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 }
 
 class _MessageBubble extends StatelessWidget {
@@ -311,7 +301,11 @@ class _MessageBubble extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 // Timestamp
-                Text('12:00', style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft)),
+                Text(
+                  '${message.createdAt.hour.toString().padLeft(2, '0')}:'
+                  '${message.createdAt.minute.toString().padLeft(2, '0')}',
+                  style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft),
+                ),
               ]),
             ),
             if (message.isUser) const SizedBox(width: 8),

@@ -11,11 +11,13 @@ from schemas import (
     QuizSubmit,
     QuizResultResponse,
     QuizCategoryResponse,
+    QuizTopicResponse,
     PaginatedResponse,
 )
 from services.quiz_service import QuizService
 from core.security import get_current_user
 from models import User
+from question_bank import get_available_topics
 
 router = APIRouter(prefix="/api/quiz", tags=["Quiz"], redirect_slashes=False)
 
@@ -39,6 +41,12 @@ async def get_categories(
         )
         for c in categories
     ]
+
+
+@router.get("/topics", response_model=list[QuizTopicResponse])
+async def get_topics():
+    """Lay cac chu de co san trong ngan hang cau hoi."""
+    return get_available_topics()
 
 
 @router.post("/generate", response_model=QuizGenerateResponse)

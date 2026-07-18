@@ -318,6 +318,7 @@ class MockTestService:
         for v in vocabs:
             if isinstance(v, dict):
                 result.append({
+                    "id": str(v.get("id", "")),
                     "word": v["word"],
                     "meaning": v["meaning"],
                     "example": v.get("example", ""),
@@ -325,6 +326,7 @@ class MockTestService:
                 })
             else:
                 result.append({
+                    "id": str(v.id),
                     "word": v.word,
                     "meaning": v.meaning,
                     "example": v.example or "",
@@ -432,6 +434,9 @@ class MockTestService:
             correctAnswer=correct,
             difficulty="easy",
             question_type="meaning_match",
+            skill="meaning",
+            explanation=f"'{vocab['word']}' nghĩa là '{vocab['meaning']}'.",
+            vocab_id=vocab.get("id") or None,
         )
 
     def _make_definition_match(
@@ -453,7 +458,10 @@ class MockTestService:
             options=options,
             correctAnswer=correct,
             difficulty="medium",
-            question_type="definition_match",
+            question_type="matching",
+            skill="vocabulary",
+            explanation=f"Từ phù hợp với nghĩa '{vocab['meaning']}' là '{vocab['word']}'.",
+            vocab_id=vocab.get("id") or None,
         )
 
     def _make_fill_blank(
@@ -485,6 +493,9 @@ class MockTestService:
             correctAnswer=correct,
             difficulty="hard",
             question_type="fill_blank",
+            skill="context",
+            explanation=f"Từ đúng trong ngữ cảnh này là '{vocab['word']}'.",
+            vocab_id=vocab.get("id") or None,
         )
 
     def _make_synonym(
@@ -514,6 +525,9 @@ class MockTestService:
             correctAnswer=correct,
             difficulty="hard",
             question_type="synonym",
+            skill="vocabulary",
+            explanation=f"'{synonym}' đồng nghĩa với '{vocab['word']}'.",
+            vocab_id=vocab.get("id") or None,
         )
 
     def _make_antonym(
@@ -543,6 +557,64 @@ class MockTestService:
             correctAnswer=correct,
             difficulty="hard",
             question_type="antonym",
+            skill="vocabulary",
+            explanation=f"'{antonym}' trái nghĩa với '{vocab['word']}'.",
+            vocab_id=vocab.get("id") or None,
+        )
+
+    def _make_listening(
+        self, vocab: dict, pool: List[dict]
+    ) -> Optional[MockTestQuestion]:
+        """Read an English word aloud and ask learners to choose its meaning."""
+        distractors = self._pick_distractors(
+            vocab["word"], vocab["topic"], pool, "meaning"
+        )
+        if len(distractors) < 3:
+            return None
+        options, correct = self._shuffle_options(vocab["meaning"], distractors)
+        return MockTestQuestion(
+            question="Nghe và chọn nghĩa đúng của từ được phát âm.",
+            options=options,
+            correctAnswer=correct,
+            difficulty="medium",
+            question_type="listening",
+            skill="pronunciation",
+            explanation=f"Từ bạn vừa nghe là '{vocab['word']}', nghĩa là '{vocab['meaning']}'.",
+            audio_text=vocab["word"],
+            vocab_id=vocab.get("id") or None,
+        )
+
+    def _make_sentence_order(
+        self, vocab: dict, pool: List[dict]
+    ) -> Optional[MockTestQuestion]:
+        """Ask learners to identify the correctly ordered example sentence."""
+        example = vocab.get("example", "").strip()
+        words = example.split()
+        if len(words) < 4:
+            return None
+
+        distractors: List[str] = []
+        attempts = 0
+        while len(distractors) < 3 and attempts < 20:
+            shuffled = words[:]
+            random.shuffle(shuffled)
+            candidate = " ".join(shuffled)
+            if candidate != example and candidate not in distractors:
+                distractors.append(candidate)
+            attempts += 1
+        if len(distractors) < 3:
+            return None
+
+        options, correct = self._shuffle_options(example, distractors)
+        return MockTestQuestion(
+            question="Chọn câu được sắp xếp đúng.",
+            options=options,
+            correctAnswer=correct,
+            difficulty="hard",
+            question_type="sentence_order",
+            skill="grammar",
+            explanation=f"Trật tự đúng là: {example}",
+            vocab_id=vocab.get("id") or None,
         )
 
     # ═══════════════════════════════════════════════════════════════════
@@ -552,110 +624,71 @@ class MockTestService:
     async def _build_questions(
         self, vocabs: list, count: int, level: str
     ) -> List[MockTestQuestion]:
-        """Xây dựng câu hỏi với đa dạng loại hình và độ khó."""
+        """Build a balanced test and avoid long runs of one question type."""
         vocab_list = self._extract_vocab_data(vocabs)
         random.shuffle(vocab_list)
-
-        if len(vocab_list) < count:
-            count = len(vocab_list)
-        if count <= 0:
+        if not vocab_list or count <= 0:
             return []
 
-        # ── 1. Tính số lượng mỗi loại câu hỏi ─────────────────────────
-        distrib = TYPE_DISTRIBUTION.get(level, TYPE_DISTRIBUTION["intermediate"])
-        targets: Dict[str, int] = {
-            qt: max(1, int(count * prob)) for qt, prob in distrib.items()
+        type_cycles = {
+            "beginner": [
+                "meaning_match", "listening", "matching", "fill_blank",
+                "sentence_order",
+            ],
+            "intermediate": [
+                "fill_blank", "listening", "matching", "sentence_order",
+                "meaning_match", "synonym", "antonym",
+            ],
+            "advanced": [
+                "sentence_order", "fill_blank", "listening", "synonym",
+                "antonym", "matching", "meaning_match",
+            ],
         }
-
-        total_targeted = sum(targets.values())
-        if total_targeted > count:
-            # Cắt bớt từ meaning_match (loại dễ nhất, linh hoạt nhất)
-            targets["meaning_match"] -= (total_targeted - count)
-        elif total_targeted < count:
-            # Thêm vào meaning_match
-            targets["meaning_match"] += (count - total_targeted)
-
-        # Đảm bảo không âm
-        for qt in targets:
-            targets[qt] = max(0, targets[qt])
-
-        word_set: Set[str] = {v["word"] for v in vocab_list}
-        used_words: Set[str] = set()
+        cycle = type_cycles.get(level, type_cycles["intermediate"])
+        word_set: Set[str] = {v["word"].lower() for v in vocab_list}
+        used_indexes: Set[int] = set()
         questions: List[MockTestQuestion] = []
+        attempts = 0
 
-        def _available(src: Optional[List[dict]] = None) -> List[dict]:
-            pool = src if src is not None else vocab_list
-            return [v for v in pool if v["word"] not in used_words]
-
-        # ── 2. fill_blank — ưu tiên từ có câu ví dụ ─────────────────
-        fb_pool = [v for v in vocab_list if len(v.get("example", "")) > 10]
-        for _ in range(targets["fill_blank"]):
-            avail = _available(fb_pool)
-            if not avail:
-                break
-            v = random.choice(avail)
-            q = self._make_fill_blank(v, vocab_list)
-            if q:
-                questions.append(q)
-                used_words.add(v["word"])
-
-        # ── 3. synonym ──────────────────────────────────────────────
-        for _ in range(targets["synonym"]):
-            syn_candidates = [
-                v for v in _available()
-                if v["word"].lower() in SYNONYM_LOOKUP
-                and SYNONYM_LOOKUP[v["word"].lower()].lower() in word_set
+        while len(questions) < count and attempts < count * len(cycle) * 4:
+            question_type = cycle[attempts % len(cycle)]
+            available = [
+                (index, vocab) for index, vocab in enumerate(vocab_list)
+                if index not in used_indexes
             ]
-            if not syn_candidates:
-                break
-            v = random.choice(syn_candidates)
-            q = self._make_synonym(v, vocab_list, word_set)
-            if q:
-                questions.append(q)
-                used_words.add(v["word"])
+            if not available:
+                used_indexes.clear()
+                available = list(enumerate(vocab_list))
+            index, vocab = random.choice(available)
 
-        # ── 4. antonym ──────────────────────────────────────────────
-        for _ in range(targets["antonym"]):
-            ant_candidates = [
-                v for v in _available()
-                if v["word"].lower() in ANTONYM_LOOKUP
-                and ANTONYM_LOOKUP[v["word"].lower()].lower() in word_set
-            ]
-            if not ant_candidates:
-                break
-            v = random.choice(ant_candidates)
-            q = self._make_antonym(v, vocab_list, word_set)
-            if q:
-                questions.append(q)
-                used_words.add(v["word"])
+            if question_type == "fill_blank":
+                question = self._make_fill_blank(vocab, vocab_list)
+            elif question_type == "listening":
+                question = self._make_listening(vocab, vocab_list)
+            elif question_type == "matching":
+                question = self._make_definition_match(vocab, vocab_list)
+            elif question_type == "sentence_order":
+                question = self._make_sentence_order(vocab, vocab_list)
+            elif question_type == "synonym":
+                question = self._make_synonym(vocab, vocab_list, word_set)
+            elif question_type == "antonym":
+                question = self._make_antonym(vocab, vocab_list, word_set)
+            else:
+                question = self._make_meaning_match(vocab, vocab_list)
 
-        # ── 5. definition_match ─────────────────────────────────────
-        for _ in range(targets["definition_match"]):
-            avail = _available()
-            if not avail:
-                break
-            v = random.choice(avail)
-            q = self._make_definition_match(v, vocab_list)
-            if q:
-                questions.append(q)
-                used_words.add(v["word"])
+            if question is not None:
+                questions.append(question)
+                used_indexes.add(index)
+            attempts += 1
 
-        # ── 6. meaning_match — fill nốt số còn thiếu ─────────────────
-        remaining = count - len(questions)
-        for _ in range(remaining):
-            # Nếu hết từ chưa dùng, cho phép dùng lại (vòng 2)
-            if not _available():
-                used_words.clear()
-            avail = _available()
-            if not avail:
+        # Sparse example/synonym data can leave gaps; meaning questions are safe.
+        while len(questions) < count:
+            vocab = random.choice(vocab_list)
+            question = self._make_meaning_match(vocab, vocab_list)
+            if question is None:
                 break
-            v = random.choice(avail)
-            q = self._make_meaning_match(v, vocab_list)
-            if q:
-                questions.append(q)
-                used_words.add(v["word"])
+            questions.append(question)
 
-        random.shuffle(questions)
         return questions[:count]
 
     # ═══════════════════════════════════════════════════════════════════
@@ -663,7 +696,13 @@ class MockTestService:
     # ═══════════════════════════════════════════════════════════════════
 
     async def generate(
-        self, user_id: str, level: str, topic: Optional[str] = None
+        self,
+        user_id: str,
+        level: str,
+        topic: Optional[str] = None,
+        question_count: int = 10,
+        duration_minutes: int = 10,
+        purpose: str = "general",
     ) -> Tuple[str, List[MockTestQuestion], int, int]:
         """Tạo đề kiểm tra từ vựng tiếng Anh từ từ vựng của người dùng + seed data."""
         config = LEVEL_CONFIG.get(level)
@@ -673,13 +712,20 @@ class MockTestService:
                 f"Hỗ trợ: beginner, intermediate, advanced"
             )
 
-        count = config["total"]
-        duration = config["duration"]
+        count = max(5, min(question_count, 20))
+        duration = max(2, min(duration_minutes, 60))
 
         # Lấy từ vựng của user
         query = select(Vocabulary).where(Vocabulary.user_id == user_id)
         if topic:
             query = query.where(Vocabulary.topic == topic)
+        if purpose == "weak":
+            query = query.order_by(
+                (Vocabulary.times_wrong - Vocabulary.times_correct).desc(),
+                Vocabulary.next_review_date.asc(),
+            )
+        elif purpose == "due_review":
+            query = query.order_by(Vocabulary.next_review_date.asc())
 
         result = await self.db.execute(query)
         all_vocabs = list(result.scalars().all())
@@ -756,6 +802,9 @@ class MockTestService:
         test_id: str,
         answers: List[MockTestAnswer],
         topic: Optional[str] = None,
+        duration_seconds: int = 0,
+        purpose: str = "general",
+        difficulty: str = "intermediate",
     ) -> MockTestResultResponse:
         """Chấm điểm bài kiểm tra và lưu kết quả."""
         correct = 0
@@ -773,10 +822,42 @@ class MockTestService:
                 selected=answer.selected,
                 correct_answer=answer.correct_answer,
                 is_correct=is_correct,
+                question_type=answer.question_type,
+                skill=answer.skill,
+                explanation=answer.explanation,
+                audio_text=answer.audio_text,
+                vocab_id=answer.vocab_id,
             ))
 
         score_percent = round((correct / total) * 100, 2) if total > 0 else 0
         grade = get_grade(score_percent)
+        breakdown: Dict[str, dict] = {}
+        for answer in graded_answers:
+            skill = answer.skill or "vocabulary"
+            stats = breakdown.setdefault(skill, {"correct": 0, "total": 0})
+            stats["total"] += 1
+            if answer.is_correct:
+                stats["correct"] += 1
+        for stats in breakdown.values():
+            stats["percent"] = round(
+                stats["correct"] * 100 / stats["total"], 1
+            ) if stats["total"] else 0
+
+        difficulty_multiplier = {
+            "beginner": 1.0,
+            "intermediate": 1.25,
+            "advanced": 1.5,
+        }.get(difficulty, 1.0)
+        xp_earned = int(correct * 10 * difficulty_multiplier)
+        if total > 0 and correct == total:
+            xp_earned += 50
+        badge = None
+        if score_percent == 100:
+            badge = "Bưu kiện hoàn hảo"
+        elif score_percent >= 90:
+            badge = "Tem vàng tri thức"
+        elif score_percent >= 75:
+            badge = "Chuyến thư bền bỉ"
 
         # Xác định test_level dựa trên số lượng câu
         if total <= 10:
@@ -801,6 +882,27 @@ class MockTestService:
         await self.db.commit()
         await self.db.refresh(result)
 
+        try:
+            from services.gamification_service import GamificationService
+            from schemas import RecordActivityRequest
+
+            gamification = GamificationService(self.db)
+            await gamification.record_activity(
+                user_id=user_id,
+                request=RecordActivityRequest(
+                    activity_type="quiz",
+                    xp_earned=xp_earned,
+                    metadata={
+                        "source": "mini_test",
+                        "purpose": purpose,
+                        "difficulty": difficulty,
+                        "score": score_percent,
+                    },
+                ),
+            )
+        except Exception:
+            pass
+
         return MockTestResultResponse(
             id=str(result.id),
             test_level=result.test_level,
@@ -811,6 +913,10 @@ class MockTestService:
             topic=result.topic,
             details=result.answers,
             completed_at=result.completed_at,
+            duration_seconds=duration_seconds,
+            xp_earned=xp_earned,
+            badge=badge,
+            breakdown=breakdown,
         )
 
     async def get_history(
@@ -838,6 +944,7 @@ class MockTestService:
                 correct_answers=m.correct_answers,
                 score_percent=float(m.score_percent),
                 grade=m.grade or "C",
+                topic=m.topic,
                 completed_at=m.completed_at,
             )
             for m in items

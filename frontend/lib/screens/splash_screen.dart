@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../app.dart';
-import '../widgets/cat_widget.dart';
+import '../widgets/app_logo.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,38 +14,23 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _fadeIn;
-  late final Animation<Offset> _slideUp;
+  late final AnimationController _controller;
+  late final Animation<double> _entrance;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
+    _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 750),
     );
-    _fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _ctrl,
-        curve: const Cubic(0.34, 1.56, 0.64, 1),
-      ),
-    );
-    _slideUp = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _ctrl,
-        curve: const Cubic(0.34, 1.56, 0.64, 1),
-      ),
-    );
-    _ctrl.forward();
+    _entrance = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _controller.forward();
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -54,198 +40,110 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColors.luxuryBg,
       body: Stack(
         children: [
-          // Decorative blobs
-          Positioned(
-            top: -80, left: -60,
-            child: Container(
-              width: 300, height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.luxuryBrown.withValues(alpha: 0.04),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -100, right: -50,
-            child: Container(
-              width: 400, height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.luxuryBrown.withValues(alpha: 0.03),
-              ),
-            ),
-          ),
-
+          const Positioned(top: -100, right: -80, child: _BotanicalOrb(size: 290)),
+          const Positioned(bottom: -130, left: -90, child: _BotanicalOrb(size: 330, coral: true)),
           SafeArea(
-            child: Column(
-              children: [
-                const Spacer(flex: 2),
-
-                // Cat avatar in Double-Bezel
-                FadeTransition(
-                  opacity: _fadeIn,
-                  child: SlideTransition(
-                    position: _slideUp,
-                    child: Container(
-                      padding: const EdgeInsets.all(1.5),
-                      decoration: BoxDecoration(
-                        color: AppColors.luxuryBrown.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: AppColors.luxuryBorder,
-                          width: 0.5,
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: FadeTransition(
+                    opacity: _entrance,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: AppColors.luxurySurface,
+                            borderRadius: BorderRadius.circular(44),
+                            border: Border.all(color: AppColors.luxuryBorder),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.luxuryBrown.withValues(alpha: 0.12),
+                                blurRadius: 32,
+                                offset: const Offset(0, 16),
+                              ),
+                            ],
+                          ),
+                          child: const Center(child: AppLogo(size: 126)),
                         ),
-                      ),
-                      child: Container(
-                        width: 132,
-                        height: 132,
-                        decoration: BoxDecoration(
-                          color: AppColors.luxurySurface,
-                          borderRadius: BorderRadius.circular(26.5),
+                        const SizedBox(height: 32),
+                        Text(
+                          'SolVocab',
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 46,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.luxuryEspresso,
+                            letterSpacing: -1,
+                          ),
                         ),
-                        child: const CatWidget(
-                          size: 120,
-                          expression: CatExpression.happy,
+                        const SizedBox(height: 10),
+                        Text(
+                          'Mỗi ngày một chút, vốn từ vững vàng.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.nunito(
+                            fontSize: 17,
+                            height: 1.5,
+                            color: AppColors.luxuryText,
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 44),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton.icon(
+                            onPressed: () => context.go('/onboarding'),
+                            iconAlignment: IconAlignment.end,
+                            icon: const Icon(Icons.arrow_forward_rounded),
+                            label: const Text('Bắt đầu hành trình'),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 54,
+                          child: OutlinedButton(
+                            onPressed: () => context.go('/login'),
+                            child: const Text('Tôi đã có tài khoản'),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 28),
-
-                // Brand
-                FadeTransition(
-                  opacity: _fadeIn,
-                  child: Column(
-                    children: [
-                      Text(
-                        'VocaEng',
-                        style: GoogleFonts.playfairDisplay(
-                          fontSize: 44,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.luxuryEspresso,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Học từ vựng thông minh',
-                        style: GoogleFonts.nunito(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.luxuryText,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Spacer(flex: 2),
-
-                // Buttons
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Column(
-                    children: [
-                      // Primary CTA — Button-in-Button
-                      FadeTransition(
-                        opacity: _fadeIn,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: GestureDetector(
-                            onTap: () => context.go('/onboarding'),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(28),
-                                gradient: AppColors.luxuryGradient,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Bắt đầu ngay',
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white.withValues(alpha: 0.15),
-                                    ),
-                                    child: const Icon(
-                                      Icons.arrow_forward_rounded,
-                                      size: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-
-                      // Secondary CTA — Button-in-Button (outlined)
-                      FadeTransition(
-                        opacity: _fadeIn,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: GestureDetector(
-                            onTap: () => context.go('/login'),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(28),
-                                border: Border.all(color: AppColors.luxuryBorder, width: 0.5),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Tôi đã có tài khoản',
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.luxuryText,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.luxuryBrown.withValues(alpha: 0.1),
-                                    ),
-                                    child: Icon(
-                                      Icons.arrow_forward_rounded,
-                                      size: 16,
-                                      color: AppColors.luxuryBrown,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(flex: 1),
-              ],
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _BotanicalOrb extends StatelessWidget {
+  const _BotanicalOrb({required this.size, this.coral = false});
+
+  final double size;
+  final bool coral;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              (coral ? AppColors.luxuryGold : AppColors.luxuryBrown)
+                  .withValues(alpha: 0.13),
+              Colors.transparent,
+            ],
+          ),
+        ),
       ),
     );
   }

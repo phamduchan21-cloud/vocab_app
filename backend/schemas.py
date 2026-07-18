@@ -97,6 +97,7 @@ class VocabularyUpdate(BaseModel):
     word: Optional[str] = Field(None, max_length=100)
     meaning: Optional[str] = Field(None, max_length=200)
     example: Optional[str] = None
+    personal_note: Optional[str] = Field(None, max_length=500)
     topic: Optional[str] = Field(None, max_length=50)
 
 
@@ -106,9 +107,11 @@ class VocabularyResponse(BaseModel):
     word: str
     meaning: str
     example: Optional[str] = None
+    personal_note: Optional[str] = None
     topic: str = "general"
     pronunciation: Optional[str] = None
     review_count: int = 0
+    review_interval: int = 0
     next_review_date: Optional[date] = None
     ease_factor: float = 2.5
     times_correct: int = 0
@@ -145,6 +148,14 @@ class QuizQuestion(BaseModel):
     options: List[str]
     correctAnswer: str
     vocabId: str
+    explanation: Optional[str] = None
+    transcript: Optional[str] = None
+    level: Optional[str] = None
+
+
+class QuizTopicResponse(BaseModel):
+    key: str
+    label: str
 
 
 class QuizGenerateResponse(BaseModel):
@@ -311,6 +322,9 @@ class DashboardResponse(BaseModel):
 class MockTestGenerateRequest(BaseModel):
     level: str = Field(default="intermediate", pattern="^(beginner|intermediate|advanced)$")
     topic: Optional[str] = Field(default=None, max_length=50)
+    question_count: int = Field(default=10, ge=5, le=20)
+    duration_minutes: int = Field(default=10, ge=2, le=60)
+    purpose: str = Field(default="general", pattern="^(general|topic|weak|due_review)$")
 
 
 class MockTestQuestion(BaseModel):
@@ -318,7 +332,11 @@ class MockTestQuestion(BaseModel):
     options: List[str]
     correctAnswer: str
     difficulty: Optional[str] = None        # easy | medium | hard
-    question_type: Optional[str] = None     # meaning_match | fill_blank | definition_match
+    question_type: Optional[str] = None
+    skill: Optional[str] = None
+    explanation: Optional[str] = None
+    audio_text: Optional[str] = None
+    vocab_id: Optional[str] = None
 
 
 class MockTestGenerateResponse(BaseModel):
@@ -335,11 +353,20 @@ class MockTestAnswer(BaseModel):
     selected: str
     correct_answer: str
     is_correct: bool = False
+    question_type: Optional[str] = None
+    skill: Optional[str] = None
+    explanation: Optional[str] = None
+    audio_text: Optional[str] = None
+    vocab_id: Optional[str] = None
 
 
 class MockTestSubmit(BaseModel):
     test_id: str
     answers: List[MockTestAnswer]
+    duration_seconds: int = Field(default=0, ge=0)
+    topic: Optional[str] = Field(default=None, max_length=50)
+    purpose: str = Field(default="general", max_length=30)
+    difficulty: str = Field(default="intermediate", max_length=20)
 
 
 class MockTestResultResponse(BaseModel):
@@ -352,6 +379,10 @@ class MockTestResultResponse(BaseModel):
     topic: Optional[str] = None
     details: Any = None
     completed_at: Optional[datetime] = None
+    duration_seconds: int = 0
+    xp_earned: int = 0
+    badge: Optional[str] = None
+    breakdown: dict = {}
 
 
 class MockTestHistoryItem(BaseModel):
@@ -361,6 +392,7 @@ class MockTestHistoryItem(BaseModel):
     correct_answers: int
     score_percent: float
     grade: str
+    topic: Optional[str] = None
     completed_at: Optional[datetime] = None
 
 

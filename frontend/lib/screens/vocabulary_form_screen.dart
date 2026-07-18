@@ -67,7 +67,9 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
           SnackBar(
             content: const Text('Không thể tải thông tin từ vựng'),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -101,9 +103,13 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isEditMode ? 'Cập nhật thành công' : 'Thêm từ vựng thành công'),
+            content: Text(
+              _isEditMode ? 'Cập nhật thành công' : 'Thêm từ vựng thành công',
+            ),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             backgroundColor: AppColors.rose,
           ),
         );
@@ -115,7 +121,9 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
           SnackBar(
             content: const Text('Không thể lưu từ vựng. Vui lòng thử lại.'),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             backgroundColor: AppColors.accent2,
           ),
         );
@@ -134,157 +142,219 @@ class _VocabularyFormScreenState extends State<VocabularyFormScreen> {
       ),
       body: _isLoading && _isEditMode && _wordController.text.isEmpty
           ? const SkeletonLoading(type: SkeletonType.form)
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 8),
-                    // Word
-                    TextFormField(
-                      controller: _wordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Từ vựng *',
-                        hintText: 'Nhập từ cần học',
-                        prefixIcon: Icon(Icons.text_fields),
-                      ),
-                      validator: (v) => v == null || v.trim().isEmpty ? 'Vui lòng nhập từ vựng' : null,
-                    ),
-                    const SizedBox(height: 16),
-                    // Meaning
-                    TextFormField(
-                      controller: _meaningController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nghĩa *',
-                        hintText: 'Nhập nghĩa của từ',
-                        prefixIcon: Icon(Icons.translate),
-                      ),
-                      validator: (v) => v == null || v.trim().isEmpty ? 'Vui lòng nhập nghĩa' : null,
-                    ),
-                    const SizedBox(height: 16),
-                    // Example
-                    TextFormField(
-                      controller: _exampleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Ví dụ',
-                        hintText: 'Nhập câu ví dụ (không bắt buộc)',
-                        prefixIcon: Icon(Icons.format_quote),
-                      ),
-                      maxLines: 2,
-                    ),
-                    const SizedBox(height: 16),
-                    // Topic selector
-                    const Text('Chủ đề', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        ..._topics.map((topic) => GestureDetector(
-                          onTap: () => setState(() {
-                            _showCustomTopic = false;
-                            _selectedTopic = topic;
-                          }),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              gradient: !_showCustomTopic && _selectedTopic == topic
-                                  ? AppTheme.primaryGradient
-                                  : null,
-                              color: !_showCustomTopic && _selectedTopic == topic
-                                  ? null
-                                  : AppColors.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              topic == 'general' ? 'Tổng hợp' : topic,
-                              style: GoogleFonts.nunito(
-                                fontSize: 14,
-                                fontWeight: !_showCustomTopic && _selectedTopic == topic
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
-                                color: !_showCustomTopic && _selectedTopic == topic
-                                    ? Colors.white
-                                    : AppColors.inkSoft,
-                              ),
-                            ),
+                        Text(
+                          _isEditMode
+                              ? 'Tinh chỉnh nội dung để lần ôn sau chính xác hơn.'
+                              : 'Một từ rõ nghĩa và có ví dụ sẽ dễ ghi nhớ hơn.',
+                          style: GoogleFonts.nunito(
+                            color: AppColors.inkSoft,
+                            fontSize: 14,
+                            height: 1.4,
                           ),
-                        )),
-                        // Custom topic button
-                        GestureDetector(
-                          onTap: () => setState(() => _showCustomTopic = true),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: _showCustomTopic ? AppColors.surfaceSubtle : AppColors.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(12),
-                              border: _showCustomTopic
-                                  ? Border.all(color: AppColors.rose, width: 2)
-                                  : null,
-                            ),
-                            child: Text(
-                              _showCustomTopic ? 'Nhập chủ đề...' : 'Thêm mới +',
-                              style: GoogleFonts.nunito(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: _showCustomTopic ? AppColors.rose : AppColors.inkSoft,
+                        ),
+                        const SizedBox(height: 24),
+                        // Word
+                        TextFormField(
+                          controller: _wordController,
+                          decoration: const InputDecoration(
+                            labelText: 'Từ vựng *',
+                            hintText: 'Nhập từ cần học',
+                            prefixIcon: Icon(Icons.text_fields),
+                          ),
+                          validator: (v) => v == null || v.trim().isEmpty
+                              ? 'Vui lòng nhập từ vựng'
+                              : null,
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 16),
+                        // Meaning
+                        TextFormField(
+                          controller: _meaningController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nghĩa *',
+                            hintText: 'Nhập nghĩa của từ',
+                            prefixIcon: Icon(Icons.translate),
+                          ),
+                          validator: (v) => v == null || v.trim().isEmpty
+                              ? 'Vui lòng nhập nghĩa'
+                              : null,
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 16),
+                        // Example
+                        TextFormField(
+                          controller: _exampleController,
+                          decoration: const InputDecoration(
+                            labelText: 'Ví dụ',
+                            hintText: 'Nhập câu ví dụ (không bắt buộc)',
+                            prefixIcon: Icon(Icons.format_quote),
+                          ),
+                          maxLines: 2,
+                          textCapitalization: TextCapitalization.sentences,
+                        ),
+                        const SizedBox(height: 16),
+                        // Topic selector
+                        const Text(
+                          'Chủ đề',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ..._topics.map(
+                              (topic) => GestureDetector(
+                                onTap: () => setState(() {
+                                  _showCustomTopic = false;
+                                  _selectedTopic = topic;
+                                }),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient:
+                                        !_showCustomTopic &&
+                                            _selectedTopic == topic
+                                        ? AppTheme.primaryGradient
+                                        : null,
+                                    color:
+                                        !_showCustomTopic &&
+                                            _selectedTopic == topic
+                                        ? null
+                                        : AppColors.surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    topic == 'general' ? 'Tổng hợp' : topic,
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 14,
+                                      fontWeight:
+                                          !_showCustomTopic &&
+                                              _selectedTopic == topic
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      color:
+                                          !_showCustomTopic &&
+                                              _selectedTopic == topic
+                                          ? Colors.white
+                                          : AppColors.inkSoft,
+                                    ),
+                                  ),
+                                ),
                               ),
+                            ),
+                            // Custom topic button
+                            GestureDetector(
+                              onTap: () =>
+                                  setState(() => _showCustomTopic = true),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _showCustomTopic
+                                      ? AppColors.surfaceSubtle
+                                      : AppColors.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: _showCustomTopic
+                                      ? Border.all(
+                                          color: AppColors.rose,
+                                          width: 2,
+                                        )
+                                      : null,
+                                ),
+                                child: Text(
+                                  _showCustomTopic
+                                      ? 'Nhập chủ đề...'
+                                      : 'Thêm mới +',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: _showCustomTopic
+                                        ? AppColors.rose
+                                        : AppColors.inkSoft,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_showCustomTopic) ...[
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _customTopicController,
+                            decoration: const InputDecoration(
+                              hintText: 'Nhập chủ đề của bạn',
+                              prefixIcon: Icon(Icons.edit),
+                            ),
+                            validator: (value) =>
+                                _showCustomTopic &&
+                                    (value == null || value.trim().isEmpty)
+                                ? 'Vui lòng nhập tên chủ đề'
+                                : null,
+                          ),
+                        ],
+                        const SizedBox(height: 32),
+                        // Save button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 54,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              gradient: AppTheme.primaryButtonGradient,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.rose.withValues(alpha: 0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _handleSave,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shadowColor: Colors.transparent,
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      _isEditMode ? 'Cập nhật' : 'Lưu từ vựng',
+                                    ),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    if (_showCustomTopic) ...[
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _customTopicController,
-                        decoration: const InputDecoration(
-                          hintText: 'Nhập chủ đề của bạn',
-                          prefixIcon: Icon(Icons.edit),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 32),
-                    // Save button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: AppTheme.primaryButtonGradient,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.rose.withValues(alpha: 0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _handleSave,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shadowColor: Colors.transparent,
-                          ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(_isEditMode ? 'Cập nhật' : 'Lưu từ vựng'),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

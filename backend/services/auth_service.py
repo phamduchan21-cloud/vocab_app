@@ -11,6 +11,13 @@ logger = logging.getLogger(__name__)
 SUPABASE_API_URL = f"{settings.SUPABASE_URL}/auth/v1" if settings.SUPABASE_URL else None
 
 
+class AuthServiceError(Exception):
+    def __init__(self, status_code: int, message: str):
+        super().__init__(message)
+        self.status_code = status_code
+        self.message = message
+
+
 class AuthService:
     """
     Xác thực JWT từ Supabase Auth.
@@ -35,7 +42,8 @@ class AuthService:
         data = resp.json()
         if resp.status_code not in (200, 201):
             msg = data.get("msg", data.get("error_description", "Yêu cầu thất bại"))
-            raise httpx.HTTPStatusError(msg, request=resp.request, response=resp)
+            status_code = 401 if endpoint.startswith("/token") else resp.status_code
+            raise AuthServiceError(status_code, msg)
         return data
 
     @staticmethod

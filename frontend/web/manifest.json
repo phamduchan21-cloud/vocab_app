@@ -1,11 +1,11 @@
 {
-    "name": "vocab_app",
-    "short_name": "vocab_app",
+    "name": "SolVocab",
+    "short_name": "SolVocab",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F3F7F2",
+    "theme_color": "#0F766E",
+    "description": "Ứng dụng học từ vựng tiếng Anh SolVocab.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
