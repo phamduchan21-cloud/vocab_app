@@ -1,14 +1,19 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
+import schemas
 from core.config import settings
+from core.observability import RequestContextMiddleware, configure_logging
 from database import init_db, close_db, async_session_factory
 from routers import auth, vocabulary, quiz, dashboard, gamification, mock_test, ai
 from services.auth_service import AuthServiceError
+
+
+configure_logging(settings.LOG_LEVEL)
 
 
 @asynccontextmanager
@@ -51,6 +56,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(RequestContextMiddleware)
 
 # Include all routers
 app.include_router(auth.router)
@@ -62,7 +68,7 @@ app.include_router(mock_test.router)
 app.include_router(ai.router)
 
 
-@app.get("/")
+@app.get("/", response_model=schemas.RootResponse)
 async def root():
     """Root endpoint — health check."""
     return {
@@ -72,8 +78,8 @@ async def root():
     }
 
 
-@app.get("/health")
-async def health_check():
+@app.get("/health", response_model=schemas.HealthResponse)
+async def health_check(response: Response):
     """Health check endpoint with DB connectivity verification."""
     db_ok = False
     try:
@@ -82,4 +88,15 @@ async def health_check():
             db_ok = True
     except Exception:
         db_ok = False
-    return {"status": "ok" if db_ok else "degraded", "database": "connected" if db_ok else "disconnected"}
+    if not db_ok:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    return {
+        "status": "ok" if db_ok else "degraded",
+        "database": "connected" if db_ok else "disconnected",
+    }
+
+
+@app.get("/health/live", response_model=schemas.LivenessResponse)
+async def liveness_check():
+    """Liveness check that does not depend on external services."""
+    return {"status": "ok"}

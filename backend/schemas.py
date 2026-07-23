@@ -5,6 +5,23 @@ from datetime import datetime, date
 from decimal import Decimal
 
 
+# ─── System Schemas ─────────────────────────────────────────────────
+
+class RootResponse(BaseModel):
+    message: str
+    version: str
+    docs: str
+
+
+class HealthResponse(BaseModel):
+    status: str
+    database: str
+
+
+class LivenessResponse(BaseModel):
+    status: str
+
+
 # ─── English Level ───────────────────────────────────────────────────
 
 class EnglishLevel(str, Enum):

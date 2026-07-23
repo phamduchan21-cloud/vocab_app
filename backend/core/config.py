@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     # Frontend URL for CORS
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # Runtime logging
+    LOG_LEVEL: str = "INFO"
+
     # AI API Keys (optional — service falls back gracefully if not set)
     GEMINI_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
