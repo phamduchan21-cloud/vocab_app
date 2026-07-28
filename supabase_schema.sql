@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   username TEXT,
   is_premium BOOLEAN DEFAULT FALSE,
+  english_level TEXT,
+  learning_goals JSONB,
+  daily_word_goal INT NOT NULL DEFAULT 10,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -19,20 +22,24 @@ CREATE TABLE IF NOT EXISTS vocabularies (
   word TEXT NOT NULL,
   meaning TEXT NOT NULL,
   example TEXT,
+  personal_note TEXT,
   pronunciation TEXT,
   topic TEXT DEFAULT 'general',
   lesson_id INT,
   next_review_date DATE,
   ease_factor FLOAT DEFAULT 2.5,
   review_count INT DEFAULT 0,
+  review_interval INT DEFAULT 0,
   times_correct INT DEFAULT 0,
   times_wrong INT DEFAULT 0,
+  is_bookmarked BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_vocab_user ON vocabularies(user_id);
 CREATE INDEX IF NOT EXISTS idx_vocab_review ON vocabularies(user_id, next_review_date);
+CREATE INDEX IF NOT EXISTS idx_vocab_bookmark ON vocabularies(user_id, is_bookmarked);
 
 -- Quiz Results
 CREATE TABLE IF NOT EXISTS quiz_results (

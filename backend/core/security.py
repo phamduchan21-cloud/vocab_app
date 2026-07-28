@@ -65,9 +65,8 @@ async def get_current_user(
     user = await AuthService.get_or_create_user(db, supabase_user_id, email)
     if user is None:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Không tìm thấy người dùng",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Không thể đồng bộ thông tin người dùng",
         )
 
     return user

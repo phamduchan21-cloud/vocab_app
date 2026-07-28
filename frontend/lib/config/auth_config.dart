@@ -6,7 +6,8 @@ class AuthConfig {
 
   static String get oauthRedirectUrl {
     if (!kIsWeb) return mobileCallbackUrl;
-    return '${Uri.base.origin}/';
+    // Keep OAuth callbacks on a public route while Supabase restores the session.
+    return '${Uri.base.origin}/#/login';
   }
 
   static String get passwordRecoveryRedirectUrl {
