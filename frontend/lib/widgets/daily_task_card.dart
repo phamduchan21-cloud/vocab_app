@@ -85,7 +85,9 @@ class DailyTaskCard extends StatelessWidget {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isDone ? AppColors.luxuryGreen : AppColors.luxuryEspresso,
+                    color: isDone
+                        ? AppColors.luxuryGreen
+                        : AppColors.luxuryEspresso,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -112,7 +114,9 @@ class DailyTaskCard extends StatelessWidget {
                       value: progress.clamp(0.0, 1.0),
                       minHeight: 6,
                       backgroundColor: AppColors.luxuryBorder,
-                      valueColor: AlwaysStoppedAnimation<Color>(effectiveAccent),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        effectiveAccent,
+                      ),
                     ),
                   ),
                 ],

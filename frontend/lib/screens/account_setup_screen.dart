@@ -114,7 +114,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                   value: (_page + 1) / 3,
                   minHeight: 7,
                   backgroundColor: AppColors.luxuryBorder,
-                  color: const Color(0xFFE95F52),
+                  color: AppColors.blue,
                 ),
               ),
             ),
@@ -322,8 +322,8 @@ class _SetupPage extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 eyebrow,
-                style: GoogleFonts.nunito(
-                  color: const Color(0xFFE95F52),
+                style: GoogleFonts.ibmPlexMono(
+                  color: AppColors.blue,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.5,
                   fontSize: 12,
@@ -333,7 +333,7 @@ class _SetupPage extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.playfairDisplay(
+                style: GoogleFonts.spaceGrotesk(
                   color: AppColors.luxuryEspresso,
                   fontWeight: FontWeight.w800,
                   height: 1.15,
@@ -396,13 +396,11 @@ class _ChoiceGrid extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: active
-                          ? const Color(0xFFFFEEE9)
+                          ? AppColors.blueBg
                           : AppColors.luxurySurface,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: active
-                            ? const Color(0xFFE95F52)
-                            : AppColors.luxuryBorder,
+                        color: active ? AppColors.blue : AppColors.luxuryBorder,
                         width: active ? 1.7 : 1,
                       ),
                     ),
@@ -411,7 +409,7 @@ class _ChoiceGrid extends StatelessWidget {
                         Icon(
                           option.icon,
                           color: active
-                              ? const Color(0xFFE95F52)
+                              ? AppColors.blue
                               : AppColors.luxuryBrown,
                         ),
                         const SizedBox(width: 12),
@@ -441,7 +439,7 @@ class _ChoiceGrid extends StatelessWidget {
                               ? Icons.check_circle_rounded
                               : Icons.circle_outlined,
                           color: active
-                              ? const Color(0xFFE95F52)
+                              ? AppColors.blue
                               : AppColors.luxuryBorder,
                         ),
                       ],

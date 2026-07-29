@@ -28,10 +28,13 @@ class SkeletonLoading extends StatelessWidget {
     switch (type) {
       case SkeletonType.list:
         return Column(
-          children: List.generate(count, (i) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: _skeletonCard(72),
-          )),
+          children: List.generate(
+            count,
+            (i) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: _skeletonCard(72),
+            ),
+          ),
         );
       case SkeletonType.grid:
         return Padding(
@@ -55,16 +58,19 @@ class SkeletonLoading extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
-            children: List.generate(4, (i) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Container(
-                height: 56,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+            children: List.generate(
+              4,
+              (i) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
-            )),
+            ),
           ),
         );
       case SkeletonType.quiz:
@@ -76,10 +82,13 @@ class SkeletonLoading extends StatelessWidget {
               const SizedBox(height: 20),
               Container(height: 60, decoration: _boxDecoration()),
               const SizedBox(height: 16),
-              ...List.generate(4, (i) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Container(height: 52, decoration: _boxDecoration()),
-              )),
+              ...List.generate(
+                4,
+                (i) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Container(height: 52, decoration: _boxDecoration()),
+                ),
+              ),
             ],
           ),
         );
@@ -90,7 +99,7 @@ class SkeletonLoading extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -99,7 +108,7 @@ class SkeletonLoading extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -121,7 +130,7 @@ class SkeletonLoading extends StatelessWidget {
 
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
-      color: Colors.white,
+      color: AppColors.surfaceContainerLow,
       borderRadius: BorderRadius.circular(8),
     );
   }
@@ -149,7 +158,10 @@ class LoadingWidget extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               message!,
-              style: GoogleFonts.nunito(fontSize: 16, color: AppColors.luxuryText),
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                color: AppColors.luxuryText,
+              ),
             ),
           ],
         ],

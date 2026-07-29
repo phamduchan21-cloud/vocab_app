@@ -12,9 +12,9 @@ class AuthPostcard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.child,
-    this.heroTitle = 'Mỗi từ mới là một lá thư gửi đến tương lai.',
+    this.heroTitle = 'Mỗi từ mới mở ra một quỹ đạo mới.',
     this.heroSubtitle =
-        'Học ngắn mỗi ngày, ôn đúng thời điểm và nhìn thấy tiến bộ của chính bạn.',
+        'Học đúng nhịp, ôn đúng lúc và tiến xa hơn mỗi ngày cùng Sol.',
   });
 
   final String title;
@@ -53,17 +53,18 @@ class AuthPostcard extends StatelessWidget {
                         ],
                         Text(
                           title,
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.spaceGrotesk(
                             fontSize: desktop ? 38 : 32,
                             height: 1.12,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -1.1,
                             color: AppColors.luxuryEspresso,
                           ),
                         ),
                         const SizedBox(height: 9),
                         Text(
                           subtitle,
-                          style: GoogleFonts.nunito(
+                          style: GoogleFonts.manrope(
                             fontSize: 15,
                             height: 1.5,
                             color: AppColors.luxuryText,
@@ -112,13 +113,24 @@ class AuthPostcard extends StatelessWidget {
                       margin: const EdgeInsets.all(22),
                       padding: const EdgeInsets.all(46),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1F5F5A),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF172B55),
+                            Color(0xFF101B36),
+                            Color(0xFF0B1226),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         borderRadius: BorderRadius.circular(34),
-                        boxShadow: const [
+                        border: Border.all(
+                          color: AppColors.blue.withValues(alpha: 0.28),
+                        ),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x260E302D),
-                            blurRadius: 34,
-                            offset: Offset(0, 18),
+                            color: AppColors.blue.withValues(alpha: 0.10),
+                            blurRadius: 44,
+                            offset: const Offset(0, 18),
                           ),
                         ],
                       ),
@@ -132,40 +144,90 @@ class AuthPostcard extends StatelessWidget {
                           ),
                           const Spacer(),
                           Center(
-                            child: Transform.rotate(
-                              angle: -0.035,
-                              child: Container(
-                                padding: const EdgeInsets.fromLTRB(
-                                  32,
-                                  24,
-                                  32,
-                                  18,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  width: 236,
+                                  height: 236,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.blue.withValues(
+                                        alpha: 0.30,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFF8EC),
-                                  borderRadius: BorderRadius.circular(28),
+                                Transform.rotate(
+                                  angle: -0.22,
+                                  child: Container(
+                                    width: 270,
+                                    height: 96,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(999),
+                                      border: Border.all(
+                                        color: AppColors.lavender.withValues(
+                                          alpha: 0.32,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                child: const CatWidget(
-                                  size: 150,
-                                  expression: CatExpression.happy,
+                                Container(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    32,
+                                    26,
+                                    32,
+                                    20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface.withValues(
+                                      alpha: 0.74,
+                                    ),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.blue.withValues(
+                                        alpha: 0.55,
+                                      ),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: const CatWidget(
+                                    size: 146,
+                                    expression: CatExpression.happy,
+                                  ),
                                 ),
-                              ),
+                                Positioned(
+                                  right: 12,
+                                  top: 54,
+                                  child: Container(
+                                    width: 16,
+                                    height: 16,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.sunny,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 34),
                           Text(
                             heroTitle,
-                            style: GoogleFonts.playfairDisplay(
+                            style: GoogleFonts.spaceGrotesk(
                               color: Colors.white,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               height: 1.12,
                               fontSize: 38,
+                              letterSpacing: -1.2,
                             ),
                           ),
                           const SizedBox(height: 14),
                           Text(
                             heroSubtitle,
-                            style: GoogleFonts.nunito(
+                            style: GoogleFonts.manrope(
                               color: Colors.white.withValues(alpha: 0.82),
                               height: 1.55,
                               fontSize: 16,
@@ -220,15 +282,15 @@ class StampSubmitButton extends StatelessWidget {
             : Icon(icon),
         label: Text(isLoading ? 'Đang gửi...' : label),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE95F52),
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: const Color(0xFFB98F88),
+          backgroundColor: AppColors.blue,
+          foregroundColor: AppColors.cosmicDeep,
+          disabledBackgroundColor: AppColors.surfaceContainerHighest,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 6,
-          shadowColor: const Color(0x55B9463D),
-          textStyle: GoogleFonts.nunito(
+          shadowColor: AppColors.blue.withValues(alpha: 0.25),
+          textStyle: GoogleFonts.spaceGrotesk(
             fontWeight: FontWeight.w900,
             letterSpacing: 0.3,
             fontSize: 16,
@@ -251,7 +313,7 @@ class AuthStatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = error ? AppColors.danger : const Color(0xFF0D716B);
+    final color = error ? AppColors.danger : AppColors.mint;
     return Semantics(
       liveRegion: true,
       child: Container(
@@ -440,7 +502,7 @@ class PasswordStrengthMeter extends StatelessWidget {
       AppColors.danger,
       const Color(0xFFD38B2D),
       const Color(0xFF38847E),
-      const Color(0xFF0D716B),
+      AppColors.mint,
     ];
     return Semantics(
       label: 'Độ mạnh mật khẩu: ${labels[score]}',
@@ -502,14 +564,14 @@ class SuccessStampOverlay extends StatelessWidget {
             height: 116,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE95F52), width: 5),
+              border: Border.all(color: AppColors.blue, width: 5),
               borderRadius: BorderRadius.circular(58),
             ),
             child: Text(
               label.toUpperCase(),
               textAlign: TextAlign.center,
               style: GoogleFonts.nunito(
-                color: const Color(0xFFE95F52),
+                color: AppColors.blue,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2,
                 fontSize: 19,
@@ -535,9 +597,7 @@ class _AirmailRule extends StatelessWidget {
           (index) => Expanded(
             child: Container(
               height: 7,
-              color: index.isEven
-                  ? const Color(0xFFE95F52)
-                  : const Color(0xFF65B8CB),
+              color: index.isEven ? AppColors.blue : AppColors.lavender,
             ),
           ),
         ),
@@ -552,7 +612,7 @@ class _PostcardBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFB98A6A).withValues(alpha: 0.48)
+      ..color = AppColors.blue.withValues(alpha: 0.34)
       ..strokeWidth = 1.4
       ..style = PaintingStyle.stroke;
     const dash = 5.0;
@@ -580,17 +640,23 @@ class _AirmailBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF0D716B).withValues(alpha: 0.035)
+      ..color = AppColors.blue.withValues(alpha: 0.045)
       ..strokeWidth = 1;
     for (double y = 28; y < size.height; y += 28) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
     final accent = Paint()
-      ..color = const Color(0xFFE95F52).withValues(alpha: 0.05)
-      ..strokeWidth = 18;
-    canvas.drawLine(
-      Offset(size.width * 0.72, 0),
-      Offset(size.width, 170),
+      ..color = AppColors.lavender.withValues(alpha: 0.055)
+      ..strokeWidth = 24;
+    canvas.drawArc(
+      Rect.fromCenter(
+        center: Offset(size.width * 0.88, size.height * 0.08),
+        width: size.width * 0.55,
+        height: size.width * 0.20,
+      ),
+      0.1,
+      3.0,
+      false,
       accent,
     );
   }

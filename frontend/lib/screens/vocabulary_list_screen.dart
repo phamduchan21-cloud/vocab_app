@@ -111,7 +111,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                     // Search bar
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(

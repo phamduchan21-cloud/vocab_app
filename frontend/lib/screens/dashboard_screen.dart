@@ -123,7 +123,7 @@ class _DashboardContent extends StatelessWidget {
     final learnedToday = review.completed.clamp(0, dailyGoal);
 
     return RefreshIndicator(
-      color: const Color(0xFFE95F52),
+      color: AppColors.peach,
       onRefresh: () async {
         await Future.wait([dashboard.refresh(), profile.loadProfile()]);
       },
@@ -308,17 +308,18 @@ class _DailyDispatchHero extends StatelessWidget {
         ? 0.0
         : (learnedToday / dailyGoal).clamp(0.0, 1.0);
     final title = due > 0
-        ? '$due thẻ đang chờ bạn đóng dấu ôn tập.'
-        : 'Hộp thư ôn tập đã gọn. Hãy gửi thêm 5 từ mới.';
+        ? '$due thẻ đang chờ bạn quay lại quỹ đạo.'
+        : 'Quỹ đạo ôn tập đã ổn định. Khám phá thêm 5 từ mới.';
     final buttonLabel = due > 0 ? 'Ôn $due thẻ ngay' : 'Học 5 từ mới';
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1F6862),
+        gradient: AppColors.luxuryGradientDark,
         borderRadius: BorderRadius.circular(30),
-        boxShadow: const [
+        border: Border.all(color: AppColors.blue.withValues(alpha: 0.24)),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x2915433F),
+            color: AppColors.blue.withValues(alpha: 0.11),
             blurRadius: 30,
             offset: Offset(0, 16),
           ),
@@ -347,8 +348,8 @@ class _DailyDispatchHero extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          'BƯU KIỆN HỌC TẬP HÔM NAY',
-                          style: GoogleFonts.nunito(
+                          'TRẠM HỌC TẬP HÔM NAY',
+                          style: GoogleFonts.ibmPlexMono(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
                             fontSize: 10,
@@ -359,11 +360,12 @@ class _DailyDispatchHero extends StatelessWidget {
                       const SizedBox(height: 14),
                       Text(
                         title,
-                        style: GoogleFonts.playfairDisplay(
+                        style: GoogleFonts.spaceGrotesk(
                           color: Colors.white,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           height: 1.12,
                           fontSize: compact ? 29 : 36,
+                          letterSpacing: -1,
                         ),
                       ),
                       const SizedBox(height: 9),
@@ -371,7 +373,7 @@ class _DailyDispatchHero extends StatelessWidget {
                         due > 0
                             ? 'Ôn đúng lúc giúp từ vựng ở lại lâu hơn trong trí nhớ.'
                             : 'Một phiên ngắn là đủ để giữ nhịp học và streak hôm nay.',
-                        style: GoogleFonts.nunito(
+                        style: GoogleFonts.manrope(
                           color: Colors.white.withValues(alpha: 0.82),
                           height: 1.45,
                           fontSize: 14,
@@ -389,8 +391,8 @@ class _DailyDispatchHero extends StatelessWidget {
                                   : '/flashcard?starter=true',
                             ),
                             style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFFE95F52),
-                              foregroundColor: Colors.white,
+                              backgroundColor: AppColors.blue,
+                              foregroundColor: AppColors.cosmicDeep,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 18,
                                 vertical: 15,
@@ -402,7 +404,7 @@ class _DailyDispatchHero extends StatelessWidget {
                             icon: const Icon(Icons.style_rounded),
                             label: Text(
                               buttonLabel,
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.spaceGrotesk(
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
@@ -436,7 +438,7 @@ class _DailyDispatchHero extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 value: progress,
                                 minHeight: 8,
-                                color: const Color(0xFFF5B940),
+                                color: AppColors.sunny,
                                 backgroundColor: Colors.white.withValues(
                                   alpha: 0.18,
                                 ),
@@ -495,9 +497,9 @@ class _HeroStamp extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 280),
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF8EC),
+            color: AppColors.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFE95F52), width: 3),
+            border: Border.all(color: AppColors.blue, width: 2),
           ),
           child: Row(
             children: [
@@ -510,8 +512,8 @@ class _HeroStamp extends StatelessWidget {
                   children: [
                     Text(
                       '${stats.streak} NGÀY',
-                      style: GoogleFonts.nunito(
-                        color: const Color(0xFFE95F52),
+                      style: GoogleFonts.ibmPlexMono(
+                        color: AppColors.blue,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.1,
                         fontSize: 12,
@@ -519,7 +521,7 @@ class _HeroStamp extends StatelessWidget {
                     ),
                     Text(
                       'Streak đang bay',
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.spaceGrotesk(
                         color: AppColors.luxuryEspresso,
                         fontWeight: FontWeight.w800,
                         fontSize: 18,
@@ -571,7 +573,7 @@ class _TodayJourney extends StatelessWidget {
             : 'Học từ mới',
         caption: reviewDone ? 'Đã đóng dấu hoàn thành' : 'Lặp lại ngắt quãng',
         done: reviewDone,
-        color: const Color(0xFF0D716B),
+        color: AppColors.blue,
         onTap: () => context.go('/flashcard'),
       ),
       _JourneyStep(
@@ -589,7 +591,7 @@ class _TodayJourney extends StatelessWidget {
         title: 'Mini Test',
         caption: goalDone ? 'Mục tiêu ngày đã đạt' : 'Đánh giá toàn diện',
         done: goalDone,
-        color: const Color(0xFFE95F52),
+        color: AppColors.peach,
         onTap: () => context.go('/mock-test'),
       ),
     ];
@@ -654,7 +656,7 @@ class _JourneyStep extends StatelessWidget {
             borderRadius: BorderRadius.circular(19),
             border: Border.all(
               color: done
-                  ? const Color(0xFF0D716B).withValues(alpha: 0.38)
+                  ? AppColors.mint.withValues(alpha: 0.38)
                   : AppColors.luxuryBorder,
             ),
           ),
@@ -690,9 +692,7 @@ class _JourneyStep extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.nunito(
-                        color: done
-                            ? const Color(0xFF0D716B)
-                            : AppColors.luxuryText,
+                        color: done ? AppColors.mint : AppColors.luxuryText,
                         fontSize: 12,
                       ),
                     ),
@@ -731,9 +731,9 @@ class _RecommendationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8EC),
+        color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE7C8A9)),
+        border: Border.all(color: AppColors.lavender.withValues(alpha: 0.28)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -743,13 +743,13 @@ class _RecommendationCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE95F52),
+                  color: AppColors.lavenderBg,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   'GỢI Ý RIÊNG CHO BẠN',
                   style: GoogleFonts.nunito(
-                    color: Colors.white,
+                    color: AppColors.lavender,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.8,
                     fontSize: 9,
@@ -806,7 +806,7 @@ class _RecommendationCard extends StatelessWidget {
                     context.go('/flashcard');
                   },
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D716B),
+                    backgroundColor: AppColors.blueDark,
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.play_arrow_rounded),
@@ -892,7 +892,7 @@ class _TopicPostcards extends StatelessWidget {
                           height: 42,
                           decoration: BoxDecoration(
                             color: const Color(
-                              0xFF0D716B,
+                              0xFF159DB8,
                             ).withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -906,7 +906,7 @@ class _TopicPostcards extends StatelessWidget {
                                   ),
                                 )
                                 .value,
-                            color: const Color(0xFF0D716B),
+                            color: AppColors.blueDark,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -1049,7 +1049,7 @@ class _ActivityRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 9),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF0D716B), size: 21),
+          Icon(icon, color: AppColors.blue, size: 21),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1077,7 +1077,7 @@ class _ActivityRow extends StatelessWidget {
           Text(
             trailing,
             style: GoogleFonts.nunito(
-              color: const Color(0xFFE95F52),
+              color: AppColors.peach,
               fontWeight: FontWeight.w900,
               fontSize: 12,
             ),
@@ -1100,9 +1100,7 @@ class _FirstDayCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFFFEEE9),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: const Color(0xFFE95F52).withValues(alpha: 0.28),
-        ),
+        border: Border.all(color: AppColors.peach.withValues(alpha: 0.28)),
       ),
       child: Row(
         children: [
@@ -1134,7 +1132,7 @@ class _FirstDayCard extends StatelessWidget {
           FilledButton(
             onPressed: onStart,
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFE95F52),
+              backgroundColor: AppColors.peach,
               foregroundColor: Colors.white,
             ),
             child: const Text('Bắt đầu'),
@@ -1170,7 +1168,7 @@ class _SectionHeading extends StatelessWidget {
               Text(
                 eyebrow,
                 style: GoogleFonts.nunito(
-                  color: const Color(0xFFE95F52),
+                  color: AppColors.peach,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.25,
                   fontSize: 10,
@@ -1212,7 +1210,12 @@ class _HomeSidebar extends StatelessWidget {
     ];
     return Container(
       width: 238,
-      color: const Color(0xFF123F3B),
+      decoration: BoxDecoration(
+        color: AppColors.cosmicDeep,
+        border: Border(
+          right: BorderSide(color: AppColors.blue.withValues(alpha: 0.16)),
+        ),
+      ),
       padding: const EdgeInsets.fromLTRB(18, 24, 18, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1238,8 +1241,8 @@ class _HomeSidebar extends StatelessWidget {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: const Color(0xFFE95F52),
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.sunny,
+                    foregroundColor: AppColors.cosmicDeep,
                     child: Text(
                       displayName.isEmpty ? 'S' : displayName[0].toUpperCase(),
                       style: const TextStyle(fontWeight: FontWeight.w900),
@@ -1295,7 +1298,9 @@ class _SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? const Color(0xFFFFF8EC) : Colors.transparent,
+      color: selected
+          ? AppColors.blue.withValues(alpha: 0.14)
+          : Colors.transparent,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -1307,13 +1312,13 @@ class _SidebarItem extends StatelessWidget {
               Icon(
                 icon,
                 size: 20,
-                color: selected ? const Color(0xFF123F3B) : Colors.white70,
+                color: selected ? AppColors.blue : Colors.white70,
               ),
               const SizedBox(width: 12),
               Text(
                 label,
-                style: GoogleFonts.nunito(
-                  color: selected ? const Color(0xFF123F3B) : Colors.white70,
+                style: GoogleFonts.manrope(
+                  color: selected ? AppColors.blue : Colors.white70,
                   fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
                 ),
               ),
@@ -1392,22 +1397,29 @@ class _AirmailHeroPainter extends CustomPainter {
     final soft = Paint()..color = Colors.white.withValues(alpha: 0.055);
     canvas.drawCircle(Offset(size.width * 0.92, 18), 110, soft);
     canvas.drawCircle(Offset(size.width * 0.08, size.height * 0.86), 74, soft);
-    final line = Paint()
-      ..color = const Color(0xFF65B8CB).withValues(alpha: 0.38)
-      ..strokeWidth = 8;
-    final coral = Paint()
-      ..color = const Color(0xFFE95F52).withValues(alpha: 0.45)
-      ..strokeWidth = 8;
-    for (double x = -40; x < size.width + 60; x += 76) {
-      canvas.drawLine(
-        Offset(x, size.height - 5),
-        Offset(x + 32, size.height - 5),
-        coral,
-      );
-      canvas.drawLine(
-        Offset(x + 36, size.height - 5),
-        Offset(x + 68, size.height - 5),
-        line,
+    final orbit = Paint()
+      ..color = AppColors.blue.withValues(alpha: 0.24)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * 0.82, size.height * 0.20),
+        width: size.width * 0.44,
+        height: size.width * 0.14,
+      ),
+      orbit,
+    );
+    final star = Paint()..color = Colors.white.withValues(alpha: 0.55);
+    for (final point in const [
+      Offset(0.10, 0.18),
+      Offset(0.24, 0.74),
+      Offset(0.66, 0.14),
+      Offset(0.88, 0.66),
+    ]) {
+      canvas.drawCircle(
+        Offset(point.dx * size.width, point.dy * size.height),
+        1.3,
+        star,
       );
     }
   }

@@ -13,10 +13,11 @@ class AppDrawer extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     final user = auth.user;
     final username =
-        user?.userMetadata?['username'] as String? ?? user?.email ?? 'Người dùng';
+        user?.userMetadata?['username'] as String? ??
+        user?.email ??
+        'Người dùng';
     final email = user?.email ?? '';
-    final avatarLetter =
-        username.isNotEmpty ? username[0].toUpperCase() : 'V';
+    final avatarLetter = username.isNotEmpty ? username[0].toUpperCase() : 'V';
 
     return Drawer(
       child: Container(
@@ -171,7 +172,9 @@ class AppDrawer extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: isActive ? AppColors.luxuryBeige.withValues(alpha: 0.3) : Colors.transparent,
+              color: isActive
+                  ? AppColors.luxuryBeige.withValues(alpha: 0.3)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -179,7 +182,9 @@ class AppDrawer extends StatelessWidget {
                 Icon(
                   icon,
                   size: 18,
-                  color: isActive ? AppColors.luxuryEspresso : AppColors.luxuryText,
+                  color: isActive
+                      ? AppColors.luxuryEspresso
+                      : AppColors.luxuryText,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -187,7 +192,9 @@ class AppDrawer extends StatelessWidget {
                   style: GoogleFonts.nunito(
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                    color: isActive ? AppColors.luxuryEspresso : AppColors.luxuryText,
+                    color: isActive
+                        ? AppColors.luxuryEspresso
+                        : AppColors.luxuryText,
                   ),
                 ),
                 const Spacer(),

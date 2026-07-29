@@ -52,10 +52,17 @@ class _AppBottomNavState extends State<AppBottomNav> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.luxurySurface,
+        color: AppColors.cosmicDeep.withValues(alpha: 0.96),
         border: Border(
-          top: BorderSide(color: AppColors.luxuryBorder.withValues(alpha: 0.6)),
+          top: BorderSide(color: AppColors.blue.withValues(alpha: 0.24)),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.blue.withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -8),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -84,10 +91,15 @@ class _AppBottomNavState extends State<AppBottomNav> {
                       width: tabWidth - 12,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.luxuryGold.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(14),
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.blue.withValues(alpha: 0.18),
+                            AppColors.lavender.withValues(alpha: 0.10),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.luxuryGold.withValues(alpha: 0.28),
+                          color: AppColors.blue.withValues(alpha: 0.34),
                         ),
                       ),
                     ),
@@ -127,7 +139,7 @@ class _AppBottomNavState extends State<AppBottomNav> {
                                           size: 22,
                                           color: Color.lerp(
                                             AppColors.luxuryText,
-                                            AppColors.luxuryGold,
+                                            AppColors.blue,
                                             value,
                                           ),
                                         ),
@@ -135,14 +147,14 @@ class _AppBottomNavState extends State<AppBottomNav> {
                                       const SizedBox(height: 2),
                                       Text(
                                         tab.label,
-                                        style: GoogleFonts.nunito(
+                                        style: GoogleFonts.manrope(
                                           fontSize: 10,
                                           fontWeight: isActive
                                               ? FontWeight.w700
                                               : FontWeight.w500,
                                           color: Color.lerp(
                                             AppColors.luxuryText,
-                                            AppColors.luxuryGold,
+                                            AppColors.blue,
                                             value,
                                           ),
                                         ),

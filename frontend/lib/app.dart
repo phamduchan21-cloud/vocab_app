@@ -28,112 +28,114 @@ import 'screens/topic_browser_screen.dart';
 import 'screens/topic_detail_screen.dart';
 import 'screens/ai_chat_screen.dart';
 import 'motion/app_motion.dart';
+import 'widgets/cosmic_background.dart';
 
-// SolVocab design system: botanical focus with warm learning accents.
+// SolVocab design system: a cosmic learning observatory.
 
 class AppBrand {
   static const name = 'SolVocab';
   static const assistantName = 'Sol';
-  static const tagline = 'Từ mới vững vàng. Mỗi ngày tiến bộ.';
+  static const tagline = 'Mở khóa từ mới. Mở rộng vũ trụ của bạn.';
 }
 
 class AppColors {
-  // ─── Warm candy background ──────────────────────────
-  static const background = Color(0xFFF3F7F2);
-  static const surface = Color(0xFFFFFDFC);
-  static const surfaceDim = Color(0xFFE8F0EB);
-  static const surfaceBright = Color(0xFFFFFDFC);
-  static const surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const surfaceContainerLow = Color(0xFFF7FAF7);
-  static const surfaceContainer = Color(0xFFEDF4EF);
-  static const surfaceContainerHigh = Color(0xFFE4EEE8);
-  static const surfaceContainerHighest = Color(0xFFD8E7DE);
-  static const surfaceVariant = Color(0xFFD8E7DE);
-  static const surfaceSubtle = Color(0xFFEDF6F0);
+  // ─── Deep-space foundation ───────────────────────────
+  static const background = Color(0xF70A0F1F);
+  static const surface = Color(0xFF151D34);
+  static const surfaceDim = Color(0xFF080D1B);
+  static const surfaceBright = Color(0xFF222E50);
+  static const surfaceContainerLowest = Color(0xFF0D1427);
+  static const surfaceContainerLow = Color(0xFF121A30);
+  static const surfaceContainer = Color(0xFF18223E);
+  static const surfaceContainerHigh = Color(0xFF202C4C);
+  static const surfaceContainerHighest = Color(0xFF29365B);
+  static const surfaceVariant = Color(0xFF29365B);
+  static const surfaceSubtle = Color(0xFF17213A);
+  static const cosmicDeep = Color(0xFF091326);
+  static const cosmicPanel = Color(0xFF121D35);
+  static const cosmicGlow = Color(0xFF55D9EA);
 
-  // ─── On-colors ─────────────────────────────────────────
-  static const onSurface = Color(0xFF15251F);
-  static const onSurfaceVariant = Color(0xFF536C63);
-  static const inverseSurface = Color(0xFF17372E);
-  static const inverseOnSurface = Color(0xFFF2F8F4);
+  // ─── Starlight text ──────────────────────────────────
+  static const onSurface = Color(0xFFF4F7FF);
+  static const onSurfaceVariant = Color(0xFFB3BED9);
+  static const inverseSurface = Color(0xFFEAF2FF);
+  static const inverseOnSurface = Color(0xFF11182B);
+  static const ink = Color(0xFFF4F7FF);
+  static const inkSoft = Color(0xFFB6C1DC);
+  static const textHint = Color(0xFF7F8CAB);
 
-  // ─── Ink (soft plum) ─────────────────────────────────
-  static const ink = Color(0xFF15251F);
-  static const inkSoft = Color(0xFF557168);
-  static const textHint = Color(0xFF8AA098);
+  // ─── Plasma cyan primary ─────────────────────────────
+  static const blue = Color(0xFF55D9EA);
+  static const blueDark = Color(0xFF159DB8);
+  static const blueLight = Color(0xFF9DECF4);
+  static const blueBg = Color(0xFF123746);
+  static const blueContainer = Color(0xFF1CAAC2);
 
-  // ─── Accent: Coral Pink (primary) ────────────────────
-  static const blue = Color(0xFF0F766E);
-  static const blueDark = Color(0xFF0A5A54);
-  static const blueLight = Color(0xFF55A69E);
-  static const blueBg = Color(0xFFE7F5F2);
-  static const blueContainer = Color(0xFF0F766E);
+  // ─── Celestial accents ───────────────────────────────
+  static const rose = Color(0xFF55D9EA);
+  static const peach = Color(0xFFFF7A66);
+  static const mint = Color(0xFF59E3B3);
+  static const mintDark = Color(0xFF24B984);
+  static const mintBg = Color(0xFF123A34);
+  static const lavender = Color(0xFF7FA8FF);
+  static const lavenderBg = Color(0xFF1A2A50);
+  static const sunny = Color(0xFFFFC857);
+  static const sunnyBg = Color(0xFF49391A);
+  static const sky = Color(0xFF61B8FF);
+  static const skyBg = Color(0xFF163451);
 
-  // ─── Playful accent colors ───────────────────────────
-  static const rose = Color(0xFF0F766E);
-  static const peach = Color(0xFFE76F51);
-  static const mint = Color(0xFF4E9B68);
-  static const mintDark = Color(0xFF36794D);
-  static const mintBg = Color(0xFFEAF6ED);
-  static const lavender = Color(0xFF3977A8);
-  static const lavenderBg = Color(0xFFEBF3F8);
-  static const sunny = Color(0xFFEAA544);
-  static const sunnyBg = Color(0xFFFFF4DF);
-  static const sky = Color(0xFF4C91C6);
-  static const skyBg = Color(0xFFEAF4FA);
-
-  // ─── Outline (soft) ─────────────────────────────────
-  static const outline = Color(0xFF9DB2A9);
-  static const outlineVariant = Color(0xFFD8E5DE);
+  // ─── Orbital outlines ────────────────────────────────
+  static const outline = Color(0xFF536487);
+  static const outlineVariant = Color(0xFF303E61);
 
   // ─── Semantic ──────────────────────────────────────────
-  static const success = Color(0xFF3F8F5B);
-  static const successBg = Color(0xFFEAF6ED);
-  static const danger = Color(0xFFD94F4F);
-  static const dangerBg = Color(0xFFFDECEC);
-  static const warning = Color(0xFFE08B2E);
-  static const warningBg = Color(0xFFFFF4DF);
-  static const tertiary = Color(0xFF3977A8);
-  static const tertiaryContainer = Color(0xFF2D648E);
+  static const success = Color(0xFF59E3B3);
+  static const successBg = Color(0xFF123A34);
+  static const danger = Color(0xFFFF6B7A);
+  static const dangerBg = Color(0xFF471D2A);
+  static const warning = Color(0xFFFFC857);
+  static const warningBg = Color(0xFF49391A);
+  static const tertiary = Color(0xFF7FA8FF);
+  static const tertiaryContainer = Color(0xFF233A72);
 
   // Backward-compatible names used across existing screens.
   static const luxuryBg = background;
   static const luxurySurface = surface;
-  static const luxuryBrown = Color(0xFF0F766E);
-  static const luxuryBrownLight = Color(0xFF2A9187);
-  static const luxuryBrownPale = Color(0xFF8AC0B7);
-  static const luxuryBeige = Color(0xFFD9F0E8);
-  static const luxuryEspresso = Color(0xFF102820);
-  static const luxuryText = Color(0xFF557168);
-  static const luxuryTextHint = Color(0xFF8AA098);
-  static const luxuryBorder = Color(0xFFD8E5DE);
-  static const luxuryGold = Color(0xFFE76F51);
-  static const luxuryGreen = Color(0xFF4E9B68);
+  static const luxuryBrown = Color(0xFF55D9EA);
+  static const luxuryBrownLight = Color(0xFF2EBAD1);
+  static const luxuryBrownPale = Color(0xFF7FA8FF);
+  static const luxuryBeige = Color(0xFF243A68);
+  static const luxuryEspresso = Color(0xFFF4F7FF);
+  static const luxuryText = Color(0xFFB6C1DC);
+  static const luxuryTextHint = Color(0xFF7F8CAB);
+  static const luxuryBorder = Color(0xFF303E61);
+  static const luxuryGold = Color(0xFFFFC857);
+  static const luxuryGreen = Color(0xFF59E3B3);
   static const luxuryDanger = danger;
   static const luxuryGradient = LinearGradient(
-    colors: [Color(0xFF0F766E), Color(0xFF2A9187)],
+    colors: [Color(0xFF159DB8), Color(0xFF3156B8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   static const luxuryGradientLight = LinearGradient(
-    colors: [Color(0xFF55A69E), Color(0xFF0F766E)],
+    colors: [Color(0xFF55D9EA), Color(0xFF5D79E8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   static const luxuryGradientBeige = LinearGradient(
-    colors: [Color(0xFFD9F0E8), Color(0xFF8AC0B7)],
+    colors: [Color(0xFF25385F), Color(0xFF314A7D)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   static const luxuryGradientDark = LinearGradient(
-    colors: [Color(0xFF17372E), Color(0xFF102820)],
+    colors: [Color(0xFF17294B), Color(0xFF0A1022)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   // ─── Backward-compatible aliases ────────────────────
   static const primary = rose;
-  static const primaryLight = Color(0xFF55A69E);
+  static const primaryLight = Color(0xFF9DECF4);
   static const primaryDark = rose;
   static const accent1 = rose;
   static const accent2 = mint;
@@ -162,43 +164,43 @@ class AppRadius {
 // Brand gradients are reserved for primary actions and hero surfaces.
 class AppTheme {
   static const primaryGradient = LinearGradient(
-    colors: [Color(0xFF0F766E), Color(0xFF2A9187)],
+    colors: [Color(0xFF159DB8), Color(0xFF3156B8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const secondaryGradient = LinearGradient(
-    colors: [Color(0xFF2A9187), Color(0xFF4E9B68)],
+    colors: [Color(0xFF24B984), Color(0xFF159DB8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const accentGradient = LinearGradient(
-    colors: [Color(0xFF3977A8), Color(0xFF4C91C6)],
+    colors: [Color(0xFF5D79E8), Color(0xFF159DB8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const primaryButtonGradient = LinearGradient(
-    colors: [Color(0xFF0F766E), Color(0xFF2A9187)],
+    colors: [Color(0xFF55D9EA), Color(0xFF2DB8D0)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const heroGradient = LinearGradient(
-    colors: [Color(0xFF0F766E), Color(0xFFE76F51)],
+    colors: [Color(0xFF12294E), Color(0xFF273B77), Color(0xFF214E68)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const aiGradient = LinearGradient(
-    colors: [Color(0xFF3977A8), Color(0xFF0F766E)],
+    colors: [Color(0xFF5D79E8), Color(0xFF159DB8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const mintGradient = LinearGradient(
-    colors: [Color(0xFF4E9B68), Color(0xFF4C91C6)],
+    colors: [Color(0xFF24B984), Color(0xFF159DB8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -233,30 +235,32 @@ class _SolVocabAppState extends State<SolVocabApp> {
       darkTheme: _buildDarkTheme(),
       themeMode: ThemeMode.light,
       routerConfig: _router,
+      builder: (context, child) =>
+          CosmicBackground(child: child ?? const SizedBox.shrink()),
     );
   }
 
   ThemeData _buildLightTheme() {
     return ThemeData(
       useMaterial3: true,
-      fontFamily: GoogleFonts.nunito().fontFamily,
-      colorScheme: ColorScheme.light(
+      fontFamily: GoogleFonts.manrope().fontFamily,
+      colorScheme: ColorScheme.dark(
         primary: AppColors.rose,
-        onPrimary: Colors.white,
-        primaryContainer: AppColors.rose,
-        onPrimaryContainer: Colors.white,
+        onPrimary: AppColors.cosmicDeep,
+        primaryContainer: AppColors.blueBg,
+        onPrimaryContainer: AppColors.blueLight,
         secondary: AppColors.mint,
-        onSecondary: Colors.white,
+        onSecondary: AppColors.cosmicDeep,
         secondaryContainer: AppColors.mintBg,
-        onSecondaryContainer: const Color(0xFF003325),
+        onSecondaryContainer: AppColors.mint,
         tertiary: AppColors.lavender,
-        onTertiary: Colors.white,
-        tertiaryContainer: AppColors.lavender,
-        onTertiaryContainer: Colors.white,
+        onTertiary: AppColors.cosmicDeep,
+        tertiaryContainer: AppColors.lavenderBg,
+        onTertiaryContainer: AppColors.lavender,
         error: AppColors.danger,
-        onError: Colors.white,
-        errorContainer: const Color(0xFFFFDAD6),
-        onErrorContainer: const Color(0xFF93000A),
+        onError: AppColors.cosmicDeep,
+        errorContainer: AppColors.dangerBg,
+        onErrorContainer: AppColors.danger,
         surface: AppColors.surface,
         onSurface: AppColors.onSurface,
         surfaceContainerLowest: AppColors.surfaceContainerLowest,
@@ -268,8 +272,8 @@ class _SolVocabAppState extends State<SolVocabApp> {
         outline: AppColors.outline,
         outlineVariant: AppColors.outlineVariant,
         inverseSurface: AppColors.inverseSurface,
-        inversePrimary: const Color(0xFFFFB0C0),
-        brightness: Brightness.light,
+        inversePrimary: AppColors.blueDark,
+        brightness: Brightness.dark,
       ),
       scaffoldBackgroundColor: AppColors.background,
       canvasColor: AppColors.background,
@@ -281,7 +285,7 @@ class _SolVocabAppState extends State<SolVocabApp> {
         foregroundColor: AppColors.ink,
         elevation: 0,
         scrolledUnderElevation: 0.3,
-        titleTextStyle: GoogleFonts.nunito(
+        titleTextStyle: GoogleFonts.spaceGrotesk(
           color: AppColors.ink,
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -328,23 +332,23 @@ class _SolVocabAppState extends State<SolVocabApp> {
           vertical: 16,
         ),
         prefixIconColor: AppColors.textHint,
-        labelStyle: GoogleFonts.nunito(
+        labelStyle: GoogleFonts.manrope(
           color: AppColors.textSecondary,
           fontSize: 14,
         ),
-        hintStyle: GoogleFonts.nunito(color: AppColors.textHint, fontSize: 14),
+        hintStyle: GoogleFonts.manrope(color: AppColors.textHint, fontSize: 14),
       ),
 
       // ─── Button ──────────────────────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.rose,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.cosmicDeep,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          textStyle: GoogleFonts.nunito(
+          textStyle: GoogleFonts.spaceGrotesk(
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
@@ -356,7 +360,7 @@ class _SolVocabAppState extends State<SolVocabApp> {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.rose,
-          textStyle: GoogleFonts.nunito(
+          textStyle: GoogleFonts.manrope(
             fontSize: 14,
             fontWeight: FontWeight.w700,
           ),
@@ -370,7 +374,7 @@ class _SolVocabAppState extends State<SolVocabApp> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          textStyle: GoogleFonts.nunito(
+          textStyle: GoogleFonts.manrope(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -384,11 +388,11 @@ class _SolVocabAppState extends State<SolVocabApp> {
         unselectedItemColor: AppColors.textHint,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: GoogleFonts.nunito(
+        selectedLabelStyle: GoogleFonts.manrope(
           fontSize: 11,
           fontWeight: FontWeight.w700,
         ),
-        unselectedLabelStyle: GoogleFonts.nunito(
+        unselectedLabelStyle: GoogleFonts.manrope(
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),
@@ -396,55 +400,55 @@ class _SolVocabAppState extends State<SolVocabApp> {
 
       // ─── Typography ─────────────────────────────────
       textTheme: TextTheme(
-        headlineLarge: GoogleFonts.nunito(
+        headlineLarge: GoogleFonts.spaceGrotesk(
           color: AppColors.ink,
           fontWeight: FontWeight.w800,
           fontSize: 28,
           height: 1.2,
         ),
-        headlineMedium: GoogleFonts.nunito(
+        headlineMedium: GoogleFonts.spaceGrotesk(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,
           fontSize: 22,
           height: 1.25,
         ),
-        headlineSmall: GoogleFonts.nunito(
+        headlineSmall: GoogleFonts.spaceGrotesk(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,
           fontSize: 18,
           height: 1.3,
         ),
-        titleLarge: GoogleFonts.nunito(
+        titleLarge: GoogleFonts.spaceGrotesk(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,
           fontSize: 17,
         ),
-        titleMedium: GoogleFonts.nunito(
+        titleMedium: GoogleFonts.spaceGrotesk(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,
           fontSize: 15,
         ),
-        titleSmall: GoogleFonts.nunito(
+        titleSmall: GoogleFonts.spaceGrotesk(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,
           fontSize: 14,
         ),
-        bodyLarge: GoogleFonts.nunito(
+        bodyLarge: GoogleFonts.manrope(
           color: AppColors.ink,
           fontSize: 16,
           height: 1.6,
         ),
-        bodyMedium: GoogleFonts.nunito(
+        bodyMedium: GoogleFonts.manrope(
           color: AppColors.onSurfaceVariant,
           fontSize: 14,
           height: 1.55,
         ),
-        bodySmall: GoogleFonts.nunito(
+        bodySmall: GoogleFonts.manrope(
           color: AppColors.textHint,
           fontSize: 12,
           height: 1.45,
         ),
-        labelLarge: GoogleFonts.nunito(
+        labelLarge: GoogleFonts.manrope(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,
           fontSize: 14,
@@ -467,9 +471,9 @@ class _SolVocabAppState extends State<SolVocabApp> {
         space: 1,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.ink,
-        contentTextStyle: GoogleFonts.nunito(
-          color: Colors.white,
+        backgroundColor: AppColors.surfaceBright,
+        contentTextStyle: GoogleFonts.manrope(
+          color: AppColors.onSurface,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
@@ -495,69 +499,7 @@ class _SolVocabAppState extends State<SolVocabApp> {
   }
 
   ThemeData _buildDarkTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      fontFamily: GoogleFonts.nunito().fontFamily,
-      colorScheme: ColorScheme.dark(
-        primary: AppColors.rose,
-        onPrimary: Colors.white,
-        primaryContainer: AppColors.rose,
-        onPrimaryContainer: Colors.white,
-        secondary: AppColors.mint,
-        onSecondary: Colors.white,
-        secondaryContainer: const Color(0xFF003325),
-        onSecondaryContainer: AppColors.mint,
-        tertiary: AppColors.lavender,
-        onTertiary: Colors.white,
-        tertiaryContainer: AppColors.lavender,
-        onTertiaryContainer: Colors.white,
-        error: AppColors.danger,
-        onError: Colors.white,
-        errorContainer: const Color(0xFFFFDAD6),
-        onErrorContainer: const Color(0xFF93000A),
-        surface: const Color(0xFF1E1C2E),
-        onSurface: const Color(0xFFE8E0F0),
-        surfaceContainerLowest: const Color(0xFF141226),
-        surfaceContainerLow: const Color(0xFF1E1C2E),
-        surfaceContainer: const Color(0xFF2A2840),
-        surfaceContainerHigh: const Color(0xFF363452),
-        surfaceContainerHighest: const Color(0xFF424064),
-        onSurfaceVariant: const Color(0xFFB8AEC8),
-        outline: const Color(0xFF5A5270),
-        outlineVariant: const Color(0xFF3A3858),
-        inverseSurface: const Color(0xFFE8E0F0),
-        inversePrimary: const Color(0xFFFFB0C0),
-        brightness: Brightness.dark,
-      ),
-      scaffoldBackgroundColor: const Color(0xFF141226),
-      canvasColor: const Color(0xFF141226),
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Color(0xFF1E1C2E),
-        foregroundColor: Color(0xFFE8E0F0),
-      ),
-      cardTheme: CardThemeData(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(AppRadius.xl)),
-        ),
-        color: const Color(0xFF1E1C2E),
-        surfaceTintColor: Colors.transparent,
-      ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF1E1C2E),
-        selectedItemColor: AppColors.rose,
-        unselectedItemColor: Color(0xFF7A7290),
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-      ),
-      snackBarTheme: const SnackBarThemeData(
-        backgroundColor: Color(0xFF2A2840),
-        contentTextStyle: TextStyle(color: Color(0xFFE8E0F0)),
-      ),
-      dialogTheme: const DialogThemeData(backgroundColor: Color(0xFF1E1C2E)),
-    );
+    return _buildLightTheme();
   }
 
   GoRouter _buildRouter(AuthProvider auth) {

@@ -75,7 +75,7 @@ class _TopicBrowserScreenState extends State<TopicBrowserScreen> {
                     const SizedBox(height: 18),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(

@@ -65,13 +65,19 @@ class TopicGrid extends StatelessWidget {
         baseColor: AppColors.luxuryBorder,
         highlightColor: AppColors.luxurySurface,
         child: Row(
-          children: List.generate(4, (_) => Expanded(
-            child: Container(
-              height: 72,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+          children: List.generate(
+            4,
+            (_) => Expanded(
+              child: Container(
+                height: 72,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
-          )),
+          ),
         ),
       ),
     );
@@ -114,11 +120,15 @@ class TopicGrid extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: displayTopics.map((topic) => _TopicChip(
-            emoji: _emojiFor(topic.topic),
-            topic: topic,
-            onTap: () => onTopicTap?.call(topic.topic),
-          )).toList(),
+          children: displayTopics
+              .map(
+                (topic) => _TopicChip(
+                  emoji: _emojiFor(topic.topic),
+                  topic: topic,
+                  onTap: () => onTopicTap?.call(topic.topic),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -147,7 +157,10 @@ class _TopicChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(9),
-            border: Border.all(color: AppColors.luxuryBorder.withValues(alpha: 0.4), width: 0.5),
+            border: Border.all(
+              color: AppColors.luxuryBorder.withValues(alpha: 0.4),
+              width: 0.5,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

@@ -1399,11 +1399,11 @@ class _CurrentStageCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: AppColors.luxuryEspresso,
+        gradient: AppColors.luxuryGradientDark,
         borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: AppColors.luxuryEspresso.withValues(alpha: 0.16),
+            color: AppColors.blue.withValues(alpha: 0.16),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -2857,7 +2857,7 @@ class _BadgeTab extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: AppColors.luxuryEspresso,
+            color: AppColors.cosmicDeep,
             borderRadius: BorderRadius.circular(22),
           ),
           child: Column(

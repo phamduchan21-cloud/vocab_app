@@ -36,13 +36,26 @@ class LeaderboardPreview extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(height: 20, width: 200,
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
+            Container(
+              height: 20,
+              width: 200,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
             const SizedBox(height: 12),
-            ...List.generate(3, (_) => Container(
-              height: 48, margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-            )),
+            ...List.generate(
+              3,
+              (_) => Container(
+                height: 48,
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -93,7 +106,10 @@ class LeaderboardPreview extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(11),
-              border: Border.all(color: AppColors.luxuryBorder.withValues(alpha: 0.4), width: 0.5),
+              border: Border.all(
+                color: AppColors.luxuryBorder.withValues(alpha: 0.4),
+                width: 0.5,
+              ),
             ),
             child: Column(
               children: List.generate(displayEntries.length, (index) {
@@ -112,18 +128,22 @@ class LeaderboardPreview extends StatelessWidget {
     final rankStr = rank == 1
         ? '🥇'
         : rank == 2
-            ? '🥈'
-            : rank == 3
-                ? '🥉'
-                : '$rank.';
+        ? '🥈'
+        : rank == 3
+        ? '🥉'
+        : '$rank.';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isMe ? AppColors.luxuryBeige.withValues(alpha: 0.2) : Colors.transparent,
+        color: isMe
+            ? AppColors.luxuryBeige.withValues(alpha: 0.2)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         border: Border(
-          bottom: BorderSide(color: AppColors.luxuryBorder.withValues(alpha: 0.5)),
+          bottom: BorderSide(
+            color: AppColors.luxuryBorder.withValues(alpha: 0.5),
+          ),
         ),
       ),
       child: Row(

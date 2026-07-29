@@ -14,7 +14,8 @@ class PostmarkDashPainter extends CustomPainter {
     const dashWidth = 4.0;
     const dashSpace = 3.0;
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width < size.height ? size.width : size.height) / 2 - 4;
+    final radius =
+        (size.width < size.height ? size.width : size.height) / 2 - 4;
     double startAngle = -1.2;
     const arcSweep = 2.4;
     final totalArcLength = radius * arcSweep;
@@ -23,7 +24,13 @@ class PostmarkDashPainter extends CustomPainter {
     for (int i = 0; i < dashCount; i++) {
       final start = startAngle + (i * totalDash) / radius;
       final end = start + dashWidth / radius;
-      canvas.drawArc(Rect.fromCenter(center: center, width: radius * 2, height: radius * 2), start, end - start, false, paint);
+      canvas.drawArc(
+        Rect.fromCenter(center: center, width: radius * 2, height: radius * 2),
+        start,
+        end - start,
+        false,
+        paint,
+      );
     }
   }
 
@@ -36,7 +43,12 @@ class PostmarkScore extends StatelessWidget {
   final int score;
   final String label;
   final Color color;
-  const PostmarkScore({super.key, required this.score, required this.label, required this.color});
+  const PostmarkScore({
+    super.key,
+    required this.score,
+    required this.label,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +58,25 @@ class PostmarkScore extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CustomPaint(painter: PostmarkDashPainter(color: color), size: const Size(120, 120)),
+          CustomPaint(
+            painter: PostmarkDashPainter(color: color),
+            size: const Size(120, 120),
+          ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('$score', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: color)),
-              Text(label, style: const TextStyle(fontSize: 13, color: Colors.black54)),
+              Text(
+                '$score',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 13, color: Colors.black54),
+              ),
             ],
           ),
         ],

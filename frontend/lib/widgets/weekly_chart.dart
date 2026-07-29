@@ -21,16 +21,14 @@ class WeeklyChart extends StatelessWidget {
     final displayDays = days.isEmpty
         ? List.generate(
             7,
-            (index) => WeeklyActivityDay(
-              date: '',
-              xp: 0,
-              quizzes: 0,
-              learned: 0,
-            ),
+            (index) =>
+                WeeklyActivityDay(date: '', xp: 0, quizzes: 0, learned: 0),
           )
         : days;
-    final maxXp =
-        displayDays.fold<int>(1, (max, day) => day.xp > max ? day.xp : max);
+    final maxXp = displayDays.fold<int>(
+      1,
+      (max, day) => day.xp > max ? day.xp : max,
+    );
     final progress = (currentXp / weeklyXpGoal).clamp(0.0, 1.0);
 
     const dayLabels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
@@ -55,7 +53,10 @@ class WeeklyChart extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(19),
-          border: Border.all(color: AppColors.luxuryBorder.withValues(alpha: 0.4), width: 0.5),
+          border: Border.all(
+            color: AppColors.luxuryBorder.withValues(alpha: 0.4),
+            width: 0.5,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +74,10 @@ class WeeklyChart extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.luxuryGold.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(8),
@@ -98,9 +102,7 @@ class WeeklyChart extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: List.generate(displayDays.length, (i) {
                   final day = displayDays[i];
-                  final height = maxXp == 0
-                      ? 4.0
-                      : 8.0 + (day.xp / maxXp) * 80;
+                  final height = maxXp == 0 ? 4.0 : 8.0 + (day.xp / maxXp) * 80;
                   final hasData = day.xp > 0;
                   final isToday = i == todayIdx;
 
@@ -144,9 +146,7 @@ class WeeklyChart extends StatelessWidget {
                                       end: Alignment.topCenter,
                                     )
                                   : null,
-                              color: hasData
-                                  ? null
-                                  : AppColors.luxuryBorder,
+                              color: hasData ? null : AppColors.luxuryBorder,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -154,8 +154,9 @@ class WeeklyChart extends StatelessWidget {
                             dayLabels[i],
                             style: GoogleFonts.nunito(
                               fontSize: 11,
-                              fontWeight:
-                                  isToday ? FontWeight.w700 : FontWeight.w500,
+                              fontWeight: isToday
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
                               color: isToday
                                   ? AppColors.luxuryGold
                                   : AppColors.luxuryText,
@@ -190,8 +191,9 @@ class WeeklyChart extends StatelessWidget {
                       value: progress,
                       minHeight: 10,
                       backgroundColor: AppColors.luxuryBorder,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(AppColors.luxuryGold),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppColors.luxuryGold,
+                      ),
                     ),
                   ),
                 ),
