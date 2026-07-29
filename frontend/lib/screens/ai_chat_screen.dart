@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../app.dart';
 import '../services/ai_service.dart';
 import '../services/api_service.dart';
+import '../widgets/cat_widget.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -26,16 +27,18 @@ class _AIChatScreenState extends State<AIChatScreen> {
   void initState() {
     super.initState();
     _aiService = AIService(context.read<ApiService>());
-    _messages.add(_ChatMessage(
-      text: 'Chào bạn! Tôi là Sol, trợ lý học tiếng Anh của SolVocab.\n\n'
-          'Bạn có thể hỏi tôi về:\n'
-          '• 📖 Giải thích từ vựng\n'
-          '• 📝 Ví dụ câu\n'
-          '• 🔄 Phân biệt từ dễ nhầm\n'
-          '• 📚 Ngữ pháp cơ bản\n\n'
-          'Bạn muốn học gì hôm nay? 🎯',
-      isUser: false,
-    ));
+    _messages.add(
+      _ChatMessage(
+        text:
+            'Chào bạn, tôi là Sol. Tôi có thể giải thích từ vựng, đặt câu ví dụ, phân biệt từ dễ nhầm hoặc giúp bạn hiểu một điểm ngữ pháp.\n\nBạn đang muốn hỏi điều gì?',
+        isUser: false,
+        suggestions: const [
+          'Giải thích một từ',
+          'Cho tôi câu ví dụ',
+          'Phân biệt hai từ',
+        ],
+      ),
+    );
   }
 
   @override
@@ -55,21 +58,35 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _messageController.clear();
 
     try {
-      final result = await _aiService.chat(message: text.trim());
+      final sourceRoute =
+          GoRouterState.of(context).uri.queryParameters['from'] ?? '/';
+      final result = await _aiService.chat(
+        message: text.trim(),
+        context: {'screen': sourceRoute, 'topic': _topicForRoute(sourceRoute)},
+      );
       if (!mounted) return;
-      final reply = result['reply'] as String? ?? 'Xin lỗi, tôi chưa có câu trả lời.';
-      final suggestions = (result['suggestions'] as List?)?.map((s) => s.toString()).toList() ?? <String>[];
+      final reply =
+          result['reply'] as String? ?? 'Tôi chưa có câu trả lời phù hợp.';
+      final suggestions =
+          (result['suggestions'] as List?)?.map((s) => s.toString()).toList() ??
+          <String>[];
       setState(() {
-        _messages.add(_ChatMessage(text: reply, isUser: false, suggestions: suggestions));
+        _messages.add(
+          _ChatMessage(text: reply, isUser: false, suggestions: suggestions),
+        );
         _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _messages.add(_ChatMessage(
-          text: '❌ Xin lỗi, AI hiện không khả dụng. Vui lòng thử lại sau.',
-          isUser: false,
-        ));
+        _messages.add(
+          _ChatMessage(
+            text:
+                'Sol chưa kết nối được với dịch vụ AI. Hãy kiểm tra kết nối và thử gửi lại sau ít phút.',
+            isUser: false,
+            suggestions: const ['Thử lại câu hỏi vừa rồi'],
+          ),
+        );
         _isLoading = false;
       });
     }
@@ -88,67 +105,122 @@ class _AIChatScreenState extends State<AIChatScreen> {
     });
   }
 
+  String _topicForRoute(String route) {
+    if (route.startsWith('/flashcard')) return 'flashcard và ghi nhớ từ vựng';
+    if (route.startsWith('/quiz')) return 'quiz từ vựng';
+    if (route.startsWith('/mock-test')) return 'mini test tiếng Anh';
+    if (route.startsWith('/profile')) return 'lộ trình học cá nhân';
+    if (route.startsWith('/progress')) return 'tiến độ học tập';
+    return 'từ vựng tiếng Anh';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Row(children: [
-          Container(
-            width: 32, height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.rose.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(10),
+        title: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.blue.withValues(alpha: 0.10),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.blue.withValues(alpha: 0.28),
+                ),
+              ),
+              child: const CatWidget(
+                size: 36,
+                expression: CatExpression.talking,
+              ),
             ),
-            child: const Center(child: Text('S', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800))),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Sol - Trợ lý học tập', overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.nunito(fontWeight: FontWeight.w700, fontSize: 17, color: AppColors.ink)),
-              Text(_isLoading ? 'Đang chuẩn bị câu trả lời...' : 'Sẵn sàng hỗ trợ',
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft)),
-            ]),
-          ),
-        ]),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sol · Trợ lý học tập',
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 17,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  Text(
+                    _isLoading
+                        ? 'Đang chuẩn bị câu trả lời...'
+                        : 'Đang trực tuyến',
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.manrope(
+                      fontSize: 11,
+                      color: _isLoading ? AppColors.inkSoft : AppColors.mint,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.ink),
-          onPressed: () => context.go('/'),
+          onPressed: () => context.canPop() ? context.pop() : context.go('/'),
         ),
       ),
-      body: Center(child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 840),
-        child: Column(children: [
-        // Messages
-        Expanded(
-          child: _messages.isEmpty
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                  itemCount: _messages.length,
-                  itemBuilder: (context, index) {
-                    final msg = _messages[index];
-                    return _MessageBubble(message: msg, onSuggestionTap: (s) => _sendMessage(s));
-                  },
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 840),
+          child: Column(
+            children: [
+              // Messages
+              Expanded(
+                child: _messages.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        itemCount: _messages.length,
+                        itemBuilder: (context, index) {
+                          final msg = _messages[index];
+                          return _MessageBubble(
+                            message: msg,
+                            onSuggestionTap: (s) => _sendMessage(s),
+                          );
+                        },
+                      ),
+              ),
+              // Loading
+              if (_isLoading)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Sol đang trả lời...',
+                        style: GoogleFonts.nunito(
+                          fontSize: 12,
+                          color: AppColors.inkSoft,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-        ),
-        // Loading
-        if (_isLoading)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
-              const SizedBox(width: 8),
-              Text('Sol đang trả lời...', style: GoogleFonts.nunito(fontSize: 12, color: AppColors.inkSoft)),
-            ]),
+              // Input — Stitch glassmorphism
+              _buildInput(),
+            ],
           ),
-        // Input — Stitch glassmorphism
-        _buildInput(),
-        ]),
-      )),
+        ),
+      ),
     );
   }
 
@@ -158,73 +230,95 @@ class _AIChatScreenState extends State<AIChatScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.95),
         boxShadow: [
-          BoxShadow(color: AppColors.ink.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, -2)),
+          BoxShadow(
+            color: AppColors.ink.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
         ],
       ),
       child: SafeArea(
         top: false,
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          // Suggestion chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(children: [
-              _buildSuggestionChip('Giải thích thêm'),
-              const SizedBox(width: 6),
-              _buildSuggestionChip('Cho ví dụ'),
-              const SizedBox(width: 6),
-              _buildSuggestionChip('Từ tiếp theo'),
-            ]),
-          ),
-          // Input bar
-          Row(children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.outlineVariant),
-                ),
-                child: Row(children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Hỏi Sol về từ vựng hoặc ngữ pháp...',
-                        hintStyle: GoogleFonts.nunito(color: AppColors.textHint, fontSize: 14),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      style: GoogleFonts.nunito(fontSize: 14, color: AppColors.ink),
-                      maxLines: 3, minLines: 1,
-                      enabled: !_isLoading,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (v) => _sendMessage(v),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Suggestion chips
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  _buildSuggestionChip('Giải thích thêm'),
+                  const SizedBox(width: 6),
+                  _buildSuggestionChip('Cho ví dụ'),
+                  const SizedBox(width: 6),
+                  _buildSuggestionChip('Từ tiếp theo'),
+                ],
+              ),
+            ),
+            // Input bar
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: AppColors.outlineVariant),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _messageController,
+                            decoration: InputDecoration(
+                              hintText: 'Hỏi Sol về từ vựng hoặc ngữ pháp...',
+                              hintStyle: GoogleFonts.nunito(
+                                color: AppColors.textHint,
+                                fontSize: 14,
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
+                            ),
+                            style: GoogleFonts.nunito(
+                              fontSize: 14,
+                              color: AppColors.ink,
+                            ),
+                            maxLines: 3,
+                            minLines: 1,
+                            enabled: !_isLoading,
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (v) => _sendMessage(v),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ]),
-              ),
+                ),
+                const SizedBox(width: 8),
+                IconButton.filled(
+                  tooltip: 'Gửi tin nhắn',
+                  onPressed: _isLoading
+                      ? null
+                      : () => _sendMessage(_messageController.text),
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.rose,
+                    disabledBackgroundColor: AppColors.outline,
+                    foregroundColor: Colors.white,
+                    disabledForegroundColor: Colors.white,
+                    minimumSize: const Size(44, 44),
+                  ),
+                  icon: const Icon(Icons.send_rounded, size: 20),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            IconButton.filled(
-              tooltip: 'Gửi tin nhắn',
-              onPressed: _isLoading
-                  ? null
-                  : () => _sendMessage(_messageController.text),
-              style: IconButton.styleFrom(
-                backgroundColor: AppColors.rose,
-                disabledBackgroundColor: AppColors.outline,
-                foregroundColor: Colors.white,
-                disabledForegroundColor: Colors.white,
-                minimumSize: const Size(44, 44),
-              ),
-              icon: const Icon(Icons.send_rounded, size: 20),
-            ),
-          ]),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -234,11 +328,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
       onPressed: _isLoading ? null : () => _sendMessage(label),
       side: const BorderSide(color: AppColors.outlineVariant),
       backgroundColor: AppColors.surface,
-      label: Text(label,
-          style: GoogleFonts.nunito(
-            fontSize: 13,
-            color: AppColors.onSurfaceVariant,
-          )),
+      label: Text(
+        label,
+        style: GoogleFonts.nunito(
+          fontSize: 13,
+          color: AppColors.onSurfaceVariant,
+        ),
+      ),
     );
   }
 }
@@ -266,71 +362,134 @@ class _MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: Column(crossAxisAlignment: message.isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start, children: [
-        // Date divider (only for first message or AI welcome)
-        Row(
-          mainAxisAlignment: message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            // Bot avatar
-            if (!message.isUser) ...[
-              Container(
-                width: 28, height: 28,
-                decoration: BoxDecoration(color: AppColors.rose.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(8)),
-                child: const Center(child: Text('🤖', style: TextStyle(fontSize: 16))),
-              ),
-              const SizedBox(width: 8),
-            ],
-            Flexible(
-              child: Column(crossAxisAlignment: message.isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start, children: [
+      child: Column(
+        crossAxisAlignment: message.isUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          // Date divider (only for first message or AI welcome)
+          Row(
+            mainAxisAlignment: message.isUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Bot avatar
+              if (!message.isUser) ...[
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  width: 28,
+                  height: 28,
                   decoration: BoxDecoration(
-                    color: message.isUser ? AppColors.rose : AppColors.surface,
-                    borderRadius: BorderRadius.circular(18).copyWith(
-                      bottomRight: message.isUser ? const Radius.circular(4) : null,
-                      bottomLeft: !message.isUser ? const Radius.circular(4) : null,
-                    ),
-                    border: message.isUser ? null : Border.all(color: AppColors.surfaceContainerHighest),
-                    boxShadow: message.isUser ? null : [BoxShadow(color: AppColors.ink.withValues(alpha: 0.04), blurRadius: 8)],
+                    color: AppColors.rose.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(message.text, style: GoogleFonts.nunito(
-                    fontSize: 14, height: 1.5,
-                    color: message.isUser ? Colors.white : AppColors.ink,
-                  )),
+                  child: const CatWidget(
+                    size: 26,
+                    expression: CatExpression.talking,
+                  ),
                 ),
-                const SizedBox(height: 4),
-                // Timestamp
-                Text(
-                  '${message.createdAt.hour.toString().padLeft(2, '0')}:'
-                  '${message.createdAt.minute.toString().padLeft(2, '0')}',
-                  style: GoogleFonts.nunito(fontSize: 11, color: AppColors.inkSoft),
+                const SizedBox(width: 8),
+              ],
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: message.isUser
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: message.isUser
+                            ? AppColors.blue
+                            : AppColors.surface,
+                        borderRadius: BorderRadius.circular(18).copyWith(
+                          bottomRight: message.isUser
+                              ? const Radius.circular(4)
+                              : null,
+                          bottomLeft: !message.isUser
+                              ? const Radius.circular(4)
+                              : null,
+                        ),
+                        border: message.isUser
+                            ? null
+                            : Border.all(
+                                color: AppColors.surfaceContainerHighest,
+                              ),
+                        boxShadow: message.isUser
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: AppColors.ink.withValues(alpha: 0.04),
+                                  blurRadius: 8,
+                                ),
+                              ],
+                      ),
+                      child: Text(
+                        message.text,
+                        style: GoogleFonts.nunito(
+                          fontSize: 14,
+                          height: 1.5,
+                          color: message.isUser
+                              ? AppColors.cosmicDeep
+                              : AppColors.ink,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Timestamp
+                    Text(
+                      '${message.createdAt.hour.toString().padLeft(2, '0')}:'
+                      '${message.createdAt.minute.toString().padLeft(2, '0')}',
+                      style: GoogleFonts.nunito(
+                        fontSize: 11,
+                        color: AppColors.inkSoft,
+                      ),
+                    ),
+                  ],
                 ),
-              ]),
-            ),
-            if (message.isUser) const SizedBox(width: 8),
-          ],
-        ),
-        // Suggestion chips
-        if (!message.isUser && message.suggestions.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 36),
-            child: Wrap(spacing: 8, runSpacing: 6, children: message.suggestions.map((s) => InkWell(
-              onTap: () => onSuggestionTap(s),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.rose.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(s, style: GoogleFonts.nunito(fontSize: 12, color: AppColors.rose, fontWeight: FontWeight.w500)),
               ),
-            )).toList()),
+              if (message.isUser) const SizedBox(width: 8),
+            ],
           ),
+          // Suggestion chips
+          if (!message.isUser && message.suggestions.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 36),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: message.suggestions
+                    .map(
+                      (s) => InkWell(
+                        onTap: () => onSuggestionTap(s),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.rose.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            s,
+                            style: GoogleFonts.nunito(
+                              fontSize: 12,
+                              color: AppColors.rose,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
         ],
-      ]),
+      ),
     );
   }
 }

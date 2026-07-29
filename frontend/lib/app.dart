@@ -29,6 +29,7 @@ import 'screens/topic_detail_screen.dart';
 import 'screens/ai_chat_screen.dart';
 import 'motion/app_motion.dart';
 import 'widgets/cosmic_background.dart';
+import 'widgets/sol_assistant_overlay.dart';
 
 // SolVocab design system: a cosmic learning observatory.
 
@@ -235,8 +236,18 @@ class _SolVocabAppState extends State<SolVocabApp> {
       darkTheme: _buildDarkTheme(),
       themeMode: ThemeMode.light,
       routerConfig: _router,
-      builder: (context, child) =>
-          CosmicBackground(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => CosmicBackground(
+        child: SolAssistantOverlay(
+          routeInformation: _router.routeInformationProvider,
+          onOpenChat: () {
+            final from = _router.routeInformationProvider.value.uri.path;
+            _router.push(
+              Uri(path: '/ai-chat', queryParameters: {'from': from}).toString(),
+            );
+          },
+          child: child ?? const SizedBox.shrink(),
+        ),
+      ),
     );
   }
 
