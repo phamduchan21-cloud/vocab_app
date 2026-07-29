@@ -34,7 +34,7 @@ class _SpeakerButtonState extends State<SpeakerButton>
     super.dispose();
   }
 
-  void _speak() {
+  Future<void> _speak() async {
     if (_isSpeaking) {
       TtsService.stop();
       _stopAnimation();
@@ -53,11 +53,25 @@ class _SpeakerButtonState extends State<SpeakerButton>
     _animController!.repeat(reverse: true);
     setState(() => _isSpeaking = true);
 
-    TtsService.speak(widget.text);
+    final started = await TtsService.speak(widget.text);
+    if (!mounted) return;
+    if (!started) {
+      _stopAnimation();
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Chưa phát được giọng đọc. Hãy thử lại hoặc kiểm tra âm thanh trình duyệt.',
+          ),
+        ),
+      );
+      return;
+    }
 
     // Auto-stop after estimated duration
     _stopTimer?.cancel();
-    _stopTimer = Timer(const Duration(seconds: 3), () {
+    final estimatedSeconds =
+        (2 + widget.text.trim().split(RegExp(r'\s+')).length).clamp(3, 6);
+    _stopTimer = Timer(Duration(seconds: estimatedSeconds), () {
       if (mounted) _stopAnimation();
     });
   }
@@ -66,7 +80,7 @@ class _SpeakerButtonState extends State<SpeakerButton>
     _stopTimer?.cancel();
     _animController?.stop();
     _animController?.reset();
-    setState(() => _isSpeaking = false);
+    if (mounted) setState(() => _isSpeaking = false);
   }
 
   @override
