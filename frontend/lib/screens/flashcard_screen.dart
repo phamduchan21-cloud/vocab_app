@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../app.dart';
 import '../models/vocabulary.dart';
 import '../providers/flashcard_provider.dart';
+import '../motion/app_motion.dart';
 import '../services/tts_service.dart';
 import '../widgets/app_bottom_nav.dart';
 import '../widgets/empty_state_widget.dart';
@@ -54,7 +55,12 @@ class _EntryAnimationState extends State<_EntryAnimation>
           ),
         );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _controller.forward();
+      if (!mounted) return;
+      if (AppMotion.reduced(context)) {
+        _controller.value = 1;
+      } else {
+        _controller.forward();
+      }
     });
   }
 
@@ -193,6 +199,10 @@ class _FlashcardScreenState extends State<FlashcardScreen>
   void _toggleFlip() {
     setState(() {
       _isFlipped = !_isFlipped;
+      if (AppMotion.reduced(context)) {
+        _flipController.value = _isFlipped ? 1 : 0;
+        return;
+      }
       if (_isFlipped) {
         _flipController.forward();
       } else {

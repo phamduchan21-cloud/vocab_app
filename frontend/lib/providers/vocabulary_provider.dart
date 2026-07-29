@@ -70,6 +70,27 @@ class VocabularyProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchBookmarked({int limit = 200}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    _currentPage = 1;
+    notifyListeners();
+
+    try {
+      final result = await _service.getBookmarked(
+        page: _currentPage,
+        limit: limit,
+      );
+      _items = result['items'] as List<Vocabulary>;
+      _total = result['total'] as int;
+    } catch (e) {
+      _errorMessage = 'Không thể tải danh sách từ đã lưu. Vui lòng thử lại.';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> loadMore() async {
     if (_isLoading || _items.length >= _total) return;
     _isLoading = true;

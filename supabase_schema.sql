@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS quiz_results (
   user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
   quiz_type TEXT NOT NULL,
   skill_type TEXT,
+  topic TEXT,
   total_questions INT NOT NULL,
   correct_answers INT NOT NULL,
   score_percent DECIMAL(5,2) NOT NULL,
@@ -106,3 +107,70 @@ CREATE TABLE IF NOT EXISTS user_achievements (
 );
 
 CREATE INDEX IF NOT EXISTS idx_achievement_user ON user_achievements(user_id);
+
+-- Claimable rewards, persisted wallet, and immutable ledger
+CREATE TABLE IF NOT EXISTS user_rewards (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  reward_key TEXT NOT NULL,
+  source_type TEXT NOT NULL DEFAULT 'achievement',
+  title TEXT NOT NULL,
+  description TEXT,
+  xp_amount INT NOT NULL DEFAULT 0,
+  gems_amount INT NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending',
+  unlocked_at TIMESTAMPTZ DEFAULT NOW(),
+  claimed_at TIMESTAMPTZ,
+  CONSTRAINT uq_user_reward_key UNIQUE (user_id, reward_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_reward_status
+  ON user_rewards(user_id, status);
+
+CREATE TABLE IF NOT EXISTS user_wallets (
+  user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  gems_balance INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS reward_transactions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  transaction_key TEXT NOT NULL,
+  source_type TEXT NOT NULL,
+  source_id TEXT,
+  xp_delta INT NOT NULL DEFAULT 0,
+  gems_delta INT NOT NULL DEFAULT 0,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT uq_reward_transaction_key UNIQUE (user_id, transaction_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_reward_transaction_user
+  ON reward_transactions(user_id, created_at);
+
+-- CEFR A1-B2 learning route
+CREATE TABLE IF NOT EXISTS user_learning_paths (
+  user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  current_cefr TEXT NOT NULL DEFAULT 'A1',
+  current_step INT NOT NULL DEFAULT 0,
+  placement_source TEXT NOT NULL DEFAULT 'onboarding',
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS user_path_steps (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  cefr_level TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'locked',
+  progress_percent FLOAT NOT NULL DEFAULT 0,
+  quiz_average FLOAT NOT NULL DEFAULT 0,
+  mini_test_score FLOAT NOT NULL DEFAULT 0,
+  completed_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT uq_user_path_step UNIQUE (user_id, cefr_level)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_path_step_status
+  ON user_path_steps(user_id, status);

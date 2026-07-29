@@ -1,9 +1,9 @@
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, text
 
 from models import (
     MockTest,
@@ -11,6 +11,9 @@ from models import (
     UserDailyActivity,
     UserAchievement,
     User,
+    UserReward,
+    UserWallet,
+    RewardTransaction,
     Vocabulary,
 )
 from schemas import (
@@ -20,6 +23,10 @@ from schemas import (
     LeaderboardEntry,
     LeaderboardResponse,
     ClaimStreakResponse,
+    RewardItemResponse,
+    RewardSummaryResponse,
+    RewardClaimResponse,
+    RewardTransactionResponse,
 )
 from services.dashboard_service import calc_level
 
@@ -94,10 +101,22 @@ class GamificationService:
         level, level_title = calc_level(total_xp)
 
         # ── 4. Gems (tổng) ─────────────────────────────────────────
-        total_gems = total_xp // 10
+        wallet = await self._get_or_create_wallet(user_id)
+        total_gems = wallet.gems_balance or 0
 
         # Gems earned hôm nay
         gems_earned = xp_amount // 10 if xp_amount > 0 else 0
+        if gems_earned:
+            await self._add_wallet_transaction(
+                user_id=user_id,
+                transaction_key=f"activity:{uuid.uuid4()}",
+                source_type="activity",
+                source_id=str(today_activity.id),
+                gems_delta=gems_earned,
+                description=f"Thưởng hoạt động {activity_type}",
+                wallet=wallet,
+            )
+            await self.db.commit()
 
         # ── 5. Check achievements ──────────────────────────────────
         new_achievements = await self._check_achievements(user_id, streak)
@@ -173,63 +192,152 @@ class GamificationService:
         return LeaderboardResponse(entries=entries)
 
     async def claim_streak_reward(self, user_id: str) -> Optional[ClaimStreakResponse]:
-        """Claim reward khi đạt milestone streak."""
+        """Compatibility endpoint backed by the reward inbox."""
         streak = await self._calc_streak_for_user(user_id, date.today())
-
-        # Tìm milestone gần nhất có thể claim
-        milestone = None
-        milestone_streak = 0
-        for s, m in sorted(STREAK_MILESTONES.items(), reverse=True):
-            if streak >= s:
-                # Kiểm tra đã claim chưa
-                existing = await self._has_achievement(user_id, m["key"])
-                if not existing:
-                    milestone = m
-                    milestone_streak = s
-                    break
-
-        if not milestone:
-            # Kiểm tra có milestone nào chưa claim không
-            # Nếu không, trả về streak hiện tại
-            total_gems = (await self._get_total_xp(user_id)) // 10
+        await self._check_achievements(user_id, streak)
+        pending = await self.db.scalar(
+            select(UserReward)
+            .where(
+                UserReward.user_id == user_id,
+                UserReward.status == "pending",
+                UserReward.reward_key.like("streak_%"),
+            )
+            .order_by(UserReward.unlocked_at.desc())
+        )
+        if pending is None:
             return ClaimStreakResponse(
                 streak=streak,
                 reward_gems=0,
                 reward_xp=0,
-                message=f"Bạn đã đạt streak {streak} ngày! Hãy cố gắng thêm để nhận thưởng.",
+                message=f"Streak hiện tại là {streak} ngày. Chưa có quà mới để nhận.",
                 new_achievement=None,
             )
-
-        # Tạo achievement
-        achievement = UserAchievement(
-            id=str(uuid.uuid4()),
-            user_id=user_id,
-            achievement_key=milestone["key"],
-            title=milestone["title"],
-            description=f"Đạt streak {milestone_streak} ngày",
-            icon="fire",
-        )
-        self.db.add(achievement)
-
-        # Cộng XP + gems vào daily activity
-        today = date.today()
-        today_activity = await self._get_or_create_today_activity(user_id, today)
-        today_activity.xp_earned = (today_activity.xp_earned or 0) + milestone["xp"]
-        await self.db.commit()
-
+        claim = await self.claim_reward(user_id, pending.id)
         return ClaimStreakResponse(
             streak=streak,
-            reward_gems=milestone["gems"],
-            reward_xp=milestone["xp"],
-            message=f"🎉 Chúc mừng! Bạn đã nhận thưởng streak {milestone_streak} ngày! +{milestone['xp']}XP +{milestone['gems']} Gems",
-            new_achievement=AchievementResponse(
-                id=str(achievement.id),
-                achievement_key=achievement.achievement_key,
-                title=achievement.title,
-                description=achievement.description,
-                icon=achievement.icon,
-                unlocked_at=achievement.unlocked_at,
-            ),
+            reward_gems=claim.gems_earned,
+            reward_xp=claim.xp_earned,
+            message=claim.message,
+            new_achievement=None,
+        )
+
+    async def get_reward_summary(self, user_id: str) -> RewardSummaryResponse:
+        streak = await self._calc_streak_for_user(user_id, date.today())
+        await self._check_achievements(user_id, streak)
+        claimable = await self.db.scalar(
+            select(func.count())
+            .select_from(UserReward)
+            .where(UserReward.user_id == user_id, UserReward.status == "pending")
+        ) or 0
+        wallet = await self._get_or_create_wallet(user_id)
+        next_streak = next(
+            (value for value in sorted(STREAK_MILESTONES) if value > streak),
+            None,
+        )
+        return RewardSummaryResponse(
+            claimable_count=claimable,
+            xp_total=await self._get_total_xp(user_id),
+            gems_balance=wallet.gems_balance or 0,
+            next_streak=next_streak,
+            streak_progress=streak,
+        )
+
+    async def get_rewards(
+        self,
+        user_id: str,
+        status_filter: Optional[str] = None,
+    ) -> List[RewardItemResponse]:
+        await self.get_reward_summary(user_id)
+        query = select(UserReward).where(UserReward.user_id == user_id)
+        if status_filter:
+            query = query.where(UserReward.status == status_filter)
+        result = await self.db.execute(
+            query.order_by(UserReward.unlocked_at.desc()).limit(100)
+        )
+        return [RewardItemResponse.model_validate(item) for item in result.scalars()]
+
+    async def get_reward_history(
+        self,
+        user_id: str,
+    ) -> List[RewardTransactionResponse]:
+        result = await self.db.execute(
+            select(RewardTransaction)
+            .where(RewardTransaction.user_id == user_id)
+            .order_by(RewardTransaction.created_at.desc())
+            .limit(50)
+        )
+        return [
+            RewardTransactionResponse.model_validate(item)
+            for item in result.scalars()
+        ]
+
+    async def claim_reward(
+        self,
+        user_id: str,
+        reward_id: str,
+    ) -> RewardClaimResponse:
+        reward = await self.db.scalar(
+            select(UserReward)
+            .where(UserReward.id == reward_id, UserReward.user_id == user_id)
+            .with_for_update()
+        )
+        if reward is None:
+            raise ValueError("Phần thưởng không tồn tại.")
+        if reward.status != "pending":
+            raise ValueError("Phần thưởng này đã được nhận.")
+        return await self._claim_rewards(user_id, [reward])
+
+    async def claim_all_rewards(self, user_id: str) -> RewardClaimResponse:
+        result = await self.db.execute(
+            select(UserReward)
+            .where(UserReward.user_id == user_id, UserReward.status == "pending")
+            .order_by(UserReward.unlocked_at)
+            .with_for_update()
+        )
+        rewards = list(result.scalars().all())
+        if not rewards:
+            wallet = await self._get_or_create_wallet(user_id)
+            return RewardClaimResponse(
+                claimed=[],
+                xp_total=await self._get_total_xp(user_id),
+                gems_balance=wallet.gems_balance or 0,
+                message="Bạn chưa có phần thưởng nào đang chờ.",
+            )
+        return await self._claim_rewards(user_id, rewards)
+
+    async def _claim_rewards(
+        self,
+        user_id: str,
+        rewards: List[UserReward],
+    ) -> RewardClaimResponse:
+        xp_earned = sum(item.xp_amount or 0 for item in rewards)
+        gems_earned = sum(item.gems_amount or 0 for item in rewards)
+        today_activity = await self._get_or_create_today_activity(user_id, date.today())
+        today_activity.xp_earned = (today_activity.xp_earned or 0) + xp_earned
+        wallet = await self._get_or_create_wallet(user_id)
+        now = datetime.now(timezone.utc)
+
+        for reward in rewards:
+            reward.status = "claimed"
+            reward.claimed_at = now
+            await self._add_wallet_transaction(
+                user_id=user_id,
+                transaction_key=f"reward:{reward.id}",
+                source_type="reward",
+                source_id=reward.id,
+                xp_delta=reward.xp_amount or 0,
+                gems_delta=reward.gems_amount or 0,
+                description=reward.title,
+                wallet=wallet,
+            )
+        await self.db.commit()
+        return RewardClaimResponse(
+            claimed=[RewardItemResponse.model_validate(item) for item in rewards],
+            xp_earned=xp_earned,
+            gems_earned=gems_earned,
+            xp_total=await self._get_total_xp(user_id),
+            gems_balance=wallet.gems_balance or 0,
+            message=f"Đã nhận {xp_earned} XP và {gems_earned} gems.",
         )
 
     # ─── Private helpers ───────────────────────────────────────────────
@@ -271,6 +379,93 @@ class GamificationService:
             UserDailyActivity.user_id == user_id,
         )
         return await self.db.scalar(query) or 0
+
+    async def _get_or_create_wallet(self, user_id: str) -> UserWallet:
+        wallet = await self.db.get(UserWallet, user_id)
+        if wallet is not None:
+            return wallet
+        await self.db.execute(
+            text(
+                """
+                INSERT INTO user_wallets (user_id, gems_balance)
+                VALUES (:user_id, 0)
+                ON CONFLICT (user_id) DO NOTHING
+                """
+            ),
+            {"user_id": user_id},
+        )
+        await self.db.flush()
+        wallet = await self.db.get(UserWallet, user_id)
+        if wallet is None:
+            raise RuntimeError("Không thể khởi tạo ví phần thưởng.")
+        return wallet
+
+    async def _add_wallet_transaction(
+        self,
+        *,
+        user_id: str,
+        transaction_key: str,
+        source_type: str,
+        source_id: Optional[str] = None,
+        xp_delta: int = 0,
+        gems_delta: int = 0,
+        description: Optional[str] = None,
+        wallet: Optional[UserWallet] = None,
+    ) -> RewardTransaction:
+        existing = await self.db.scalar(
+            select(RewardTransaction).where(
+                RewardTransaction.user_id == user_id,
+                RewardTransaction.transaction_key == transaction_key,
+            )
+        )
+        if existing is not None:
+            return existing
+        target_wallet = wallet or await self._get_or_create_wallet(user_id)
+        target_wallet.gems_balance = (target_wallet.gems_balance or 0) + gems_delta
+        transaction = RewardTransaction(
+            id=str(uuid.uuid4()),
+            user_id=user_id,
+            transaction_key=transaction_key,
+            source_type=source_type,
+            source_id=source_id,
+            xp_delta=xp_delta,
+            gems_delta=gems_delta,
+            description=description,
+        )
+        self.db.add(transaction)
+        return transaction
+
+    async def _ensure_reward_for_achievement(
+        self,
+        achievement: UserAchievement,
+        *,
+        xp_amount: int,
+        gems_amount: int,
+    ) -> UserReward:
+        existing = await self.db.scalar(
+            select(UserReward).where(
+                UserReward.user_id == achievement.user_id,
+                UserReward.reward_key == achievement.achievement_key,
+            )
+        )
+        if existing is not None:
+            return existing
+        reward = UserReward(
+            id=str(uuid.uuid4()),
+            user_id=achievement.user_id,
+            reward_key=achievement.achievement_key,
+            source_type="achievement",
+            title=achievement.title,
+            description=achievement.description,
+            xp_amount=xp_amount,
+            gems_amount=gems_amount,
+            status="pending",
+            unlocked_at=achievement.unlocked_at or datetime.utcnow(),
+        )
+        self.db.add(reward)
+        await self.db.commit()
+        await self.db.refresh(reward)
+        return reward
 
     async def _get_or_create_today_activity(self, user_id: str, today: date) -> UserDailyActivity:
         """Tìm activity hôm nay, nếu chưa có thì tạo mới."""
@@ -325,6 +520,11 @@ class GamificationService:
                     self.db.add(ach)
                     await self.db.commit()
                     await self.db.refresh(ach)
+                    await self._ensure_reward_for_achievement(
+                        ach,
+                        xp_amount=milestone["xp"],
+                        gems_amount=milestone["gems"],
+                    )
                     new_ones.append(AchievementResponse(
                         id=str(ach.id),
                         achievement_key=ach.achievement_key,
@@ -359,6 +559,11 @@ class GamificationService:
                 self.db.add(ach)
                 await self.db.commit()
                 await self.db.refresh(ach)
+                await self._ensure_reward_for_achievement(
+                    ach,
+                    xp_amount=50 if count < 500 else 150,
+                    gems_amount=5 if count < 500 else 15,
+                )
                 new_ones.append(AchievementResponse(
                     id=str(ach.id),
                     achievement_key=ach.achievement_key,
@@ -411,6 +616,11 @@ class GamificationService:
             self.db.add(achievement)
             await self.db.commit()
             await self.db.refresh(achievement)
+            await self._ensure_reward_for_achievement(
+                achievement,
+                xp_amount=75,
+                gems_amount=8,
+            )
             new_ones.append(AchievementResponse(
                 id=str(achievement.id),
                 achievement_key=achievement.achievement_key,

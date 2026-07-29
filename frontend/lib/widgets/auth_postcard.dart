@@ -47,7 +47,7 @@ class AuthPostcard extends StatelessWidget {
                         if (!desktop) ...[
                           const Align(
                             alignment: Alignment.centerLeft,
-                            child: AppLogo(size: 48, showName: true),
+                            child: AppLogoHero(size: 48, showName: true),
                           ),
                           const SizedBox(height: 22),
                         ],
@@ -125,7 +125,11 @@ class AuthPostcard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const AppLogo(size: 58, showName: true, light: true),
+                          const AppLogoHero(
+                            size: 58,
+                            showName: true,
+                            light: true,
+                          ),
                           const Spacer(),
                           Center(
                             child: Transform.rotate(

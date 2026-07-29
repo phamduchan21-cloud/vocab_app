@@ -26,6 +26,29 @@ def get_vocab_service(db: AsyncSession = Depends(get_db)) -> VocabularyService:
     return VocabularyService(db)
 
 
+def _to_vocabulary_response(vocab) -> VocabularyResponse:
+    return VocabularyResponse(
+        id=str(vocab.id),
+        user_id=str(vocab.user_id),
+        word=vocab.word,
+        meaning=vocab.meaning,
+        example=vocab.example,
+        personal_note=vocab.personal_note,
+        topic=vocab.topic,
+        pronunciation=vocab.pronunciation,
+        review_count=vocab.review_count or 0,
+        review_interval=vocab.review_interval or 0,
+        next_review_date=vocab.next_review_date,
+        ease_factor=vocab.ease_factor or 2.5,
+        times_correct=vocab.times_correct or 0,
+        times_wrong=vocab.times_wrong or 0,
+        is_bookmarked=vocab.is_bookmarked or False,
+        lesson_id=vocab.lesson_id,
+        created_at=vocab.created_at,
+        updated_at=vocab.updated_at,
+    )
+
+
 # ─── Lesson endpoints ────────────────────────────────────────────
 
 @router.get("/lessons", response_model=dict)
@@ -88,29 +111,7 @@ async def list_vocabularies(
 
     pages = math.ceil(total / limit) if total > 0 else 0
 
-    vocab_responses = [
-        VocabularyResponse(
-            id=str(v.id),
-            user_id=str(v.user_id),
-            word=v.word,
-            meaning=v.meaning,
-            example=v.example,
-            personal_note=v.personal_note,
-            topic=v.topic,
-            pronunciation=v.pronunciation,
-            review_count=v.review_count or 0,
-            review_interval=v.review_interval or 0,
-            next_review_date=v.next_review_date,
-            ease_factor=v.ease_factor or 2.5,
-            times_correct=v.times_correct or 0,
-            times_wrong=v.times_wrong or 0,
-            is_bookmarked=v.is_bookmarked or False,
-            lesson_id=v.lesson_id,
-            created_at=v.created_at,
-            updated_at=v.updated_at,
-        )
-        for v in items
-    ]
+    vocab_responses = [_to_vocabulary_response(v) for v in items]
 
     return PaginatedResponse(
         items=vocab_responses,
@@ -130,25 +131,7 @@ async def create_vocabulary(
 ):
     """Thêm từ vựng mới."""
     vocab = await service.create(user_id=current_user.id, word=data.word, meaning=data.meaning, example=data.example, topic=data.topic)
-    return VocabularyResponse(
-        id=str(vocab.id),
-        user_id=str(vocab.user_id),
-        word=vocab.word,
-        meaning=vocab.meaning,
-        example=vocab.example,
-        personal_note=vocab.personal_note,
-        topic=vocab.topic,
-        pronunciation=vocab.pronunciation,
-        review_count=vocab.review_count or 0,
-        review_interval=vocab.review_interval or 0,
-        next_review_date=vocab.next_review_date,
-        ease_factor=vocab.ease_factor or 2.5,
-        times_correct=vocab.times_correct or 0,
-        times_wrong=vocab.times_wrong or 0,
-        lesson_id=vocab.lesson_id,
-        created_at=vocab.created_at,
-        updated_at=vocab.updated_at,
-    )
+    return _to_vocabulary_response(vocab)
 
 
 # ─── Seed Data Endpoints — MUST come BEFORE /{id} catch-all ─────────
@@ -185,6 +168,30 @@ async def get_seed_vocab(
     )
 
 
+@router.get("/bookmarked/all", response_model=PaginatedResponse)
+async def list_bookmarked(
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=50, ge=1, le=200),
+    service: VocabularyService = Depends(get_vocab_service),
+    current_user: User = Depends(get_current_user),
+):
+    """Lấy danh sách từ vựng đã đánh dấu bookmark."""
+    items, total = await service.get_list(
+        user_id=current_user.id,
+        page=page,
+        limit=limit,
+        bookmarked_only=True,
+    )
+    pages = math.ceil(total / limit) if total > 0 else 0
+    return PaginatedResponse(
+        items=[_to_vocabulary_response(v) for v in items],
+        total=total,
+        page=page,
+        pages=pages,
+        limit=limit,
+    )
+
+
 @router.get("/{id}", response_model=VocabularyResponse)
 async def get_vocabulary(
     id: str,
@@ -198,25 +205,7 @@ async def get_vocabulary(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Không tìm thấy từ vựng",
         )
-    return VocabularyResponse(
-        id=str(vocab.id),
-        user_id=str(vocab.user_id),
-        word=vocab.word,
-        meaning=vocab.meaning,
-        example=vocab.example,
-        personal_note=vocab.personal_note,
-        topic=vocab.topic,
-        pronunciation=vocab.pronunciation,
-        review_count=vocab.review_count or 0,
-        review_interval=vocab.review_interval or 0,
-        next_review_date=vocab.next_review_date,
-        ease_factor=vocab.ease_factor or 2.5,
-        times_correct=vocab.times_correct or 0,
-        times_wrong=vocab.times_wrong or 0,
-        lesson_id=vocab.lesson_id,
-        created_at=vocab.created_at,
-        updated_at=vocab.updated_at,
-    )
+    return _to_vocabulary_response(vocab)
 
 
 @router.put("/{id}", response_model=VocabularyResponse)
@@ -238,25 +227,7 @@ async def update_vocabulary(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Không tìm thấy từ vựng",
         )
-    return VocabularyResponse(
-        id=str(vocab.id),
-        user_id=str(vocab.user_id),
-        word=vocab.word,
-        meaning=vocab.meaning,
-        example=vocab.example,
-        personal_note=vocab.personal_note,
-        topic=vocab.topic,
-        pronunciation=vocab.pronunciation,
-        review_count=vocab.review_count or 0,
-        review_interval=vocab.review_interval or 0,
-        next_review_date=vocab.next_review_date,
-        ease_factor=vocab.ease_factor or 2.5,
-        times_correct=vocab.times_correct or 0,
-        times_wrong=vocab.times_wrong or 0,
-        lesson_id=vocab.lesson_id,
-        created_at=vocab.created_at,
-        updated_at=vocab.updated_at,
-    )
+    return _to_vocabulary_response(vocab)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -293,25 +264,7 @@ async def review_vocabulary(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Không tìm thấy từ vựng",
         )
-    return VocabularyResponse(
-        id=str(vocab.id),
-        user_id=str(vocab.user_id),
-        word=vocab.word,
-        meaning=vocab.meaning,
-        example=vocab.example,
-        personal_note=vocab.personal_note,
-        topic=vocab.topic,
-        pronunciation=vocab.pronunciation,
-        review_count=vocab.review_count or 0,
-        review_interval=vocab.review_interval or 0,
-        next_review_date=vocab.next_review_date,
-        ease_factor=vocab.ease_factor or 2.5,
-        times_correct=vocab.times_correct or 0,
-        times_wrong=vocab.times_wrong or 0,
-        lesson_id=vocab.lesson_id,
-        created_at=vocab.created_at,
-        updated_at=vocab.updated_at,
-    )
+    return _to_vocabulary_response(vocab)
 
 
 # ─── Bookmark endpoint ──────────────────────────────────────────────
@@ -329,73 +282,7 @@ async def toggle_bookmark(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Không tìm thấy từ vựng",
         )
-    return VocabularyResponse(
-        id=str(vocab.id),
-        user_id=str(vocab.user_id),
-        word=vocab.word,
-        meaning=vocab.meaning,
-        example=vocab.example,
-        personal_note=vocab.personal_note,
-        topic=vocab.topic,
-        pronunciation=vocab.pronunciation,
-        review_count=vocab.review_count or 0,
-        review_interval=vocab.review_interval or 0,
-        next_review_date=vocab.next_review_date,
-        ease_factor=vocab.ease_factor or 2.5,
-        times_correct=vocab.times_correct or 0,
-        times_wrong=vocab.times_wrong or 0,
-        is_bookmarked=vocab.is_bookmarked or False,
-        lesson_id=vocab.lesson_id,
-        created_at=vocab.created_at,
-        updated_at=vocab.updated_at,
-    )
-
-
-@router.get("/bookmarked/all", response_model=PaginatedResponse)
-async def list_bookmarked(
-    page: int = Query(default=1, ge=1),
-    limit: int = Query(default=50, ge=1, le=200),
-    service: VocabularyService = Depends(get_vocab_service),
-    current_user: User = Depends(get_current_user),
-):
-    """Lấy danh sách từ vựng đã đánh dấu bookmark."""
-    items, total = await service.get_list(
-        user_id=current_user.id,
-        page=page,
-        limit=limit,
-        bookmarked_only=True,
-    )
-    pages = math.ceil(total / limit) if total > 0 else 0
-    vocab_responses = [
-        VocabularyResponse(
-            id=str(v.id),
-            user_id=str(v.user_id),
-            word=v.word,
-            meaning=v.meaning,
-            example=v.example,
-            personal_note=v.personal_note,
-            topic=v.topic,
-            pronunciation=v.pronunciation,
-            review_count=v.review_count or 0,
-            review_interval=v.review_interval or 0,
-            next_review_date=v.next_review_date,
-            ease_factor=v.ease_factor or 2.5,
-            times_correct=v.times_correct or 0,
-            times_wrong=v.times_wrong or 0,
-            is_bookmarked=v.is_bookmarked or False,
-            lesson_id=v.lesson_id,
-            created_at=v.created_at,
-            updated_at=v.updated_at,
-        )
-        for v in items
-    ]
-    return PaginatedResponse(
-        items=vocab_responses,
-        total=total,
-        page=page,
-        pages=pages,
-        limit=limit,
-    )
+    return _to_vocabulary_response(vocab)
 
 
 # ─── Seed Data Endpoints ─────────────────────────────────────────────

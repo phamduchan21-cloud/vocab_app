@@ -10,6 +10,7 @@ import '../models/quiz_result.dart';
 import '../providers/auth_provider.dart';
 import '../providers/dashboard_provider.dart';
 import '../providers/profile_provider.dart';
+import '../motion/app_motion.dart';
 import '../widgets/app_bottom_nav.dart';
 import '../widgets/error_state_widget.dart';
 import '../widgets/loading_widget.dart';
@@ -72,7 +73,12 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _heroCtrl.forward().then((_) => _contentCtrl.forward());
+      if (AppMotion.reduced(context)) {
+        _heroCtrl.value = 1;
+        _contentCtrl.value = 1;
+      } else {
+        _heroCtrl.forward().then((_) => _contentCtrl.forward());
+      }
       final dashboard = context.read<DashboardProvider>();
       final profile = context.read<ProfileProvider>();
       if (dashboard.data == null && !dashboard.isLoading) {
@@ -118,89 +124,131 @@ class _ProfileScreenState extends State<ProfileScreen>
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 960),
+            constraints: const BoxConstraints(maxWidth: 1180),
             child: RefreshIndicator(
               color: AppColors.luxuryBrown,
               onRefresh: () async {
                 await dashboard.loadDashboard();
                 await profile.loadProfile();
               },
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                children: [
-                  // ─── EDITORIAL LUXURY HERO ────────────────────
-                  FadeTransition(
-                    opacity: _heroFade,
-                    child: SlideTransition(
-                      position: _heroSlide,
-                      child: _buildHeroBento(
-                        avatarText,
-                        username,
-                        email,
-                        stats,
-                        profile.userProfile?.englishLevel,
-                        profile.userProfile?.createdAt,
-                        profile.userProfile?.dailyWordGoal ?? 10,
-                        profile.isClaimingReward
-                            ? null
-                            : () async {
-                                final msg = await profile.claimStreakReward();
-                                if (!mounted || msg == null) return;
-                                await dashboard.loadDashboard();
-                              },
+              child: NestedScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    sliver: SliverToBoxAdapter(
+                      child: FadeTransition(
+                        opacity: _heroFade,
+                        child: SlideTransition(
+                          position: _heroSlide,
+                          child: _buildHeroBento(
+                            avatarText,
+                            username,
+                            email,
+                            stats,
+                            profile.learningPath.currentCefr,
+                            profile.userProfile?.createdAt,
+                            profile.userProfile?.dailyWordGoal ?? 10,
+                            profile.rewardSummary.claimableCount,
+                            profile.isClaimingReward ||
+                                    profile.rewardSummary.claimableCount == 0
+                                ? null
+                                : () async {
+                                    final messenger = ScaffoldMessenger.of(
+                                      context,
+                                    );
+                                    final message = await profile
+                                        .claimAllRewards();
+                                    if (!mounted || message == null) return;
+                                    await dashboard.loadDashboard();
+                                    messenger.showSnackBar(
+                                      SnackBar(content: Text(message)),
+                                    );
+                                  },
+                          ),
+                        ),
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 28),
-
-                  // ─── GLASS TAB BAR (fades in later) ────────
-                  FadeTransition(
-                    opacity: _contentFade,
-                    child: _buildGlassTabBar(),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ─── TAB CONTENT ───────────────────────────
-                  FadeTransition(
-                    opacity: _contentFade,
-                    child: SizedBox(
-                      height: 740,
-                      child: TabBarView(
-                        controller: _tabController,
-                        physics: const BouncingScrollPhysics(),
-                        children: [
-                          _OverviewTab(
-                            stats: stats,
-                            recentQuizzes: profile.recentQuizzes,
-                            topics: dashboard.data?.topics ?? const [],
-                            weeklyActivity: profile.data,
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _ProfileTabHeaderDelegate(
+                      child: ColoredBox(
+                        color: AppColors.luxuryBg,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+                          child: FadeTransition(
+                            opacity: _contentFade,
+                            child: _buildGlassTabBar(),
                           ),
-                          _ProgressTab(
-                            isLoading: profile.isLoading,
-                            errorMessage: profile.errorMessage,
-                            weeklyActivity: profile.data,
-                            topics: dashboard.data?.topics ?? const [],
-                          ),
-                          _BadgeTab(
-                            isLoading: profile.isLoading,
-                            errorMessage: profile.errorMessage,
-                            achievements: profile.achievements,
-                            stats: stats,
-                          ),
-                          _AccountTab(
-                            email: email,
-                            username: username,
-                            englishLevel: profile.userProfile?.englishLevel,
-                            profile: profile.userProfile,
-                            onEdit: () => _showEditProfileSheet(username),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ],
+                body: FadeTransition(
+                  opacity: _contentFade,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TabBarView(
+                      controller: _tabController,
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        _JourneyTab(
+                          isLoading: profile.isLoading,
+                          errorMessage: profile.errorMessage,
+                          path: profile.learningPath,
+                          todayPlan: profile.todayPlan,
+                          isUpdating: profile.isUpdatingProfile,
+                          onContinue: () {
+                            final route = profile.todayPlan.dueReviews > 0
+                                ? '/flashcard'
+                                : profile.todayPlan.activityRoute;
+                            context.go(route);
+                          },
+                          onAdjustGoal: () => _tabController.animateTo(3),
+                          onComplete: () async {
+                            final messenger = ScaffoldMessenger.of(context);
+                            final message = await profile
+                                .completeCurrentPathStep();
+                            if (!mounted || message == null) return;
+                            messenger.showSnackBar(
+                              SnackBar(content: Text(message)),
+                            );
+                          },
+                        ),
+                        _ProgressTab(
+                          isLoading: profile.isLoading,
+                          errorMessage: profile.errorMessage,
+                          stats: stats,
+                          recentQuizzes: profile.recentQuizzes,
+                          weeklyActivity: profile.data,
+                          topics: dashboard.data?.topics ?? const [],
+                        ),
+                        _BadgeTab(
+                          isLoading: profile.isLoading,
+                          errorMessage: profile.errorMessage,
+                          achievements: profile.achievements,
+                          stats: stats,
+                          rewardSummary: profile.rewardSummary,
+                          rewards: profile.rewards,
+                          rewardHistory: profile.rewardHistory,
+                          isClaiming: profile.isClaimingReward,
+                        ),
+                        _AccountTab(
+                          email: email,
+                          username: username,
+                          englishLevel: profile.userProfile?.englishLevel,
+                          profile: profile.userProfile,
+                          onEdit: () => _showEditProfileSheet(username),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -227,6 +275,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     String? englishLevel,
     DateTime? createdAt,
     int dailyWordGoal,
+    int claimableRewards,
     VoidCallback? onClaimReward,
   ) {
     return Container(
@@ -455,7 +504,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: _GlassActionBtn(
-                          label: 'Nhận thưởng',
+                          label: claimableRewards > 0
+                              ? '$claimableRewards quà chờ'
+                              : 'Chưa có quà',
                           icon: Icons.card_giftcard_rounded,
                           onTap: onClaimReward,
                           outlined: false,
@@ -587,9 +638,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           fontWeight: FontWeight.w500,
         ),
         tabs: const [
-          Tab(text: 'Tổng quan'),
-          Tab(text: 'Tiến độ'),
-          Tab(text: 'Huy hiệu'),
+          Tab(text: 'Hành trình'),
+          Tab(text: 'Thống kê'),
+          Tab(text: 'Album tem'),
           Tab(text: 'Tài khoản'),
         ],
       ),
@@ -787,6 +838,31 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 }
 
+class _ProfileTabHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  const _ProfileTabHeaderDelegate({required this.child});
+
+  @override
+  double get minExtent => 70;
+
+  @override
+  double get maxExtent => 70;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(covariant _ProfileTabHeaderDelegate oldDelegate) =>
+      oldDelegate.child != child;
+}
+
 // ═════════════════════════════════════════════════════════════════════════
 // ENGLISH LEVEL BADGE — editorial chip
 // ═════════════════════════════════════════════════════════════════════════
@@ -870,8 +946,9 @@ class _EnglishLevelBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emoji = getEnglishLevelEmoji(level) ?? '📚';
-    final label = getEnglishLevelLabel(level);
+    final isCefr = RegExp(r'^[AB][12]$').hasMatch(level ?? '');
+    final emoji = isCefr ? '✈️' : getEnglishLevelEmoji(level) ?? '📚';
+    final label = isCefr ? 'CEFR $level' : getEnglishLevelLabel(level);
 
     return GestureDetector(
       onTap: onTap,
@@ -989,8 +1066,34 @@ class _GlassActionBtn extends StatelessWidget {
 
 void _showLevelPicker(BuildContext context) {
   final profile = context.read<ProfileProvider>();
-  final currentLevel = profile.userProfile?.englishLevel;
+  final currentLevel = profile.learningPath.currentCefr;
   final messenger = ScaffoldMessenger.of(context);
+  const cefrLevels = [
+    {
+      'key': 'A1',
+      'emoji': '🛫',
+      'label': 'A1 · Khởi hành',
+      'description': 'Greetings, Family, Numbers, Daily Life',
+    },
+    {
+      'key': 'A2',
+      'emoji': '🧳',
+      'label': 'A2 · Giao tiếp hằng ngày',
+      'description': 'Food, Travel, Shopping, Weather',
+    },
+    {
+      'key': 'B1',
+      'emoji': '🌍',
+      'label': 'B1 · Độc lập',
+      'description': 'Health, Work, Education, Entertainment',
+    },
+    {
+      'key': 'B2',
+      'emoji': '🎓',
+      'label': 'B2 · Tự tin học thuật',
+      'description': 'Technology, Emotions, Society',
+    },
+  ];
 
   showModalBottomSheet(
     context: context,
@@ -1020,7 +1123,7 @@ void _showLevelPicker(BuildContext context) {
             ),
             const SizedBox(height: 24),
             Text(
-              'Chọn trình độ tiếng Anh',
+              'Chọn chặng CEFR',
               style: GoogleFonts.playfairDisplay(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -1029,22 +1132,47 @@ void _showLevelPicker(BuildContext context) {
             ),
             const SizedBox(height: 6),
             Text(
-              'Giúp chúng tôi gợi ý nội dung phù hợp với bạn.',
+              'Lịch sử học vẫn được giữ nguyên khi bạn đổi chặng.',
               style: GoogleFonts.nunito(
                 fontSize: 13,
                 color: AppColors.luxuryText,
               ),
             ),
             const SizedBox(height: 18),
-            ...englishLevels.map((level) {
+            ...cefrLevels.map((level) {
               final isSelected = level['key'] == currentLevel;
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: InkWell(
                   onTap: () async {
-                    final error = await profile.updateEnglishLevel(
-                      level['key']!,
+                    if (isSelected) return;
+                    final confirmed = await showDialog<bool>(
+                      context: ctx,
+                      builder: (dialogContext) => AlertDialog(
+                        title: Text(
+                          'Chuyển sang ${level['key']}?',
+                          style: GoogleFonts.playfairDisplay(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        content: const Text(
+                          'Các chặng trước sẽ được đánh dấu miễn qua, không giả lập là đã học xong. Tiến trình cũ không bị xóa.',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () =>
+                                Navigator.pop(dialogContext, false),
+                            child: const Text('Giữ chặng hiện tại'),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(dialogContext, true),
+                            child: const Text('Xác nhận chuyển'),
+                          ),
+                        ],
+                      ),
                     );
+                    if (confirmed != true) return;
+                    final error = await profile.updateCefrLevel(level['key']!);
                     if (ctx.mounted) Navigator.pop(ctx);
                     if (!context.mounted) return;
                     messenger.showSnackBar(
@@ -1053,7 +1181,7 @@ void _showLevelPicker(BuildContext context) {
                             ? AppColors.danger
                             : AppColors.luxuryBrown,
                         content: Text(
-                          error ?? '✅ Đã cập nhật trình độ: ${level['label']}',
+                          error ?? 'Đã cập nhật lộ trình: ${level['label']}',
                         ),
                       ),
                     );
@@ -1083,13 +1211,26 @@ void _showLevelPicker(BuildContext context) {
                         ),
                         const SizedBox(width: 14),
                         Expanded(
-                          child: Text(
-                            level['label']!,
-                            style: GoogleFonts.nunito(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.luxuryEspresso,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                level['label']!,
+                                style: GoogleFonts.nunito(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.luxuryEspresso,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                level['description']!,
+                                style: GoogleFonts.nunito(
+                                  fontSize: 10,
+                                  color: AppColors.luxuryText,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         if (isSelected)
@@ -1120,9 +1261,623 @@ void _showLevelPicker(BuildContext context) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════
-// TAB 1: TỔNG QUAN — Asymmetrical Bento Grid + Editorial Card
+// TAB 1: HÀNH TRÌNH — CEFR route and adaptive daily plan
 // ═════════════════════════════════════════════════════════════════════════
 
+class _JourneyTab extends StatelessWidget {
+  final bool isLoading;
+  final String? errorMessage;
+  final LearningPathData path;
+  final TodayLearningPlan todayPlan;
+  final bool isUpdating;
+  final VoidCallback onContinue;
+  final VoidCallback onAdjustGoal;
+  final VoidCallback onComplete;
+
+  const _JourneyTab({
+    required this.isLoading,
+    required this.errorMessage,
+    required this.path,
+    required this.todayPlan,
+    required this.isUpdating,
+    required this.onContinue,
+    required this.onAdjustGoal,
+    required this.onComplete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading && path.steps.isEmpty) {
+      return const SkeletonLoading(type: SkeletonType.card);
+    }
+    if (errorMessage != null && path.steps.isEmpty) {
+      return ErrorStateWidget(
+        message: errorMessage!,
+        onRetry: () => context.read<ProfileProvider>().loadProfile(),
+      );
+    }
+    if (path.steps.isEmpty) {
+      return ListView(
+        padding: const EdgeInsets.only(top: 8, bottom: 32),
+        children: [
+          _JourneyEmptyState(
+            onRetry: () => context.read<ProfileProvider>().loadProfile(),
+          ),
+        ],
+      );
+    }
+
+    final current = path.current ?? path.steps.first;
+    final skillHint = _skillHint(current);
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 32),
+      physics: const BouncingScrollPhysics(),
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final currentCard = _CurrentStageCard(
+              step: current,
+              overallProgress: path.overallProgress,
+              skillHint: skillHint,
+              isUpdating: isUpdating,
+              onComplete: onComplete,
+            );
+            final planCard = _TodayPlanCard(
+              plan: todayPlan,
+              onContinue: onContinue,
+              onAdjustGoal: onAdjustGoal,
+            );
+            if (constraints.maxWidth < 760) {
+              return Column(
+                children: [currentCard, const SizedBox(height: 14), planCard],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 6, child: currentCard),
+                const SizedBox(width: 14),
+                Expanded(flex: 5, child: planCard),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            const Icon(
+              Icons.flight_takeoff_rounded,
+              size: 20,
+              color: AppColors.luxuryBrown,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Tuyến bay A1 → B2',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.luxuryEspresso,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _CefrRoute(steps: path.steps),
+      ],
+    );
+  }
+
+  String _skillHint(LearningPathStep step) {
+    final scores = <({String label, double value})>[
+      (label: 'từ vựng', value: step.masteryPercent),
+      (label: 'quiz', value: step.quizAverage),
+      (label: 'mini test', value: step.miniTestScore),
+    ]..sort((a, b) => a.value.compareTo(b.value));
+    return scores.first.label;
+  }
+}
+
+class _CurrentStageCard extends StatelessWidget {
+  final LearningPathStep step;
+  final double overallProgress;
+  final String skillHint;
+  final bool isUpdating;
+  final VoidCallback onComplete;
+
+  const _CurrentStageCard({
+    required this.step,
+    required this.overallProgress,
+    required this.skillHint,
+    required this.isUpdating,
+    required this.onComplete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = (step.progressPercent / 100).clamp(0.0, 1.0);
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: AppColors.luxuryEspresso,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.luxuryEspresso.withValues(alpha: 0.16),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  'CHẶNG HIỆN TẠI',
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 9,
+                    letterSpacing: 1.1,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                step.cefrLevel,
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.luxuryGold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            step.title,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            step.description,
+            style: GoogleFonts.nunito(fontSize: 12, color: Colors.white70),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${step.progressPercent.round()}% chặng',
+                style: GoogleFonts.nunito(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                '${overallProgress.round()}% toàn hành trình',
+                style: GoogleFonts.nunito(fontSize: 11, color: Colors.white60),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(99),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 9,
+              backgroundColor: Colors.white12,
+              valueColor: const AlwaysStoppedAnimation(AppColors.luxuryGold),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              const Icon(
+                Icons.auto_graph_rounded,
+                size: 17,
+                color: AppColors.luxuryGold,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  step.canComplete
+                      ? 'Bạn đã đủ điều kiện hoàn thành chặng.'
+                      : 'Ưu tiên cải thiện $skillHint. ${step.reason}',
+                  style: GoogleFonts.nunito(
+                    fontSize: 11,
+                    height: 1.35,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (step.canComplete) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: isUpdating ? null : onComplete,
+                icon: const Icon(Icons.verified_rounded, size: 18),
+                label: Text(isUpdating ? 'Đang xử lý...' : 'Hoàn thành chặng'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.luxuryGold,
+                  foregroundColor: AppColors.luxuryEspresso,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TodayPlanCard extends StatelessWidget {
+  final TodayLearningPlan plan;
+  final VoidCallback onContinue;
+  final VoidCallback onAdjustGoal;
+
+  const _TodayPlanCard({
+    required this.plan,
+    required this.onContinue,
+    required this.onAdjustGoal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: AppColors.luxuryBrown.withValues(alpha: 0.10),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.today_rounded,
+                color: AppColors.luxuryBrown,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Kế hoạch hôm nay',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.luxuryEspresso,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${plan.estimatedMinutes} phút',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.luxuryBrown,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _PlanRow(
+            icon: Icons.replay_rounded,
+            label: 'Từ đến hạn ôn',
+            value: '${plan.dueReviews}',
+          ),
+          _PlanRow(
+            icon: Icons.add_circle_outline_rounded,
+            label: 'Từ mới theo mục tiêu',
+            value: '${plan.newWords}',
+          ),
+          _PlanRow(
+            icon: Icons.headphones_rounded,
+            label: plan.activityTitle,
+            value: 'Ưu tiên',
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.luxuryBrown.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(
+              plan.reason.isEmpty
+                  ? 'Kế hoạch cân bằng 70% ôn tập và 30% từ mới.'
+                  : plan.reason,
+              style: GoogleFonts.nunito(
+                fontSize: 11,
+                height: 1.35,
+                color: AppColors.luxuryText,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: onContinue,
+              icon: const Icon(Icons.flight_rounded, size: 18),
+              label: const Text('Tiếp tục hành trình'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.luxuryBrown,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+          Center(
+            child: TextButton(
+              onPressed: onAdjustGoal,
+              child: const Text('Điều chỉnh mục tiêu'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlanRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _PlanRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 11),
+      child: Row(
+        children: [
+          Icon(icon, size: 17, color: AppColors.luxuryBrown),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.nunito(
+                fontSize: 12,
+                color: AppColors.luxuryText,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryEspresso,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CefrRoute extends StatelessWidget {
+  final List<LearningPathStep> steps;
+
+  const _CefrRoute({required this.steps});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final desktop = constraints.maxWidth >= 760;
+        if (desktop) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var index = 0; index < steps.length; index++) ...[
+                Expanded(child: _CefrStop(step: steps[index])),
+                if (index < steps.length - 1)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 38),
+                    child: Icon(
+                      Icons.flight_rounded,
+                      size: 20,
+                      color: _statusColor(steps[index + 1].status),
+                    ),
+                  ),
+              ],
+            ],
+          );
+        }
+        return Column(
+          children: [
+            for (var index = 0; index < steps.length; index++) ...[
+              _CefrStop(step: steps[index]),
+              if (index < steps.length - 1)
+                Container(
+                  width: 2,
+                  height: 18,
+                  color: _statusColor(
+                    steps[index + 1].status,
+                  ).withValues(alpha: 0.35),
+                ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  static Color _statusColor(String status) {
+    return switch (status) {
+      'completed' => AppColors.success,
+      'current' => AppColors.luxuryBrown,
+      'waived' => AppColors.luxuryGold,
+      _ => AppColors.luxuryTextHint,
+    };
+  }
+}
+
+class _CefrStop extends StatelessWidget {
+  final LearningPathStep step;
+
+  const _CefrStop({required this.step});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _CefrRoute._statusColor(step.status);
+    final statusLabel = switch (step.status) {
+      'completed' => 'Đã hoàn thành',
+      'current' => 'Đang học',
+      'waived' => 'Được miễn',
+      _ => 'Chưa mở khóa',
+    };
+    final icon = switch (step.status) {
+      'completed' => Icons.check_rounded,
+      'current' => Icons.flight_takeoff_rounded,
+      'waived' => Icons.fast_forward_rounded,
+      _ => Icons.lock_outline_rounded,
+    };
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+              border: Border.all(color: color.withValues(alpha: 0.30)),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            step.cefrLevel,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: AppColors.luxuryEspresso,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            step.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.nunito(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryText,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            statusLabel,
+            style: GoogleFonts.nunito(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(99),
+            child: LinearProgressIndicator(
+              value: (step.progressPercent / 100).clamp(0.0, 1.0),
+              minHeight: 5,
+              backgroundColor: AppColors.luxuryBorder,
+              valueColor: AlwaysStoppedAnimation(color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _JourneyEmptyState extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _JourneyEmptyState({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.map_outlined,
+            size: 42,
+            color: AppColors.luxuryBrown,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Chưa thể tạo lộ trình',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryEspresso,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Hãy thử tải lại để hệ thống phân tích tiến độ học của bạn.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(color: AppColors.luxuryText),
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Tải lại lộ trình'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Retained as a reusable summary composition for future dashboard variants.
+// ignore: unused_element
 class _OverviewTab extends StatelessWidget {
   final DashboardStats stats;
   final List<QuizResult> recentQuizzes;
@@ -1533,11 +2288,16 @@ class _BentoGradientCard extends StatelessWidget {
 class _ProgressTab extends StatelessWidget {
   final bool isLoading;
   final String? errorMessage;
+  final DashboardStats stats;
+  final List<QuizResult> recentQuizzes;
   final List<WeeklyActivityDay> weeklyActivity;
   final List<TopicProgressItem> topics;
+
   const _ProgressTab({
     required this.isLoading,
     required this.errorMessage,
+    required this.stats,
+    required this.recentQuizzes,
     required this.weeklyActivity,
     required this.topics,
   });
@@ -1553,10 +2313,84 @@ class _ProgressTab extends StatelessWidget {
         onRetry: () => context.read<ProfileProvider>().loadProfile(),
       );
     }
+    final mastered = topics.fold<int>(0, (sum, topic) => sum + topic.mastered);
+    final totalTopicWords = topics.fold<int>(
+      0,
+      (sum, topic) => sum + topic.total,
+    );
+    final retention = totalTopicWords == 0
+        ? 0
+        : ((mastered / totalTopicWords) * 100).round();
+    final quizAverage = recentQuizzes.isEmpty
+        ? 0
+        : recentQuizzes
+                  .take(3)
+                  .fold<double>(0, (sum, quiz) => sum + quiz.scorePercent) /
+              recentQuizzes.take(3).length;
+    final strength = retention >= quizAverage
+        ? 'Ghi nhớ từ vựng'
+        : 'Phản xạ Quiz';
+    final improvement = retention < quizAverage
+        ? 'Ôn lại từ sắp quên'
+        : 'Luyện Quiz theo ngữ cảnh';
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 4, 0, 24),
       physics: const BouncingScrollPhysics(),
       children: [
+        GridView.count(
+          crossAxisCount: MediaQuery.sizeOf(context).width >= 760 ? 4 : 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 1.65,
+          children: [
+            _CompactStatCard(
+              label: 'Từ đã học',
+              value: '${stats.vocabCount}',
+              icon: Icons.menu_book_rounded,
+            ),
+            _CompactStatCard(
+              label: 'Thành thạo',
+              value: '$mastered',
+              icon: Icons.workspace_premium_rounded,
+            ),
+            _CompactStatCard(
+              label: 'Tỷ lệ nhớ',
+              value: '$retention%',
+              icon: Icons.psychology_alt_rounded,
+            ),
+            _CompactStatCard(
+              label: 'Quiz đã làm',
+              value: '${stats.quizCount}',
+              icon: Icons.quiz_rounded,
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: _InsightCard(
+                eyebrow: 'ĐIỂM MẠNH',
+                title: strength,
+                icon: Icons.bolt_rounded,
+                color: AppColors.success,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _InsightCard(
+                eyebrow: 'CẦN CẢI THIỆN',
+                title: improvement,
+                icon: Icons.track_changes_rounded,
+                color: AppColors.luxuryBrown,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
         _ActivityChart(days: weeklyActivity),
         const SizedBox(height: 18),
         Row(
@@ -1591,7 +2425,132 @@ class _ProgressTab extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         ...topics.take(6).map((t) => _TopicTile(item: t)),
+        const SizedBox(height: 14),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => context.go('/progress'),
+            icon: const Icon(Icons.insights_rounded),
+            label: const Text('Xem báo cáo tiến độ chi tiết'),
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _CompactStatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _CompactStatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(19),
+        border: Border.all(
+          color: AppColors.luxuryBrown.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 22, color: AppColors.luxuryBrown),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.luxuryEspresso,
+                  ),
+                ),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.nunito(
+                    fontSize: 10,
+                    color: AppColors.luxuryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightCard extends StatelessWidget {
+  final String eyebrow;
+  final String title;
+  final IconData icon;
+  final Color color;
+
+  const _InsightCard({
+    required this.eyebrow,
+    required this.title,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.14)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 21),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  eyebrow,
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 8,
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.luxuryEspresso,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1835,11 +2794,20 @@ class _BadgeTab extends StatelessWidget {
   final String? errorMessage;
   final List<AchievementItem> achievements;
   final DashboardStats stats;
+  final RewardSummary rewardSummary;
+  final List<RewardItem> rewards;
+  final List<RewardTransactionItem> rewardHistory;
+  final bool isClaiming;
+
   const _BadgeTab({
     required this.isLoading,
     required this.errorMessage,
     required this.achievements,
     required this.stats,
+    required this.rewardSummary,
+    required this.rewards,
+    required this.rewardHistory,
+    required this.isClaiming,
   });
 
   @override
@@ -1862,6 +2830,30 @@ class _BadgeTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 4, 0, 24),
       physics: const BouncingScrollPhysics(),
       children: [
+        _RewardInboxCard(
+          summary: rewardSummary,
+          rewards: rewards.where((reward) => reward.isClaimable).toList(),
+          isClaiming: isClaiming,
+          onClaim: (rewardId) async {
+            final messenger = ScaffoldMessenger.of(context);
+            final message = await context.read<ProfileProvider>().claimReward(
+              rewardId,
+            );
+            if (!context.mounted || message == null) return;
+            messenger.showSnackBar(SnackBar(content: Text(message)));
+            await context.read<DashboardProvider>().loadDashboard();
+          },
+          onClaimAll: () async {
+            final messenger = ScaffoldMessenger.of(context);
+            final message = await context
+                .read<ProfileProvider>()
+                .claimAllRewards();
+            if (!context.mounted || message == null) return;
+            messenger.showSnackBar(SnackBar(content: Text(message)));
+            await context.read<DashboardProvider>().loadDashboard();
+          },
+        ),
+        const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -1990,6 +2982,23 @@ class _BadgeTab extends StatelessWidget {
             );
           },
         ),
+        if (rewardHistory.isNotEmpty) ...[
+          const SizedBox(height: 22),
+          Text(
+            'Lịch sử phần thưởng',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryEspresso,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ...rewardHistory
+              .take(8)
+              .map(
+                (transaction) => _RewardHistoryTile(transaction: transaction),
+              ),
+        ],
       ],
     );
   }
@@ -2036,6 +3045,276 @@ class _BadgeTab extends StatelessWidget {
       title: 'Tem Huyền Thoại 100 Ngày',
       caption: '${stats.streak}/100 ngày liên tiếp',
       progress: (stats.streak / 100).clamp(0.0, 1.0),
+    );
+  }
+}
+
+class _RewardInboxCard extends StatelessWidget {
+  final RewardSummary summary;
+  final List<RewardItem> rewards;
+  final bool isClaiming;
+  final ValueChanged<String> onClaim;
+  final VoidCallback onClaimAll;
+
+  const _RewardInboxCard({
+    required this.summary,
+    required this.rewards,
+    required this.isClaiming,
+    required this.onClaim,
+    required this.onClaimAll,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.luxuryBrown, AppColors.luxuryBrownLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.luxuryBrown.withValues(alpha: 0.22),
+            blurRadius: 22,
+            offset: const Offset(0, 9),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.inventory_2_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'HỘP QUÀ',
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9,
+                        letterSpacing: 1.3,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    Text(
+                      summary.claimableCount > 0
+                          ? '${summary.claimableCount} phần thưởng chờ nhận'
+                          : 'Chưa có phần thưởng mới',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${summary.gemsBalance} 💎',
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    '${summary.xpTotal} XP',
+                    style: GoogleFonts.nunito(
+                      fontSize: 10,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (rewards.isEmpty) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Hoàn thành streak, Quiz, Mini Test và các chặng CEFR để mở thêm tem thưởng.',
+              style: GoogleFonts.nunito(
+                fontSize: 12,
+                height: 1.4,
+                color: Colors.white70,
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 16),
+            ...rewards
+                .take(3)
+                .map(
+                  (reward) => Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.11),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.local_post_office_outlined,
+                          size: 20,
+                          color: AppColors.luxuryGold,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                reward.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.nunito(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                '+${reward.xpAmount} XP · +${reward.gemsAmount} ngọc',
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontSize: 9,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: isClaiming
+                              ? null
+                              : () => onClaim(reward.id),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.luxuryGold,
+                          ),
+                          child: const Text('Nhận'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: isClaiming ? null : onClaimAll,
+                icon: isClaiming
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.luxuryEspresso,
+                        ),
+                      )
+                    : const Icon(Icons.done_all_rounded, size: 18),
+                label: Text(isClaiming ? 'Đang nhận...' : 'Nhận tất cả'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.luxuryGold,
+                  foregroundColor: AppColors.luxuryEspresso,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _RewardHistoryTile extends StatelessWidget {
+  final RewardTransactionItem transaction;
+
+  const _RewardHistoryTile({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
+    final date = transaction.createdAt;
+    final dateLabel = date == null
+        ? ''
+        : '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.luxurySurface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppColors.luxuryBrown.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppColors.luxuryBrown.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.receipt_long_outlined,
+              size: 18,
+              color: AppColors.luxuryBrown,
+            ),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.description ?? 'Phần thưởng học tập',
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.luxuryEspresso,
+                  ),
+                ),
+                if (dateLabel.isNotEmpty)
+                  Text(
+                    dateLabel,
+                    style: GoogleFonts.nunito(
+                      fontSize: 10,
+                      color: AppColors.luxuryTextHint,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Text(
+            '+${transaction.xpDelta} XP\n+${transaction.gemsDelta} 💎',
+            textAlign: TextAlign.right,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 10,
+              height: 1.5,
+              fontWeight: FontWeight.w700,
+              color: AppColors.luxuryBrown,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

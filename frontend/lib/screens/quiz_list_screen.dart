@@ -10,8 +10,6 @@ import '../widgets/app_bottom_nav.dart';
 import '../services/ai_service.dart';
 import '../services/api_service.dart';
 
-const _entryCurve = Cubic(0.34, 1.56, 0.64, 1);
-
 class QuizListScreen extends StatefulWidget {
   const QuizListScreen({super.key});
 
@@ -19,13 +17,9 @@ class QuizListScreen extends StatefulWidget {
   State<QuizListScreen> createState() => _QuizListScreenState();
 }
 
-class _QuizListScreenState extends State<QuizListScreen>
-    with SingleTickerProviderStateMixin {
+class _QuizListScreenState extends State<QuizListScreen> {
   int _questionCount = 10;
   String _selectedSkillType = 'all';
-  late final AnimationController _animController;
-  late final Animation<double> _fadeAnim;
-  late final Animation<Offset> _slideAnim;
 
   static const _skillTypes = [
     _SkillTypeData('all', Icons.auto_awesome, 'Kết hợp', 'Đủ 4 kỹ năng'),
@@ -58,26 +52,9 @@ class _QuizListScreenState extends State<QuizListScreen>
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _fadeAnim = CurvedAnimation(parent: _animController, curve: _entryCurve);
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animController, curve: _entryCurve));
-    _animController.forward();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<QuizProvider>().fetchCategories();
     });
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
   }
 
   Future<void> _startQuiz(QuizProvider quiz) async {
@@ -129,166 +106,160 @@ class _QuizListScreenState extends State<QuizListScreen>
         ),
       ),
       bottomNavigationBar: const AppBottomNav(selectedIndex: 1),
-      body: FadeTransition(
-        opacity: _fadeAnim,
-        child: SlideTransition(
-          position: _slideAnim,
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(pagePadding, 16, pagePadding, 32),
-            children: [
-              // ─── Hero Card (luxury gradient) ───────────
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.luxuryBg,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
-                ),
-                padding: const EdgeInsets.all(3),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: AppColors.luxuryGradient,
-                    borderRadius: BorderRadius.circular(17),
-                  ),
-                  padding: const EdgeInsets.all(24),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        right: -20,
-                        top: -20,
-                        child: Icon(
-                          Icons.psychology_outlined,
-                          size: 120,
-                          color: Colors.white.withValues(alpha: 0.10),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.18),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              'LUYỆN TẬP HÀNG NGÀY',
-                              style: GoogleFonts.nunito(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Thử Thách Quiz',
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              height: 1.2,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Kiểm tra kiến thức với các bài tập trắc nghiệm đa dạng theo chủ đề.',
-                            style: GoogleFonts.nunito(
-                              fontSize: 14,
-                              color: Colors.white.withValues(alpha: 0.88),
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(pagePadding, 16, pagePadding, 32),
+        children: [
+          // ─── Hero Card (luxury gradient) ───────────
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.luxuryBg,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.luxuryBorder, width: 1.5),
+            ),
+            padding: const EdgeInsets.all(3),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.luxuryGradient,
+                borderRadius: BorderRadius.circular(17),
               ),
-
-              const SizedBox(height: 20),
-
-              // ─── Bento: Config + AI ────────────────────
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final isWide = constraints.maxWidth >= 600;
-
-                  if (isWide) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(flex: 6, child: _buildConfigPanel(quiz)),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            children: [
-                              _buildAICard(quiz),
-                              const SizedBox(height: 16),
-                              _buildStreakCard(quiz),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-
-                  return Column(
-                    children: [
-                      _buildConfigPanel(quiz),
-                      const SizedBox(height: 16),
-                      _buildAICard(quiz),
-                      const SizedBox(height: 16),
-                      _buildStreakCard(quiz),
-                    ],
-                  );
-                },
-              ),
-
-              const SizedBox(height: 24),
-
-              // ─── Recent activity ───────────────────────
-              _buildRecentActivity(),
-
-              // ─── Error ────────────────────────────────
-              if (quiz.errorMessage != null) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.luxuryDanger.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.luxuryDanger.withValues(alpha: 0.3),
+              padding: const EdgeInsets.all(24),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Icon(
+                      Icons.psychology_outlined,
+                      size: 120,
+                      color: Colors.white.withValues(alpha: 0.10),
                     ),
                   ),
-                  child: Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: AppColors.luxuryDanger,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                         child: Text(
-                          quiz.errorMessage!,
+                          'LUYỆN TẬP HÀNG NGÀY',
                           style: GoogleFonts.nunito(
-                            fontSize: 13,
-                            color: AppColors.luxuryDanger,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.8,
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Thử Thách Quiz',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Kiểm tra kiến thức với các bài tập trắc nghiệm đa dạng theo chủ đề.',
+                        style: GoogleFonts.nunito(
+                          fontSize: 14,
+                          color: Colors.white.withValues(alpha: 0.88),
+                          height: 1.4,
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
+
+          const SizedBox(height: 20),
+
+          // ─── Bento: Config + AI ────────────────────
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 600;
+
+              if (isWide) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 6, child: _buildConfigPanel(quiz)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        children: [
+                          _buildAICard(quiz),
+                          const SizedBox(height: 16),
+                          _buildStreakCard(quiz),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return Column(
+                children: [
+                  _buildConfigPanel(quiz),
+                  const SizedBox(height: 16),
+                  _buildAICard(quiz),
+                  const SizedBox(height: 16),
+                  _buildStreakCard(quiz),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 24),
+
+          // ─── Recent activity ───────────────────────
+          _buildRecentActivity(),
+
+          // ─── Error ────────────────────────────────
+          if (quiz.errorMessage != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.luxuryDanger.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.luxuryDanger.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: AppColors.luxuryDanger,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      quiz.errorMessage!,
+                      style: GoogleFonts.nunito(
+                        fontSize: 13,
+                        color: AppColors.luxuryDanger,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

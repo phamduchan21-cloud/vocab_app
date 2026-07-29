@@ -7,6 +7,7 @@ import '../models/quiz_result.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/error_state_widget.dart';
+import '../motion/app_motion.dart';
 
 const _entryCurve = Cubic(0.34, 1.56, 0.64, 1);
 
@@ -35,9 +36,12 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen>
       begin: const Offset(0, 0.08),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _animController, curve: _entryCurve));
-    _animController.forward();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (AppMotion.reduced(context)) {
+        _animController.value = 1;
+      } else {
+        _animController.forward();
+      }
       context.read<QuizProvider>().fetchHistory();
     });
   }

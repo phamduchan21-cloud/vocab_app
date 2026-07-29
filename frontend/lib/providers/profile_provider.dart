@@ -16,6 +16,11 @@ class ProfileProvider extends ChangeNotifier {
   bool _isClaimingReward = false;
   bool _isUpdatingProfile = false;
   UserProfile? _userProfile;
+  RewardSummary _rewardSummary = const RewardSummary();
+  List<RewardItem> _rewards = [];
+  List<RewardTransactionItem> _rewardHistory = [];
+  LearningPathData _learningPath = const LearningPathData();
+  TodayLearningPlan _todayPlan = const TodayLearningPlan();
 
   bool get isLoading => _isLoading;
   List<WeeklyActivityDay> get data => _data;
@@ -25,6 +30,11 @@ class ProfileProvider extends ChangeNotifier {
   bool get isClaimingReward => _isClaimingReward;
   bool get isUpdatingProfile => _isUpdatingProfile;
   UserProfile? get userProfile => _userProfile;
+  RewardSummary get rewardSummary => _rewardSummary;
+  List<RewardItem> get rewards => _rewards;
+  List<RewardTransactionItem> get rewardHistory => _rewardHistory;
+  LearningPathData get learningPath => _learningPath;
+  TodayLearningPlan get todayPlan => _todayPlan;
 
   ProfileProvider(this._service);
 
@@ -49,18 +59,36 @@ class ProfileProvider extends ChangeNotifier {
         _safeGet(() => _service.getAchievements()),
         _safeGet(() => _service.getQuizHistory()),
         _safeGet(() => _service.getProfile()),
+        _safeGet(() => _service.getRewardSummary()),
+        _safeGet(() => _service.getRewards()),
+        _safeGet(() => _service.getRewardHistory()),
+        _safeGet(() => _service.getLearningPath()),
+        _safeGet(() => _service.getTodayLearningPlan()),
       ]);
 
       _data = (results[0] as List?)?.cast<WeeklyActivityDay>() ?? [];
       _achievements = (results[1] as List?)?.cast<AchievementItem>() ?? [];
       _recentQuizzes = (results[2] as List?)?.cast<QuizResult>() ?? [];
       _userProfile = results[3] as UserProfile?;
+      _rewardSummary = results[4] as RewardSummary? ?? const RewardSummary();
+      _rewards = (results[5] as List?)?.cast<RewardItem>() ?? [];
+      _rewardHistory =
+          (results[6] as List?)?.cast<RewardTransactionItem>() ?? [];
+      _learningPath =
+          results[7] as LearningPathData? ?? const LearningPathData();
+      _todayPlan =
+          results[8] as TodayLearningPlan? ?? const TodayLearningPlan();
     } catch (e) {
       _errorMessage = 'Khong the tai ho so luc nay.';
       _data = [];
       _achievements = [];
       _recentQuizzes = [];
       _userProfile = null;
+      _rewardSummary = const RewardSummary();
+      _rewards = [];
+      _rewardHistory = [];
+      _learningPath = const LearningPathData();
+      _todayPlan = const TodayLearningPlan();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -80,6 +108,74 @@ class ProfileProvider extends ChangeNotifier {
       return 'Bạn chưa thể nhận thưởng streak lúc này.';
     } finally {
       _isClaimingReward = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String?> claimReward(String rewardId) async {
+    if (_isClaimingReward) return null;
+    _isClaimingReward = true;
+    notifyListeners();
+    try {
+      final result = await _service.claimReward(rewardId);
+      await loadProfile();
+      return result['message']?.toString() ?? 'Đã nhận phần thưởng.';
+    } catch (_) {
+      return 'Không thể nhận phần thưởng lúc này.';
+    } finally {
+      _isClaimingReward = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String?> claimAllRewards() async {
+    if (_isClaimingReward) return null;
+    _isClaimingReward = true;
+    notifyListeners();
+    try {
+      final result = await _service.claimAllRewards();
+      await loadProfile();
+      return result['message']?.toString() ?? 'Đã nhận các phần thưởng.';
+    } catch (_) {
+      return 'Không thể nhận tất cả phần thưởng lúc này.';
+    } finally {
+      _isClaimingReward = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String?> updateCefrLevel(String cefrLevel) async {
+    if (_isUpdatingProfile) return null;
+    _isUpdatingProfile = true;
+    notifyListeners();
+    try {
+      _learningPath = await _service.updatePlacement(cefrLevel);
+      await loadProfile();
+      return null;
+    } catch (_) {
+      return 'Không thể cập nhật chặng học lúc này.';
+    } finally {
+      _isUpdatingProfile = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String?> completeCurrentPathStep() async {
+    if (_isUpdatingProfile) return null;
+    final current = _learningPath.current;
+    if (current == null || !current.canComplete) {
+      return current?.reason ?? 'Chặng học chưa sẵn sàng để hoàn thành.';
+    }
+    _isUpdatingProfile = true;
+    notifyListeners();
+    try {
+      final result = await _service.completePathStep(current.cefrLevel);
+      await loadProfile();
+      return result['message']?.toString();
+    } catch (_) {
+      return 'Không thể hoàn thành chặng học lúc này.';
+    } finally {
+      _isUpdatingProfile = false;
       notifyListeners();
     }
   }

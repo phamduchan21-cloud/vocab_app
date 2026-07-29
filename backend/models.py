@@ -13,6 +13,7 @@ from sqlalchemy import (
     JSON,
     Float,
     Index,
+    UniqueConstraint,
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -155,6 +156,126 @@ class UserAchievement(Base):
 
     def __repr__(self):
         return f"<UserAchievement(user={self.user_id}, key={self.achievement_key})>"
+
+
+class UserReward(Base):
+    """A claimable reward unlocked by an achievement or learning milestone."""
+
+    __tablename__ = "user_rewards"
+    __table_args__ = (
+        UniqueConstraint("user_id", "reward_key", name="uq_user_reward_key"),
+        Index("idx_user_reward_status", "user_id", "status"),
+    )
+
+    id = Column(String(36), primary_key=True)
+    user_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    reward_key = Column(String(80), nullable=False)
+    source_type = Column(String(30), nullable=False, default="achievement")
+    title = Column(String(120), nullable=False)
+    description = Column(String(255), nullable=True)
+    xp_amount = Column(Integer, nullable=False, default=0)
+    gems_amount = Column(Integer, nullable=False, default=0)
+    status = Column(String(20), nullable=False, default="pending")
+    unlocked_at = Column(DateTime(timezone=True), server_default=func.now())
+    claimed_at = Column(DateTime(timezone=True), nullable=True)
+
+
+class UserWallet(Base):
+    """Persisted wallet so gems are no longer inferred from XP."""
+
+    __tablename__ = "user_wallets"
+
+    user_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    gems_balance = Column(Integer, nullable=False, default=0)
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
+class RewardTransaction(Base):
+    """Immutable reward ledger used for idempotent wallet updates."""
+
+    __tablename__ = "reward_transactions"
+    __table_args__ = (
+        UniqueConstraint("user_id", "transaction_key", name="uq_reward_transaction_key"),
+        Index("idx_reward_transaction_user", "user_id", "created_at"),
+    )
+
+    id = Column(String(36), primary_key=True)
+    user_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    transaction_key = Column(String(100), nullable=False)
+    source_type = Column(String(30), nullable=False)
+    source_id = Column(String(36), nullable=True)
+    xp_delta = Column(Integer, nullable=False, default=0)
+    gems_delta = Column(Integer, nullable=False, default=0)
+    description = Column(String(255), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class UserLearningPath(Base):
+    """The learner's active CEFR route."""
+
+    __tablename__ = "user_learning_paths"
+
+    user_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    current_cefr = Column(String(2), nullable=False, default="A1")
+    current_step = Column(Integer, nullable=False, default=0)
+    placement_source = Column(String(20), nullable=False, default="profile")
+    started_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
+class UserPathStep(Base):
+    """Persisted status for one CEFR stage."""
+
+    __tablename__ = "user_path_steps"
+    __table_args__ = (
+        UniqueConstraint("user_id", "cefr_level", name="uq_user_path_step"),
+        Index("idx_user_path_step_status", "user_id", "status"),
+    )
+
+    id = Column(String(36), primary_key=True)
+    user_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    cefr_level = Column(String(2), nullable=False)
+    status = Column(String(20), nullable=False, default="locked")
+    progress_percent = Column(Float, nullable=False, default=0)
+    quiz_average = Column(Float, nullable=False, default=0)
+    mini_test_score = Column(Float, nullable=False, default=0)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
 
 
 class MockTest(Base):

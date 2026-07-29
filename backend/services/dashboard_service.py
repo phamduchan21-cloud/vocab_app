@@ -4,7 +4,13 @@ from typing import List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
 
-from models import Vocabulary, QuizResult, UserDailyActivity, UserAchievement
+from models import (
+    Vocabulary,
+    QuizResult,
+    UserDailyActivity,
+    UserAchievement,
+    UserWallet,
+)
 from schemas import (
     DashboardResponse,
     DashboardStatsVocab,
@@ -67,6 +73,13 @@ class DashboardService:
             .where(UserDailyActivity.user_id == user_id)
         ) or 0
 
+    async def _get_gems_total(self, user_id: str, total_xp: int) -> int:
+        wallet = await self.db.get(UserWallet, user_id)
+        if wallet is not None:
+            return wallet.gems_balance or 0
+        # Backward-compatible fallback before the reward migration is applied.
+        return total_xp // 10
+
     async def get_stats(self, user_id: str) -> DashboardResponse:
         """Get expanded dashboard statistics."""
         vocab_count = await self.db.scalar(
@@ -77,7 +90,7 @@ class DashboardService:
         accuracy_rate = round((correct_answers / total_questions) * 100, 2) if total_questions > 0 else 0.0
 
         total_xp = await self._get_xp_total(user_id)
-        gems = total_xp // 10
+        gems = await self._get_gems_total(user_id, total_xp)
         level, level_title = calc_level(total_xp)
         streak = await self._calc_streak(user_id)
         weekly_progress = await self._calc_weekly_progress(user_id)
@@ -103,7 +116,7 @@ class DashboardService:
         accuracy_rate = round((correct_answers / total_questions) * 100, 2) if total_questions > 0 else 0.0
 
         total_xp = await self._get_xp_total(user_id)
-        gems = total_xp // 10
+        gems = await self._get_gems_total(user_id, total_xp)
         level, level_title = calc_level(total_xp)
         streak = await self._calc_streak(user_id)
         weekly_progress = await self._calc_weekly_progress(user_id)

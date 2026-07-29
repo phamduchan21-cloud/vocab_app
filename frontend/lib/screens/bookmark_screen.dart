@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../app.dart';
 import '../models/vocabulary.dart';
 import '../providers/vocabulary_provider.dart';
+import '../motion/app_motion.dart';
 import '../widgets/app_bottom_nav.dart';
 import '../widgets/error_state_widget.dart';
 import '../widgets/loading_widget.dart';
@@ -49,7 +50,12 @@ class _EntryAnimationState extends State<_EntryAnimation>
           ),
         );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _controller.forward();
+      if (!mounted) return;
+      if (AppMotion.reduced(context)) {
+        _controller.value = 1;
+      } else {
+        _controller.forward();
+      }
     });
   }
 
@@ -223,7 +229,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<VocabularyProvider>();
-      if (provider.items.isEmpty) provider.fetchAll(limit: 200);
+      provider.fetchBookmarked(limit: 200);
     });
   }
 
@@ -279,13 +285,13 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<VocabularyProvider>();
-    final isLoading = provider.isLoading && provider.items.isEmpty;
-    final hasError = provider.errorMessage != null && provider.items.isEmpty;
+    final bookmarkedCount = provider.bookmarked.length;
+    final isLoading = provider.isLoading && bookmarkedCount == 0;
+    final hasError = provider.errorMessage != null && bookmarkedCount == 0;
     final isEmptyState =
         !provider.isLoading &&
         provider.errorMessage == null &&
-        provider.items.isEmpty;
-    // ponytail: bookmarkedCount unused, removed
+        bookmarkedCount == 0;
     final screenW = MediaQuery.of(context).size.width;
     final isNarrow = screenW < 400;
     final hPad = isNarrow ? 20.0 : 44.0;
@@ -331,7 +337,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  '${provider.bookmarked.length}',
+                                  '$bookmarkedCount',
                                   style: GoogleFonts.nunito(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -501,7 +507,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     if (hasError) {
       return ErrorStateWidget(
         message: provider.errorMessage!,
-        onRetry: () => provider.fetchAll(limit: 200),
+        onRetry: () => provider.fetchBookmarked(limit: 200),
       );
     }
     if (isEmptyState) {
@@ -636,7 +642,16 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
               onStarToggle: () {
                 final vocab = provider.items.firstWhere(
                   (v) => v.id == word.id,
-                  orElse: () => provider.items.first,
+                  orElse: () => Vocabulary(
+                    id: word.id,
+                    userId: '',
+                    word: word.word,
+                    meaning: word.meaning,
+                    pronunciation: word.ipa,
+                    isBookmarked: word.isBookmarked,
+                    createdAt: DateTime.now(),
+                    updatedAt: DateTime.now(),
+                  ),
                 );
                 provider.toggleBookmark(vocab);
               },

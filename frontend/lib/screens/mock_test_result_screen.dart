@@ -8,6 +8,7 @@ import '../models/mock_test.dart';
 import '../providers/mock_test_provider.dart';
 import '../providers/vocabulary_provider.dart';
 import '../widgets/postmark_score.dart';
+import '../motion/app_motion.dart';
 
 class MockTestResultScreen extends StatefulWidget {
   final MockTestResult result;
@@ -107,10 +108,12 @@ class _MockTestResultScreenState extends State<MockTestResultScreen> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final content = [
-            PostmarkScore(
-              score: result.scorePercent.round(),
-              label: 'ĐIỂM',
-              color: color,
+            AirmailStampReveal(
+              child: PostmarkScore(
+                score: result.scorePercent.round(),
+                label: 'ĐIỂM',
+                color: color,
+              ),
             ),
             const SizedBox(width: 22, height: 18),
             Expanded(

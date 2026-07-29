@@ -27,97 +27,7 @@ import 'screens/bookmark_screen.dart';
 import 'screens/topic_browser_screen.dart';
 import 'screens/topic_detail_screen.dart';
 import 'screens/ai_chat_screen.dart';
-
-// ═══════════════════════════════════════════════════════════
-// 🔄 Custom Page Transitions — bouncy spring cubic
-// ═══════════════════════════════════════════════════════════
-
-const _springCurve = Cubic(0.34, 1.56, 0.64, 1);
-const _slideCurve = Cubic(0.22, 1, 0.36, 1);
-
-Page<dynamic> _slideUpPage(Widget child) {
-  return _CustomTransitionPage(
-    key: ValueKey(child.hashCode),
-    child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
-            .animate(
-              CurvedAnimation(
-                parent: animation,
-                curve: _springCurve,
-                reverseCurve: _slideCurve,
-              ),
-            ),
-        child: FadeTransition(opacity: animation, child: child),
-      );
-    },
-  );
-}
-
-Page<dynamic> _slideRightPage(Widget child) {
-  return _CustomTransitionPage(
-    key: ValueKey(child.hashCode),
-    child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0.18, 0), end: Offset.zero)
-            .animate(
-              CurvedAnimation(
-                parent: animation,
-                curve: _slideCurve,
-                reverseCurve: _slideCurve,
-              ),
-            ),
-        child: FadeTransition(opacity: animation, child: child),
-      );
-    },
-  );
-}
-
-Page<dynamic> _scaleFadePage(Widget child) {
-  return _CustomTransitionPage(
-    key: ValueKey(child.hashCode),
-    child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return ScaleTransition(
-        scale: Tween<double>(
-          begin: 0.88,
-          end: 1.0,
-        ).animate(CurvedAnimation(parent: animation, curve: _springCurve)),
-        child: FadeTransition(opacity: animation, child: child),
-      );
-    },
-  );
-}
-
-Page<dynamic> _authSwitchPage(Widget child) {
-  return _CustomTransitionPage(
-    key: ValueKey(child.runtimeType),
-    child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      final curved = CurvedAnimation(parent: animation, curve: _slideCurve);
-      return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0.12, 0),
-          end: Offset.zero,
-        ).animate(curved),
-        child: FadeTransition(opacity: curved, child: child),
-      );
-    },
-  );
-}
-
-class _CustomTransitionPage extends CustomTransitionPage<dynamic> {
-  const _CustomTransitionPage({
-    required super.child,
-    required super.transitionsBuilder,
-    super.key,
-  }) : super(
-         transitionDuration: const Duration(milliseconds: 400),
-         reverseTransitionDuration: const Duration(milliseconds: 300),
-       );
-}
+import 'motion/app_motion.dart';
 
 // SolVocab design system: botanical focus with warm learning accents.
 
@@ -659,7 +569,11 @@ class _SolVocabAppState extends State<SolVocabApp> {
         final location = state.matchedLocation;
         final isAuthPreview = state.uri.queryParameters['preview'] == 'true';
 
-        if (location == '/splash' || location == '/onboarding') return null;
+        if (location == '/splash') {
+          if (!isLoggedIn) return null;
+          return auth.needsOnboarding ? '/setup' : '/';
+        }
+        if (location == '/onboarding') return null;
 
         final isAuthRoute = location == '/login' || location == '/register';
         if (!isLoggedIn && !isAuthRoute) return '/login';
@@ -672,64 +586,120 @@ class _SolVocabAppState extends State<SolVocabApp> {
       routes: [
         GoRoute(
           path: '/splash',
-          pageBuilder: (_, _) => _scaleFadePage(const SplashScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const SplashScreen(),
+            kind: MotionPageKind.auth,
+          ),
         ),
         GoRoute(
           path: '/onboarding',
-          pageBuilder: (_, _) => _slideUpPage(const OnboardingScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const OnboardingScreen(),
+            kind: MotionPageKind.modal,
+          ),
         ),
         GoRoute(
           path: '/login',
-          pageBuilder: (_, _) => _authSwitchPage(const LoginScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const LoginScreen(),
+            kind: MotionPageKind.auth,
+          ),
         ),
         GoRoute(
           path: '/register',
-          pageBuilder: (_, _) => _authSwitchPage(const RegisterScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const RegisterScreen(),
+            kind: MotionPageKind.auth,
+          ),
         ),
         GoRoute(
           path: '/setup',
-          pageBuilder: (_, _) => _slideUpPage(const AccountSetupScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const AccountSetupScreen(),
+            kind: MotionPageKind.modal,
+          ),
         ),
         GoRoute(
           path: '/',
-          pageBuilder: (_, _) => _slideUpPage(const DashboardScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const DashboardScreen(),
+            kind: MotionPageKind.mainTab,
+          ),
         ),
         GoRoute(
           path: '/flashcard',
-          pageBuilder: (_, _) => _slideRightPage(const FlashcardScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const FlashcardScreen(),
+            kind: MotionPageKind.mainTab,
+          ),
         ),
         GoRoute(
           path: '/quiz',
-          pageBuilder: (_, _) => _slideRightPage(const QuizListScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const QuizListScreen(),
+            kind: MotionPageKind.mainTab,
+          ),
           routes: [
             GoRoute(
               path: 'play',
-              pageBuilder: (_, _) => _slideRightPage(const QuizPlayScreen()),
+              pageBuilder: (_, state) => AppMotion.page(
+                state: state,
+                child: const QuizPlayScreen(),
+                kind: MotionPageKind.detail,
+              ),
             ),
             GoRoute(
               path: 'result/:id',
               pageBuilder: (_, state) {
                 final id = state.pathParameters['id']!;
-                return _slideRightPage(QuizResultScreen(id: id));
+                return AppMotion.page(
+                  state: state,
+                  child: QuizResultScreen(id: id),
+                  kind: MotionPageKind.result,
+                );
               },
             ),
             GoRoute(
               path: 'history',
-              pageBuilder: (_, _) => _slideRightPage(const QuizHistoryScreen()),
+              pageBuilder: (_, state) => AppMotion.page(
+                state: state,
+                child: const QuizHistoryScreen(),
+                kind: MotionPageKind.detail,
+              ),
             ),
           ],
         ),
         GoRoute(
           path: '/ai-chat',
-          pageBuilder: (_, _) => _slideRightPage(const AIChatScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const AIChatScreen(),
+            kind: MotionPageKind.detail,
+          ),
         ),
         GoRoute(
           path: '/test',
-          pageBuilder: (_, _) => _slideRightPage(const MockTestScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const MockTestScreen(),
+            kind: MotionPageKind.mainTab,
+          ),
         ),
         GoRoute(
           path: '/mock-test',
-          pageBuilder: (_, _) => _slideRightPage(const MockTestScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const MockTestScreen(),
+            kind: MotionPageKind.mainTab,
+          ),
           routes: [
             GoRoute(
               path: 'play/:level',
@@ -744,77 +714,119 @@ class _SolVocabAppState extends State<SolVocabApp> {
                 final duration =
                     int.tryParse(state.uri.queryParameters['duration'] ?? '') ??
                     10;
-                return _slideRightPage(
-                  MockTestPlayScreen(
+                return AppMotion.page(
+                  state: state,
+                  child: MockTestPlayScreen(
                     level: level,
                     topic: topic,
                     purpose: purpose,
                     questionCount: count,
                     durationMinutes: duration,
                   ),
+                  kind: MotionPageKind.detail,
                 );
               },
             ),
             GoRoute(
               path: 'history',
-              pageBuilder: (_, _) =>
-                  _slideRightPage(const MockTestHistoryScreen()),
+              pageBuilder: (_, state) => AppMotion.page(
+                state: state,
+                child: const MockTestHistoryScreen(),
+                kind: MotionPageKind.detail,
+              ),
             ),
             GoRoute(
               path: 'result/:id',
               pageBuilder: (_, state) {
                 final result = state.extra as MockTestResult?;
                 if (result == null) {
-                  return _slideRightPage(
-                    const Scaffold(
+                  return AppMotion.page(
+                    state: state,
+                    child: const Scaffold(
                       body: Center(child: Text('Không có dữ liệu kết quả')),
                     ),
+                    kind: MotionPageKind.result,
                   );
                 }
-                return _slideRightPage(MockTestResultScreen(result: result));
+                return AppMotion.page(
+                  state: state,
+                  child: MockTestResultScreen(result: result),
+                  kind: MotionPageKind.result,
+                );
               },
             ),
           ],
         ),
         GoRoute(
           path: '/bookmark',
-          pageBuilder: (_, _) => _slideRightPage(const BookmarkScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const BookmarkScreen(),
+            kind: MotionPageKind.detail,
+          ),
         ),
         GoRoute(
           path: '/progress',
-          pageBuilder: (_, _) => _slideRightPage(const ProgressScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const ProgressScreen(),
+            kind: MotionPageKind.detail,
+          ),
         ),
         GoRoute(
           path: '/profile',
-          pageBuilder: (_, _) => _slideRightPage(const ProfileScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const ProfileScreen(),
+            kind: MotionPageKind.mainTab,
+          ),
         ),
         GoRoute(
           path: '/topics',
-          pageBuilder: (_, _) => _slideRightPage(const TopicBrowserScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const TopicBrowserScreen(),
+            kind: MotionPageKind.detail,
+          ),
           routes: [
             GoRoute(
               path: ':lessonId',
               pageBuilder: (_, state) {
                 final lessonId = state.pathParameters['lessonId']!;
-                return _slideRightPage(TopicDetailScreen(lessonId: lessonId));
+                return AppMotion.page(
+                  state: state,
+                  child: TopicDetailScreen(lessonId: lessonId),
+                  kind: MotionPageKind.detail,
+                );
               },
             ),
           ],
         ),
         GoRoute(
           path: '/vocabulary',
-          pageBuilder: (_, _) => _slideRightPage(const VocabularyListScreen()),
+          pageBuilder: (_, state) => AppMotion.page(
+            state: state,
+            child: const VocabularyListScreen(),
+            kind: MotionPageKind.detail,
+          ),
           routes: [
             GoRoute(
               path: 'new',
-              pageBuilder: (_, _) =>
-                  _slideRightPage(const VocabularyFormScreen()),
+              pageBuilder: (_, state) => AppMotion.page(
+                state: state,
+                child: const VocabularyFormScreen(),
+                kind: MotionPageKind.modal,
+              ),
             ),
             GoRoute(
               path: ':id/edit',
               pageBuilder: (_, state) {
                 final id = state.pathParameters['id']!;
-                return _slideRightPage(VocabularyFormScreen(id: id));
+                return AppMotion.page(
+                  state: state,
+                  child: VocabularyFormScreen(id: id),
+                  kind: MotionPageKind.modal,
+                );
               },
             ),
           ],

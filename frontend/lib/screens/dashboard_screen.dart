@@ -11,6 +11,7 @@ import '../providers/dashboard_provider.dart';
 import '../providers/flashcard_provider.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/app_bottom_nav.dart';
+import '../motion/app_motion.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/cat_widget.dart';
 import '../widgets/error_state_widget.dart';
@@ -1352,7 +1353,12 @@ class _RevealState extends State<_Reveal> with SingleTickerProviderStateMixin {
       end: Offset.zero,
     ).animate(_fade);
     Future<void>.delayed(Duration(milliseconds: widget.delayMs), () {
-      if (mounted) _controller.forward();
+      if (!mounted) return;
+      if (AppMotion.reduced(context)) {
+        _controller.value = 1;
+      } else {
+        _controller.forward();
+      }
     });
   }
 

@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List, Any
 from datetime import datetime, date
 from decimal import Decimal
@@ -468,6 +468,99 @@ class ClaimStreakResponse(BaseModel):
 
 
 # ─── Pagination ──────────────────────────────────────────────────────
+
+class RewardItemResponse(BaseModel):
+    id: str
+    reward_key: str
+    source_type: str
+    title: str
+    description: Optional[str] = None
+    xp_amount: int = 0
+    gems_amount: int = 0
+    status: str
+    unlocked_at: Optional[datetime] = None
+    claimed_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RewardSummaryResponse(BaseModel):
+    claimable_count: int = 0
+    xp_total: int = 0
+    gems_balance: int = 0
+    next_streak: Optional[int] = None
+    streak_progress: int = 0
+
+
+class RewardClaimResponse(BaseModel):
+    claimed: List[RewardItemResponse] = []
+    xp_earned: int = 0
+    gems_earned: int = 0
+    xp_total: int = 0
+    gems_balance: int = 0
+    message: str
+
+
+class RewardTransactionResponse(BaseModel):
+    id: str
+    source_type: str
+    xp_delta: int = 0
+    gems_delta: int = 0
+    description: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LearningPathStepResponse(BaseModel):
+    cefr_level: str
+    title: str
+    description: str
+    lesson_ids: List[int]
+    topics: List[str]
+    status: str
+    progress_percent: float = 0
+    mastery_percent: float = 0
+    quiz_average: float = 0
+    mini_test_score: float = 0
+    completed_topics: int = 0
+    required_topics: int = 0
+    can_complete: bool = False
+    reason: str
+
+
+class LearningPathResponse(BaseModel):
+    current_cefr: str
+    current_step: int
+    placement_source: str
+    overall_progress: float = 0
+    steps: List[LearningPathStepResponse]
+
+
+class TodayLearningPlanResponse(BaseModel):
+    cefr_level: str
+    due_reviews: int = 0
+    new_words: int = 0
+    activity_title: str
+    activity_route: str
+    estimated_minutes: int = 0
+    reason: str
+
+
+class PlacementRequest(BaseModel):
+    cefr_level: str = Field(..., pattern="^(A1|A2|B1|B2)$")
+    source: str = Field(
+        default="placement",
+        pattern="^(placement|profile|onboarding)$",
+    )
+
+
+class CompletePathStepResponse(BaseModel):
+    completed_level: str
+    next_level: Optional[str] = None
+    reward: Optional[RewardItemResponse] = None
+    message: str
+
 
 class PaginatedResponse(BaseModel):
     items: List[Any]

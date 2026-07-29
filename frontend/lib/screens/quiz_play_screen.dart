@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../app.dart';
 import '../providers/quiz_provider.dart';
+import '../motion/app_motion.dart';
 import '../services/tts_service.dart';
 import '../widgets/app_bottom_nav.dart';
 import '../widgets/speaker_button.dart';
@@ -184,8 +185,6 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
       begin: const Offset(0, 0.08),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _animController, curve: _entryCurve));
-    _animController.forward();
-
     _startedAt = DateTime.now();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadQuestions();
@@ -215,7 +214,11 @@ class _QuizPlayScreenState extends State<QuizPlayScreen>
       ..clear()
       ..addAll(List<String?>.filled(_questions.length, null));
 
-    _animController.forward(from: 0);
+    if (AppMotion.reduced(context)) {
+      _animController.value = 1;
+    } else {
+      _animController.forward(from: 0);
+    }
     setState(() {
       _questionsLoaded = true;
     });

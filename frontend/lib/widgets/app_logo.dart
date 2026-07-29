@@ -3,6 +3,33 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../app.dart';
 
+const solvocabLogoHeroTag = 'solvocab-brand-logo';
+
+class AppLogoHero extends StatelessWidget {
+  const AppLogoHero({
+    super.key,
+    this.size = 72,
+    this.showName = false,
+    this.light = false,
+  });
+
+  final double size;
+  final bool showName;
+  final bool light;
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: solvocabLogoHeroTag,
+      transitionOnUserGestures: true,
+      child: Material(
+        type: MaterialType.transparency,
+        child: AppLogo(size: size, showName: showName, light: light),
+      ),
+    );
+  }
+}
+
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,

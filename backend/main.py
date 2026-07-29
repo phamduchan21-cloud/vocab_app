@@ -9,7 +9,16 @@ import schemas
 from core.config import settings
 from core.observability import RequestContextMiddleware, configure_logging
 from database import init_db, close_db, async_session_factory
-from routers import auth, vocabulary, quiz, dashboard, gamification, mock_test, ai
+from routers import (
+    auth,
+    vocabulary,
+    quiz,
+    dashboard,
+    gamification,
+    mock_test,
+    ai,
+    learning_path,
+)
 from services.auth_service import AuthServiceError
 
 
@@ -66,6 +75,7 @@ app.include_router(dashboard.router)
 app.include_router(gamification.router)
 app.include_router(mock_test.router)
 app.include_router(ai.router)
+app.include_router(learning_path.router)
 
 
 @app.get("/", response_model=schemas.RootResponse)

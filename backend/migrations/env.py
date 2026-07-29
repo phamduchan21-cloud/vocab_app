@@ -16,9 +16,14 @@ if config.config_file_name is not None:
 
 # Import all models so Alembic can detect them
 from database import Base
+from core.config import settings
 from models import User, Vocabulary, QuizResult, QuizCategory, UserDailyActivity, UserAchievement, MockTest
 
 target_metadata = Base.metadata
+config.set_main_option(
+    "sqlalchemy.url",
+    settings.DATABASE_URL.replace("%", "%%"),
+)
 
 
 def run_migrations_offline() -> None:

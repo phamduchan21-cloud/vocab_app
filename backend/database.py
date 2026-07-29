@@ -56,11 +56,10 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db():
-    """Create all tables nếu dùng SQLite local.
-    Trên Supabase, tables đã được tạo qua SQL script riêng."""
-    if "sqlite" in settings.DATABASE_URL:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+    """Create missing tables and apply safe runtime backfills."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        if "sqlite" in settings.DATABASE_URL:
             if not await _sqlite_has_column(conn, "vocabularies", "is_bookmarked"):
                 await conn.execute(
                     text(
@@ -79,6 +78,47 @@ async def init_db():
                 await conn.execute(
                     text("ALTER TABLE vocabularies ADD COLUMN personal_note TEXT")
                 )
+            return
+
+        # Existing users keep the gem balance shown before wallets were persisted.
+        await conn.execute(
+            text(
+                """
+                INSERT INTO user_wallets (user_id, gems_balance)
+                SELECT users.id, COALESCE(SUM(user_daily_activities.xp_earned), 0) / 10
+                FROM users
+                LEFT JOIN user_daily_activities
+                    ON user_daily_activities.user_id = users.id
+                GROUP BY users.id
+                ON CONFLICT (user_id) DO NOTHING
+                """
+            )
+        )
+        # Historical achievements are marked claimed to prevent duplicate payouts.
+        await conn.execute(
+            text(
+                """
+                INSERT INTO user_rewards (
+                    id, user_id, reward_key, source_type, title, description,
+                    xp_amount, gems_amount, status, unlocked_at, claimed_at
+                )
+                SELECT
+                    user_achievements.id,
+                    user_achievements.user_id,
+                    user_achievements.achievement_key,
+                    'achievement',
+                    user_achievements.title,
+                    user_achievements.description,
+                    0,
+                    0,
+                    'claimed',
+                    user_achievements.unlocked_at,
+                    user_achievements.unlocked_at
+                FROM user_achievements
+                ON CONFLICT (user_id, reward_key) DO NOTHING
+                """
+            )
+        )
 
 
 async def _sqlite_has_column(conn, table: str, column: str) -> bool:

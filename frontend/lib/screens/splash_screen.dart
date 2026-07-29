@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../app.dart';
+import '../motion/app_motion.dart';
 import '../widgets/app_logo.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -24,8 +25,18 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 750),
     );
-    _entrance = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
-    _controller.forward();
+    _entrance = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (AppMotion.reduced(context)) {
+        _controller.value = 1;
+      } else {
+        _controller.forward();
+      }
+    });
   }
 
   @override
@@ -40,12 +51,23 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColors.luxuryBg,
       body: Stack(
         children: [
-          const Positioned(top: -100, right: -80, child: _BotanicalOrb(size: 290)),
-          const Positioned(bottom: -130, left: -90, child: _BotanicalOrb(size: 330, coral: true)),
+          const Positioned(
+            top: -100,
+            right: -80,
+            child: _BotanicalOrb(size: 290),
+          ),
+          const Positioned(
+            bottom: -130,
+            left: -90,
+            child: _BotanicalOrb(size: 330, coral: true),
+          ),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 28,
+                ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 520),
                   child: FadeTransition(
@@ -61,13 +83,15 @@ class _SplashScreenState extends State<SplashScreen>
                             border: Border.all(color: AppColors.luxuryBorder),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.luxuryBrown.withValues(alpha: 0.12),
+                                color: AppColors.luxuryBrown.withValues(
+                                  alpha: 0.12,
+                                ),
                                 blurRadius: 32,
                                 offset: const Offset(0, 16),
                               ),
                             ],
                           ),
-                          child: const Center(child: AppLogo(size: 126)),
+                          child: const Center(child: AppLogoHero(size: 126)),
                         ),
                         const SizedBox(height: 32),
                         Text(
@@ -138,8 +162,9 @@ class _BotanicalOrb extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              (coral ? AppColors.luxuryGold : AppColors.luxuryBrown)
-                  .withValues(alpha: 0.13),
+              (coral ? AppColors.luxuryGold : AppColors.luxuryBrown).withValues(
+                alpha: 0.13,
+              ),
               Colors.transparent,
             ],
           ),
