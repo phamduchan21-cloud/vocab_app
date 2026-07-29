@@ -1095,50 +1095,98 @@ class _FirstDayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFEEE9),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.peach.withValues(alpha: 0.28)),
-      ),
-      child: Row(
-        children: [
-          const CatWidget(size: 72, expression: CatExpression.happy),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Ngày đầu tiên bắt đầu từ 5 thẻ',
-                  style: GoogleFonts.playfairDisplay(
-                    color: AppColors.luxuryEspresso,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 20,
-                  ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 520;
+        final content = Row(
+          children: [
+            Container(
+              width: 78,
+              height: 78,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.blue.withValues(alpha: 0.10),
+                border: Border.all(
+                  color: AppColors.blue.withValues(alpha: 0.30),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Hoàn thành một phiên ngắn để tạo dấu mốc đầu tiên.',
-                  style: GoogleFonts.nunito(
-                    color: AppColors.luxuryText,
-                    fontSize: 13,
+              ),
+              child: const CatWidget(size: 66, expression: CatExpression.happy),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Khởi động quỹ đạo với 5 thẻ',
+                    style: GoogleFonts.spaceGrotesk(
+                      color: AppColors.onSurface,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      letterSpacing: -0.4,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 5),
+                  Text(
+                    'Một phiên học ngắn để Sol bắt đầu xây lộ trình dành riêng cho bạn.',
+                    style: GoogleFonts.manrope(
+                      color: AppColors.onSurfaceVariant,
+                      height: 1.45,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+        final button = FilledButton.icon(
+          onPressed: onStart,
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.blue,
+            foregroundColor: AppColors.cosmicDeep,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
           ),
-          FilledButton(
-            onPressed: onStart,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.peach,
-              foregroundColor: Colors.white,
+          icon: const Icon(Icons.rocket_launch_rounded, size: 18),
+          label: const Text('Bắt đầu'),
+        );
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF17294B), Color(0xFF101A31)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: const Text('Bắt đầu'),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: AppColors.blue.withValues(alpha: 0.24)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.blue.withValues(alpha: 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ],
-      ),
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [content, const SizedBox(height: 16), button],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: content),
+                    const SizedBox(width: 20),
+                    button,
+                  ],
+                ),
+        );
+      },
     );
   }
 }
