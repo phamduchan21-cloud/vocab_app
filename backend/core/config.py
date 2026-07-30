@@ -13,6 +13,9 @@ class Settings(BaseSettings):
 
     # Frontend URL for CORS
     FRONTEND_URL: str = "http://localhost:5173"
+    CORS_ORIGIN_REGEX: Optional[str] = (
+        r"^https://vocab-app-black-xi\.vercel\.app$"
+    )
 
     # Runtime logging
     LOG_LEVEL: str = "INFO"

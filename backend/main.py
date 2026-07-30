@@ -62,6 +62,7 @@ if settings.FRONTEND_URL and "localhost" not in settings.FRONTEND_URL:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=settings.CORS_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

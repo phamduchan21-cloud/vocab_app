@@ -63,3 +63,22 @@ def test_cors_exposes_request_id_for_frontend_diagnostics():
     assert "x-request-id" in exposed
     assert "x-ai-error-code" in exposed
     assert "retry-after" in exposed
+
+
+def test_cors_accepts_legacy_production_alias():
+    with TestClient(app) as client:
+        response = client.options(
+            "/api/dashboard",
+            headers={
+                "Origin": "https://vocab-app-black-xi.vercel.app",
+                "Access-Control-Request-Method": "GET",
+                "Access-Control-Request-Headers": (
+                    "authorization,content-type,x-request-id"
+                ),
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == (
+        "https://vocab-app-black-xi.vercel.app"
+    )
