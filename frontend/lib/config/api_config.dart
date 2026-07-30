@@ -1,6 +1,6 @@
 class ApiConfig {
   /// FastAPI backend URL
-  /// Khi build: flutter build web --dart-define=API_BASE_URL=https://vocab-api.onrender.com
+  /// Khi build: flutter build web --dart-define=API_BASE_URL=https://vocab-api-5d6f.onrender.com
   /// Mặc định: localhost cho dev
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',

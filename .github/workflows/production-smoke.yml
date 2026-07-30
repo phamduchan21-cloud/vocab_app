@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
-      PRODUCTION_API_URL: ${{ vars.PRODUCTION_API_URL || 'https://vocab-api.onrender.com' }}
+      PRODUCTION_API_URL: ${{ vars.PRODUCTION_API_URL || 'https://vocab-api-5d6f.onrender.com' }}
       PRODUCTION_WEB_URL: ${{ vars.PRODUCTION_WEB_URL || 'https://app-hoc-tu-vung.vercel.app' }}
 
     steps:
