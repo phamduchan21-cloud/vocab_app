@@ -325,11 +325,18 @@ class _MockTestScreenState extends State<MockTestScreen> {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: AppColors.ink,
+        gradient: const LinearGradient(
+          colors: [AppColors.cosmicPanel, Color(0xFF17345A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.cosmicGlow.withValues(alpha: 0.28),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.14),
+            color: AppColors.cosmicGlow.withValues(alpha: 0.10),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -653,12 +660,13 @@ class _MockTestScreenState extends State<MockTestScreen> {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
           decoration: BoxDecoration(
-            color: selected ? AppColors.ink : AppColors.surface,
+            color: selected ? AppColors.blueBg : AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: selected
-                  ? AppColors.ink
+                  ? AppColors.cosmicGlow
                   : AppColors.ink.withValues(alpha: 0.12),
+              width: selected ? 1.7 : 1,
             ),
           ),
           child: Column(
@@ -667,14 +675,14 @@ class _MockTestScreenState extends State<MockTestScreen> {
                 label,
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.w800,
-                  color: selected ? Colors.white : AppColors.ink,
+                  color: selected ? AppColors.blueLight : AppColors.ink,
                 ),
               ),
               Text(
                 band,
                 style: GoogleFonts.ibmPlexMono(
                   fontSize: 10,
-                  color: selected ? Colors.white70 : AppColors.inkSoft,
+                  color: selected ? AppColors.onSurface : AppColors.inkSoft,
                 ),
               ),
             ],
