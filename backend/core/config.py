@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     # AI API Keys (optional — service falls back gracefully if not set)
+    XAI_API_KEY: Optional[str] = None
+    XAI_MODEL: str = "grok-4.3"
     GEMINI_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
 

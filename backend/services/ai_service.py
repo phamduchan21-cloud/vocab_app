@@ -216,14 +216,19 @@ class OpenAIProvider(AIProvider):
     def __init__(self):
         self.api_key = settings.OPENAI_API_KEY
         self.model = "gpt-4o-mini"  # Cheaper model
+        self.base_url: Optional[str] = None
+        self.provider_name = "OpenAI"
 
     async def _call(self, prompt: str, response_format: str = "json") -> str:
         if not self.api_key:
-            raise ValueError("OPENAI_API_KEY not configured")
+            raise ValueError(f"{self.provider_name} API key not configured")
 
         from openai import AsyncOpenAI
 
-        client = AsyncOpenAI(api_key=self.api_key)
+        client_kwargs = {"api_key": self.api_key}
+        if self.base_url:
+            client_kwargs["base_url"] = self.base_url
+        client = AsyncOpenAI(**client_kwargs)
         response = await client.chat.completions.create(
             model=self.model,
             messages=[{"role": "system", "content": "You are a helpful English tutor. Respond in Vietnamese."},
@@ -260,17 +265,32 @@ class OpenAIProvider(AIProvider):
 # ─── Main AI Service ────────────────────────────────────────────────
 
 
+class XAIProvider(OpenAIProvider):
+    """xAI Grok API through its OpenAI-compatible endpoint."""
+
+    def __init__(self):
+        self.api_key = settings.XAI_API_KEY
+        self.model = settings.XAI_MODEL
+        self.base_url = "https://api.x.ai/v1"
+        self.provider_name = "xAI"
+
+
 class AIService:
     """AI Service with auto-fallback strategy."""
 
     def __init__(self):
         self.providers: list[AIProvider] = []
+        if settings.XAI_API_KEY:
+            self.providers.append(XAIProvider())
         if settings.GEMINI_API_KEY:
             self.providers.append(GeminiProvider())
         if settings.OPENAI_API_KEY:
             self.providers.append(OpenAIProvider())
         if not self.providers:
-            logger.warning("No AI providers configured. Set GEMINI_API_KEY or OPENAI_API_KEY in .env")
+            logger.warning(
+                "No AI providers configured. Set XAI_API_KEY, GEMINI_API_KEY, "
+                "or OPENAI_API_KEY in .env"
+            )
 
     async def _call(self, fn_name: str, *args, **kwargs):
         """Try each provider in order until one succeeds."""
