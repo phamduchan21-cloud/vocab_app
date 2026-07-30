@@ -45,6 +45,32 @@ void main() {
     route.dispose();
   });
 
+  testWidgets('assistant hint stays compact on desktop', (tester) async {
+    tester.view.physicalSize = const Size(1100, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final route = ValueNotifier(RouteInformation(uri: Uri.parse('/quiz')));
+    addTearDown(route.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SolAssistantOverlay(
+          routeInformation: route,
+          onOpenChat: () async {},
+          child: const Scaffold(body: Text('Quiz')),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final hint = find.byKey(const ValueKey('sol-assistant-hint'));
+    expect(hint, findsOneWidget);
+    expect(tester.getSize(hint).width, lessThanOrEqualTo(330));
+    expect(tester.getSize(hint).height, 122);
+  });
+
   testWidgets('assistant stays hidden on auth and chat routes', (tester) async {
     final route = ValueNotifier(RouteInformation(uri: Uri.parse('/login')));
 

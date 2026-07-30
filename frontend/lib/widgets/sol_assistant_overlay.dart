@@ -25,6 +25,7 @@ class SolAssistantOverlay extends StatefulWidget {
 class _SolAssistantOverlayState extends State<SolAssistantOverlay>
     with SingleTickerProviderStateMixin {
   static const _mascotSize = 78.0;
+  static const _hintHeight = 122.0;
   static const _pageMargin = 14.0;
   static const _hiddenRoutes = {
     '/splash',
@@ -143,7 +144,7 @@ class _SolAssistantOverlayState extends State<SolAssistantOverlay>
         final showBelow = position.dy < padding.top + 135;
         final bubbleTop = showBelow
             ? position.dy + _mascotSize + 10
-            : position.dy - 116;
+            : position.dy - _hintHeight - 10;
 
         return Stack(
           fit: StackFit.expand,
@@ -153,9 +154,11 @@ class _SolAssistantOverlayState extends State<SolAssistantOverlay>
             if (!_chatOpen && _isVisible(path)) ...[
               if (_showHint)
                 Positioned(
+                  key: const ValueKey('sol-assistant-hint'),
                   left: bubbleLeft,
                   top: bubbleTop,
                   width: bubbleWidth,
+                  height: _hintHeight,
                   child: _AssistantHint(
                     pointsDown: !showBelow,
                     onClose: () => setState(() => _showHint = false),
