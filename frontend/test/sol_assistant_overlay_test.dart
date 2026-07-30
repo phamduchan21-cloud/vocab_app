@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vocab_app/widgets/cat_widget.dart';
 import 'package:vocab_app/widgets/sol_assistant_overlay.dart';
@@ -19,7 +20,7 @@ void main() {
       MaterialApp(
         home: SolAssistantOverlay(
           routeInformation: route,
-          onOpenChat: () => openCount++,
+          onOpenChat: () async => openCount++,
           child: const Scaffold(body: Text('Flashcard')),
         ),
       ),
@@ -51,7 +52,7 @@ void main() {
       MaterialApp(
         home: SolAssistantOverlay(
           routeInformation: route,
-          onOpenChat: () {},
+          onOpenChat: () async {},
           child: const Scaffold(body: Text('Nội dung')),
         ),
       ),
@@ -68,5 +69,61 @@ void main() {
     expect(find.byType(CatWidget), findsOneWidget);
 
     route.dispose();
+  });
+
+  testWidgets('assistant returns after closing a pushed chat route', (
+    tester,
+  ) async {
+    late final GoRouter router;
+    router = GoRouter(
+      initialLocation: '/profile',
+      routes: [
+        GoRoute(
+          path: '/profile',
+          builder: (_, _) => const Scaffold(body: Text('Profile')),
+        ),
+        GoRoute(
+          path: '/ai-chat',
+          builder: (context, _) => Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                tooltip: 'Close chat',
+                onPressed: context.pop,
+                icon: const Icon(Icons.arrow_back),
+              ),
+            ),
+            body: const Text('AI Chat'),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        builder: (context, child) => SolAssistantOverlay(
+          routeInformation: router.routeInformationProvider,
+          onOpenChat: () => router.push('/ai-chat?from=/profile'),
+          child: child ?? const SizedBox.shrink(),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('Profile'), findsOneWidget);
+    expect(find.byType(CatWidget), findsOneWidget);
+
+    await tester.tap(find.byType(CatWidget));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('AI Chat'), findsOneWidget);
+    expect(find.byType(CatWidget), findsNothing);
+
+    await tester.tap(find.byTooltip('Close chat'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Profile'), findsOneWidget);
+    expect(find.byType(CatWidget), findsOneWidget);
   });
 }

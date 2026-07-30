@@ -16,7 +16,7 @@ class SolAssistantOverlay extends StatefulWidget {
 
   final Widget child;
   final ValueListenable<RouteInformation> routeInformation;
-  final VoidCallback onOpenChat;
+  final Future<void> Function() onOpenChat;
 
   @override
   State<SolAssistantOverlay> createState() => _SolAssistantOverlayState();
@@ -40,6 +40,7 @@ class _SolAssistantOverlayState extends State<SolAssistantOverlay>
   bool _showHint = true;
   bool _hovering = false;
   bool _dragging = false;
+  bool _chatOpen = false;
 
   @override
   void initState() {
@@ -110,9 +111,14 @@ class _SolAssistantOverlayState extends State<SolAssistantOverlay>
     });
   }
 
-  void _openChat() {
-    if (_dragging) return;
-    widget.onOpenChat();
+  Future<void> _openChat() async {
+    if (_dragging || _chatOpen) return;
+    setState(() => _chatOpen = true);
+    try {
+      await widget.onOpenChat();
+    } finally {
+      if (mounted) setState(() => _chatOpen = false);
+    }
   }
 
   @override
@@ -144,7 +150,7 @@ class _SolAssistantOverlayState extends State<SolAssistantOverlay>
           clipBehavior: Clip.none,
           children: [
             widget.child,
-            if (_isVisible(path)) ...[
+            if (!_chatOpen && _isVisible(path)) ...[
               if (_showHint)
                 Positioned(
                   left: bubbleLeft,
@@ -153,7 +159,7 @@ class _SolAssistantOverlayState extends State<SolAssistantOverlay>
                   child: _AssistantHint(
                     pointsDown: !showBelow,
                     onClose: () => setState(() => _showHint = false),
-                    onOpen: widget.onOpenChat,
+                    onOpen: _openChat,
                   ),
                 ),
               Positioned(
@@ -320,7 +326,6 @@ class _AssistantHint extends StatelessWidget {
             right: 7,
             top: 7,
             child: IconButton(
-              tooltip: 'Ẩn lời chào',
               onPressed: onClose,
               visualDensity: VisualDensity.compact,
               iconSize: 17,

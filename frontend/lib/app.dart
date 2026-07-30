@@ -239,9 +239,9 @@ class _SolVocabAppState extends State<SolVocabApp> {
       builder: (context, child) => CosmicBackground(
         child: SolAssistantOverlay(
           routeInformation: _router.routeInformationProvider,
-          onOpenChat: () {
+          onOpenChat: () async {
             final from = _router.routeInformationProvider.value.uri.path;
-            _router.push(
+            await _router.push(
               Uri(path: '/ai-chat', queryParameters: {'from': from}).toString(),
             );
           },

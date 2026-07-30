@@ -114,6 +114,20 @@ class _AIChatScreenState extends State<AIChatScreen> {
     return 'từ vựng tiếng Anh';
   }
 
+  void _closeChat() {
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+    final sourceRoute =
+        GoRouterState.of(context).uri.queryParameters['from'] ?? '/';
+    final destination =
+        sourceRoute.startsWith('/') && !sourceRoute.startsWith('/ai-chat')
+        ? sourceRoute
+        : '/';
+    context.go(destination);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,7 +181,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.ink),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/'),
+          onPressed: _closeChat,
         ),
       ),
       body: Center(
