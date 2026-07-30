@@ -670,3 +670,16 @@ Tổng thời gian ước tính: **19 tuần** với một nhóm nhỏ. Các m�
 - [ ] Có kiểm tra accessibility và responsive.
 - [ ] Tài liệu API, cấu hình môi trường và hướng dẫn vận hành được cập nhật.
 - [ ] Tính năng được kiểm thử trên staging trước khi bật production.
+
+### 13.12 Tiến độ hardening AI và monitoring - 30/07/2026
+
+- [x] Sửa fallback Gemini và validate toàn bộ JSON do model trả về.
+- [x] Thêm timeout, circuit breaker và fallback xAI -> Gemini -> OpenAI.
+- [x] Thêm telemetry AI theo provider, operation, latency và mã lỗi.
+- [x] Thêm `/health/ai` và `/api/ai/status` không làm lộ secret/prompt.
+- [x] Truyền `X-Request-ID` từ Flutter xuyên suốt tới FastAPI.
+- [x] Hiển thị lỗi AI thân thiện và cho phép gửi lại đúng câu hỏi thất bại.
+- [x] Thêm test quota, timeout/circuit, fallback, JSON sai và observability.
+- [x] Nâng ngưỡng coverage backend tối thiểu trong CI lên 50%.
+- [x] Thêm production smoke monitoring mỗi 30 phút cho web, API, database và AI.
+- [ ] Kết nối nền tảng error tracking/APM tập trung sau khi chọn gói dịch vụ.

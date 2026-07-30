@@ -2,7 +2,7 @@ from typing import Optional
 import time
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -11,6 +11,7 @@ from database import get_db
 from core.security import get_current_user
 from models import User, Vocabulary
 from seed_data import SEED_VOCABULARIES
+from services.ai_service import AIService, AIUnavailableError, get_ai_service
 from services.vocabulary_service import VOCAB_LESSONS
 
 logger = logging.getLogger(__name__)
@@ -72,14 +73,30 @@ class GenerateQuizResponse(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
-    suggestions: list[str] = []
+    suggestions: list[str] = Field(default_factory=list)
 
 
 class ExplainWordResponse(BaseModel):
     explanation: str
-    examples: list[str] = []
-    synonyms: list[str] = []
+    examples: list[str] = Field(default_factory=list)
+    synonyms: list[str] = Field(default_factory=list)
     tips: str = ""
+
+
+class AIProviderStatus(BaseModel):
+    name: str
+    state: str
+    calls: int
+    successes: int
+    failures: int
+    average_latency_ms: float
+    last_error_code: Optional[str] = None
+
+
+class AIStatusResponse(BaseModel):
+    status: str
+    provider_count: int
+    providers: list[AIProviderStatus]
 
 
 # ─── Helpers ────────────────────────────────────────────────────────
@@ -91,6 +108,27 @@ def _check_ratelimit(user_id: str, endpoint: str, max_reqs: int, window_secs: in
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.",
         )
+
+
+def _raise_ai_unavailable(operation: str, error: AIUnavailableError) -> None:
+    logger.error(
+        "ai_request_unavailable",
+        extra={
+            "event": "ai_request",
+            "operation": operation,
+            "outcome": "failure",
+            "error_code": error.code,
+        },
+    )
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail={
+            "code": error.code,
+            "message": "Sol đang tạm gián đoạn kết nối AI. Vui lòng thử lại sau ít phút.",
+            "retryable": error.retryable,
+        },
+        headers={"Retry-After": "30", "X-AI-Error-Code": error.code},
+    )
 
 
 def _resolve_topic(topic: Optional[str]) -> Optional[str]:
@@ -175,10 +213,10 @@ async def _collect_vocabs(
 
 @router.post("/generate-quiz", response_model=GenerateQuizResponse)
 async def ai_generate_quiz(
-    request: Request,
     data: GenerateQuizRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    ai: AIService = Depends(get_ai_service),
 ):
     """Sinh câu hỏi quiz bằng AI dựa trên từ vựng của user + seed data."""
     _check_ratelimit(current_user.id, "generate-quiz", max_reqs=10, window_secs=3600)
@@ -186,8 +224,6 @@ async def ai_generate_quiz(
     topic_key = _resolve_topic(data.topic)
     combined = await _collect_vocabs(current_user.id, db, topic_key)
 
-    from services.ai_service import AIService
-    ai = AIService()
     try:
         questions = await ai.generate_quiz(
             vocabs=combined,
@@ -195,12 +231,8 @@ async def ai_generate_quiz(
             topic=topic_key or "general",
             level=data.level,
         )
-    except Exception as e:
-        logger.error(f"AI generate-quiz failed for user {current_user.id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="AI hiện không khả dụng. Vui lòng thử lại sau.",
-        )
+    except AIUnavailableError as error:
+        _raise_ai_unavailable("generate_quiz", error)
 
     return GenerateQuizResponse(
         questions=[AIQuestion(**q) for q in questions],
@@ -212,23 +244,18 @@ async def ai_generate_quiz(
 async def ai_chat(
     data: ChatRequest,
     current_user: User = Depends(get_current_user),
+    ai: AIService = Depends(get_ai_service),
 ):
     """Chat với AI Tutor Meu về từ vựng / ngữ pháp."""
     _check_ratelimit(current_user.id, "chat", max_reqs=30, window_secs=3600)
 
-    from services.ai_service import AIService
-    ai = AIService()
     try:
         result = await ai.chat(
             message=data.message,
             context=data.context or {},
         )
-    except Exception as e:
-        logger.error(f"AI chat failed for user {current_user.id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="AI hiện không khả dụng. Vui lòng thử lại sau.",
-        )
+    except AIUnavailableError as error:
+        _raise_ai_unavailable("chat", error)
 
     return ChatResponse(
         reply=result.get("reply", "Xin lỗi, tôi chưa có câu trả lời ngay."),
@@ -244,24 +271,19 @@ async def ai_chat(
 async def ai_explain_word(
     data: ExplainWordRequest,
     current_user: User = Depends(get_current_user),
+    ai: AIService = Depends(get_ai_service),
 ):
     """Giải thích chi tiết một từ vựng bằng AI."""
     _check_ratelimit(current_user.id, "explain-word", max_reqs=30, window_secs=3600)
 
-    from services.ai_service import AIService
-    ai = AIService()
     try:
         result = await ai.explain_word(
             word=data.word,
             meaning=data.meaning or "",
             context=data.context or "",
         )
-    except Exception as e:
-        logger.error(f"AI explain-word failed for user {current_user.id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="AI hiện không khả dụng. Vui lòng thử lại sau.",
-        )
+    except AIUnavailableError as error:
+        _raise_ai_unavailable("explain_word", error)
 
     return ExplainWordResponse(
         explanation=result.get("explanation", ""),
@@ -269,3 +291,12 @@ async def ai_explain_word(
         synonyms=result.get("synonyms", []),
         tips=result.get("tips", ""),
     )
+
+
+@router.get("/status", response_model=AIStatusResponse)
+async def ai_status(
+    _: User = Depends(get_current_user),
+    ai: AIService = Depends(get_ai_service),
+):
+    """Return provider health without exposing credentials or prompts."""
+    return AIStatusResponse(**ai.health_snapshot())

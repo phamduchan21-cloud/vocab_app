@@ -1,5 +1,24 @@
 import 'api_service.dart';
 
+String friendlyAIErrorMessage(Object error) {
+  if (error is! ApiException) {
+    return 'Sol gặp lỗi ngoài dự kiến. Vui lòng thử lại sau ít phút.';
+  }
+  final message = switch (error.code) {
+    'network_unavailable' =>
+      'Không thể kết nối máy chủ. Hãy kiểm tra mạng rồi thử lại.',
+    'request_timeout' || 'provider_timeout' =>
+      'Sol phản hồi chậm hơn bình thường. Bạn có thể thử gửi lại câu hỏi.',
+    'rate_limited' =>
+      'Bạn đang gửi hơi nhanh. Hãy chờ một lát rồi thử lại nhé.',
+    'ai_unavailable' || 'quota_exhausted' =>
+      'Sol đang tạm gián đoạn kết nối AI. Vui lòng thử lại sau ít phút.',
+    _ => error.message,
+  };
+  final requestId = error.requestId;
+  return requestId == null ? message : '$message\nMã hỗ trợ: $requestId';
+}
+
 /// Frontend service for AI features.
 /// Calls backend /api/ai/ endpoints.
 class AIService {

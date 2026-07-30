@@ -20,6 +20,7 @@ from routers import (
     learning_path,
 )
 from services.auth_service import AuthServiceError
+from services.ai_service import get_ai_service
 
 
 configure_logging(settings.LOG_LEVEL)
@@ -64,6 +65,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Request-ID", "X-AI-Error-Code", "Retry-After"],
 )
 app.add_middleware(RequestContextMiddleware)
 
@@ -110,3 +112,22 @@ async def health_check(response: Response):
 async def liveness_check():
     """Liveness check that does not depend on external services."""
     return {"status": "ok"}
+
+
+@app.get("/health/ai", response_model=schemas.AIHealthResponse)
+async def ai_health_check(response: Response):
+    """Report local provider/circuit state without making a paid AI request."""
+    snapshot = get_ai_service().health_snapshot()
+    configured = snapshot["provider_count"]
+    ready = sum(
+        provider["state"] == "ready" for provider in snapshot["providers"]
+    )
+    health_status = "ready" if ready else "unconfigured"
+    if configured and not ready:
+        health_status = "degraded"
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    return {
+        "status": health_status,
+        "providers_configured": configured,
+        "providers_ready": ready,
+    }

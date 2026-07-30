@@ -76,15 +76,14 @@ class _AIChatScreenState extends State<AIChatScreen> {
         );
         _isLoading = false;
       });
-    } catch (e) {
+    } catch (error) {
       if (!mounted) return;
       setState(() {
         _messages.add(
           _ChatMessage(
-            text:
-                'Sol chưa kết nối được với dịch vụ AI. Hãy kiểm tra kết nối và thử gửi lại sau ít phút.',
+            text: friendlyAIErrorMessage(error),
             isUser: false,
-            suggestions: const ['Thử lại câu hỏi vừa rồi'],
+            retryText: text.trim(),
           ),
         );
         _isLoading = false;
@@ -202,6 +201,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                           return _MessageBubble(
                             message: msg,
                             onSuggestionTap: (s) => _sendMessage(s),
+                            onRetry: () => _sendMessage(msg.retryText ?? ''),
                           );
                         },
                       ),
@@ -357,12 +357,14 @@ class _ChatMessage {
   final String text;
   final bool isUser;
   final List<String> suggestions;
+  final String? retryText;
   final DateTime createdAt;
 
   _ChatMessage({
     required this.text,
     required this.isUser,
     this.suggestions = const [],
+    this.retryText,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 }
@@ -370,7 +372,12 @@ class _ChatMessage {
 class _MessageBubble extends StatelessWidget {
   final _ChatMessage message;
   final ValueChanged<String> onSuggestionTap;
-  const _MessageBubble({required this.message, required this.onSuggestionTap});
+  final VoidCallback onRetry;
+  const _MessageBubble({
+    required this.message,
+    required this.onSuggestionTap,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -499,6 +506,17 @@ class _MessageBubble extends StatelessWidget {
                       ),
                     )
                     .toList(),
+              ),
+            ),
+          ],
+          if (!message.isUser && message.retryText != null) ...[
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 36),
+              child: FilledButton.tonalIcon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded, size: 17),
+                label: const Text('Thử lại câu hỏi vừa rồi'),
               ),
             ),
           ],

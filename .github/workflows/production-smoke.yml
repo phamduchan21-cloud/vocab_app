@@ -1,0 +1,71 @@
+name: Production smoke monitoring
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17,47 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Check production health
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PRODUCTION_API_URL: ${{ vars.PRODUCTION_API_URL || 'https://vocab-api.onrender.com' }}
+      PRODUCTION_WEB_URL: ${{ vars.PRODUCTION_WEB_URL || 'https://app-hoc-tu-vung.vercel.app' }}
+
+    steps:
+      - name: Check frontend
+        run: >-
+          curl --fail --show-error --silent
+          --retry 2 --retry-all-errors
+          --connect-timeout 20 --max-time 90
+          "${PRODUCTION_WEB_URL}/"
+          --output /dev/null
+
+      - name: Check backend liveness and database
+        run: |
+          curl --fail --show-error --silent \
+            --retry 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 90 \
+            "${PRODUCTION_API_URL}/health/live"
+          curl --fail --show-error --silent \
+            --retry 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 90 \
+            "${PRODUCTION_API_URL}/health"
+
+      - name: Check AI provider configuration
+        run: |
+          curl --fail --show-error --silent \
+            --retry 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 90 \
+            "${PRODUCTION_API_URL}/health/ai" > ai-health.json
+          python - <<'PY'
+          import json
+
+          with open("ai-health.json", encoding="utf-8") as source:
+              payload = json.load(source)
+          assert payload["providers_configured"] > 0, "No AI provider configured"
+          assert payload["providers_ready"] > 0, "All AI provider circuits are open"
+          print(
+              "AI health:",
+              payload["status"],
+              f'({payload["providers_ready"]}/{payload["providers_configured"]} ready)',
+          )
+          PY
+
+      - name: Upload smoke diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-smoke-${{ github.run_id }}
+          path: ai-health.json
+          if-no-files-found: ignore
+          retention-days: 7

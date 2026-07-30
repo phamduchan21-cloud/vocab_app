@@ -22,6 +22,12 @@ class LivenessResponse(BaseModel):
     status: str
 
 
+class AIHealthResponse(BaseModel):
+    status: str
+    providers_configured: int
+    providers_ready: int
+
+
 # ─── English Level ───────────────────────────────────────────────────
 
 class EnglishLevel(str, Enum):

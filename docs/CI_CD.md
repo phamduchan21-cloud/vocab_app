@@ -69,8 +69,13 @@ Workflow pin Vercel CLI ở phiên bản `56.5.0`, build Flutter trước, tạo
 |----------|---------|---------|
 | `/health/live` | Kiểm tra tiến trình FastAPI còn hoạt động | `200` nếu ứng dụng đang chạy |
 | `/health` | Kiểm tra FastAPI và kết nối database | `200` khi sẵn sàng, `503` khi database lỗi |
+| `/health/ai` | Kiểm tra cấu hình và circuit AI | `200` khi có provider sẵn sàng, `503` khi tất cả circuit đang mở |
 
 Mỗi response có header `X-Request-ID`. Có thể dùng ID này để đối chiếu với log JSON của backend khi điều tra lỗi.
+
+Workflow `Production smoke monitoring` chạy mỗi 30 phút. Có thể đặt repository
+variables `PRODUCTION_WEB_URL` và `PRODUCTION_API_URL`; nếu bỏ trống workflow dùng
+domain production hiện tại. Runbook chi tiết nằm tại `docs/AI_OPERATIONS.md`.
 
 ## Rollback
 

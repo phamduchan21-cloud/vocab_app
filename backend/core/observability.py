@@ -28,7 +28,20 @@ class JsonFormatter(logging.Formatter):
                 request_id_context.get(),
             ),
         }
-        for field in ("method", "path", "status_code", "duration_ms"):
+        for field in (
+            "method",
+            "path",
+            "status_code",
+            "duration_ms",
+            "event",
+            "operation",
+            "provider",
+            "outcome",
+            "error_code",
+            "attempt",
+            "fallback",
+            "circuit_state",
+        ):
             value = getattr(record, field, None)
             if value is not None:
                 payload[field] = value

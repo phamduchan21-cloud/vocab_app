@@ -8,7 +8,17 @@ import '../config/api_config.dart';
 class ApiException implements Exception {
   final int statusCode;
   final String message;
-  ApiException(this.statusCode, this.message);
+  final String? code;
+  final String? requestId;
+  final Duration? retryAfter;
+
+  ApiException(
+    this.statusCode,
+    this.message, {
+    this.code,
+    this.requestId,
+    this.retryAfter,
+  });
 
   @override
   String toString() => message;
@@ -25,6 +35,7 @@ class ApiAuthException implements Exception {
 class ApiService {
   http.Client? _client;
   static const Duration _timeout = Duration(seconds: 30);
+  static int _requestSequence = 0;
 
   http.Client get _http => _client ??= http.Client();
 
@@ -34,7 +45,12 @@ class ApiService {
   }
 
   Map<String, String> _headers() {
-    final headers = <String, String>{'Content-Type': 'application/json'};
+    final requestId =
+        '${DateTime.now().microsecondsSinceEpoch}-${_requestSequence++}';
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+      'X-Request-ID': requestId,
+    };
     final token = _getToken();
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';
@@ -98,9 +114,20 @@ class ApiService {
       throw ApiException(
         0,
         'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.',
+        code: 'network_unavailable',
+      );
+    } on http.ClientException {
+      throw ApiException(
+        0,
+        'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.',
+        code: 'network_unavailable',
       );
     } on TimeoutException {
-      throw ApiException(0, 'Yêu cầu đã hết thời gian chờ. Vui lòng thử lại.');
+      throw ApiException(
+        0,
+        'Yêu cầu đã hết thời gian chờ. Vui lòng thử lại.',
+        code: 'request_timeout',
+      );
     }
   }
 
@@ -148,16 +175,45 @@ class ApiService {
     }
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.body.isEmpty) return null;
-      return jsonDecode(response.body);
+      try {
+        return jsonDecode(response.body);
+      } on FormatException {
+        throw ApiException(
+          502,
+          'Máy chủ trả về dữ liệu không hợp lệ. Vui lòng thử lại.',
+          code: 'invalid_response',
+          requestId: response.headers['x-request-id'],
+        );
+      }
     }
     String message = 'Đã xảy ra lỗi không xác định.';
+    String? code;
+    final requestId = response.headers['x-request-id'];
+    Duration? retryAfter;
+    final retryAfterValue = int.tryParse(response.headers['retry-after'] ?? '');
+    if (retryAfterValue != null) {
+      retryAfter = Duration(seconds: retryAfterValue);
+    }
     try {
-      final body = jsonDecode(response.body);
-      if (body is Map && body.containsKey('detail')) {
-        message = body['detail'].toString();
+      final responseBody = jsonDecode(response.body);
+      if (responseBody is Map && responseBody.containsKey('detail')) {
+        final detail = responseBody['detail'];
+        if (detail is Map) {
+          message = detail['message']?.toString() ?? message;
+          code = detail['code']?.toString();
+        } else {
+          message = detail.toString();
+        }
       }
     } catch (_) {}
-    throw ApiException(response.statusCode, message);
+    code ??= response.headers['x-ai-error-code'];
+    throw ApiException(
+      response.statusCode,
+      message,
+      code: code,
+      requestId: requestId,
+      retryAfter: retryAfter,
+    );
   }
 
   void dispose() {

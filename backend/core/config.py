@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     XAI_MODEL: str = "grok-4.3"
     GEMINI_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    AI_PROVIDER_TIMEOUT_SECONDS: float = 12.0
+    AI_REQUEST_TIMEOUT_SECONDS: float = 28.0
+    AI_CIRCUIT_FAILURE_THRESHOLD: int = 3
+    AI_CIRCUIT_RECOVERY_SECONDS: int = 60
 
     model_config = {
         "env_file": ".env",
